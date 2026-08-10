@@ -1,0 +1,1082 @@
+[
+  {
+    "id": "db_vanilla_001",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\1\\1.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_002",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\2\\2.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_003",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\3\\3.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_004",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\4\\4.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_005",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\5\\5.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_006",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\6\\6.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_007",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\7\\7.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_008",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\8\\8.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_009",
+    "complexity": "Medium",
+    "difficulty_raw": "medium",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\9\\9.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_010",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\10\\10.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_011",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\11\\11.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_012",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\12\\12.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_013",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\13\\13.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_014",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\14\\14.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_015",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\15\\15.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_016",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\16\\16.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_017",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\17\\17.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_018",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\18\\18.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_019",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\19\\19.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_020",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\20\\20.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_021",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\21\\21.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_022",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\22\\22.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_023",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\23\\23.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_024",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\24\\24.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_025",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\25\\25.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_026",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\26\\26.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_027",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\27\\27.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_028",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\28\\28.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_029",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\29\\29.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_030",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\30\\30.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_031",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\31\\31.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_032",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\32\\32.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_033",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\33\\33.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_034",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\34\\34.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_035",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\35\\35.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_036",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\36\\36.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_037",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\37\\37.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_038",
+    "complexity": "Medium",
+    "difficulty_raw": "medium",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\38\\38.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_039",
+    "complexity": "Easy",
+    "difficulty_raw": "short",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\39\\39.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_040",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\40\\40.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_041",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\41\\41.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_042",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\42\\42.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_043",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\43\\43.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_044",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\44\\44.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_045",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\45\\45.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_046",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\46\\46.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_047",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\47\\47.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_048",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\48\\48.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_049",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\49\\49.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_050",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\50\\50.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_051",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\51\\51.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_052",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\52\\52.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_053",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\53\\53.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_054",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\54\\54.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_055",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\55\\55.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_056",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\56\\56.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_057",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\57\\57.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_058",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\58\\58.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_059",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\59\\59.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_060",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\60\\60.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_061",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\61\\61.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_062",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\62\\62.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_063",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\63\\63.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_064",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\64\\64.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_065",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\65\\65.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_066",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\66\\66.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_067",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\67\\67.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_068",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\68\\68.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_069",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\69\\69.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_070",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\70\\70.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_071",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\71\\71.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_072",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\72\\72.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_073",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\73\\73.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_074",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\74\\74.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_075",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\75\\75.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_076",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\76\\76.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_077",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\77\\77.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_078",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\78\\78.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_079",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\79\\79.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_080",
+    "complexity": "Medium",
+    "difficulty_raw": "mid",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\80\\80.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_081",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\81\\81.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_082",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\82\\82.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_083",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\83\\83.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_084",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\84\\84.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_085",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\85\\85.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_086",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\86\\86.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_087",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\87\\87.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_088",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\88\\88.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_089",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\89\\89.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_090",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\90\\90.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_091",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\91\\91.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_092",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\92\\92.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_093",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\93\\93.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_094",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\94\\94.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_095",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\95\\95.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_096",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\96\\96.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_097",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\97\\97.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_098",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\98\\98.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_099",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\99\\99.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_100",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\100\\100.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_101",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\101\\101.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_102",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\102\\102.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_103",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\103\\103.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_104",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\104\\104.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_105",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\105\\105.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_106",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\106\\106.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_107",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\107\\107.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_108",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\108\\108.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_109",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\109\\109.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_110",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\110\\110.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_111",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\111\\111.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_112",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\112\\112.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_113",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\113\\113.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_114",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\114\\114.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_115",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\115\\115.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_116",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\116\\116.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_117",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\117\\117.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_118",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\118\\118.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_119",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\119\\119.png",
+    "framework": "vanilla"
+  },
+  {
+    "id": "db_vanilla_120",
+    "complexity": "Hard",
+    "difficulty_raw": "long",
+    "description": "Implement this webpage design using plain HTML and CSS.",
+    "specification": "You are an expert frontend developer. Reproduce the webpage shown in the reference screenshot using plain HTML and CSS. Requirements:\n- Output a single complete HTML file with all CSS embedded in a <style> tag\n- Match the exact layout, color scheme, typography, and spacing from the screenshot\n- Reproduce all visible UI elements: navigation, headers, content areas, footer\n- Use semantic HTML5 elements\n- Do not use JavaScript frameworks or external CSS libraries",
+    "image_path": "C:\\Users\\brennotc\\Documents\\Mestrado\\Projeto Programação\\eval_framework\\designbench_data\\generation\\vanilla\\120\\120.png",
+    "framework": "vanilla"
+  }
+]
