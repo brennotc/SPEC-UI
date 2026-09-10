@@ -63,6 +63,10 @@ def _strip_fences(code: str) -> str:
     return _FENCE_RE.sub("", code).strip()
 
 
+class DailyQuotaExceededError(RuntimeError):
+    """Raised when the Gemini daily request quota is exhausted."""
+
+
 # ---------------------------------------------------------------------------
 # Gemini rate limiter
 # ---------------------------------------------------------------------------
@@ -102,6 +106,12 @@ class GeminiRateLimiter:
             self.max_retries,
         )
         time.sleep(wait_s)
+
+    @staticmethod
+    def is_daily_quota_error(exc: Exception) -> bool:
+        """Return True when the daily free-tier quota is exhausted (do not retry)."""
+        msg = str(exc).lower()
+        return any(kw in msg for kw in ("per day", "daily", "quota_exceeded", "free tier"))
 
     @staticmethod
     def is_rate_limit_error(exc: Exception) -> bool:
@@ -294,13 +304,25 @@ class LLMRunner:
             try:
                 self._rate_limiter.wait()
                 client = genai.Client(api_key=api_key)
+
+                config = types.GenerateContentConfig(
+                    automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True)
+                )
+
                 response = client.models.generate_content(
                     model=current_model,
                     contents=contents,
+                    config=config,
                 )
                 return response.text
 
             except Exception as exc:  # noqa: BLE001 — broad catch by design
+                # daily quota is unrecoverable — bubble up immediately, no retry
+                if self._rate_limiter.is_daily_quota_error(exc):
+                    raise DailyQuotaExceededError(
+                        "Gemini daily quota exhausted. Run again tomorrow."
+                    ) from exc
+
                 if self._rate_limiter.is_rate_limit_error(exc):
                     if attempt < self.config.gemini_max_retries - 1:
                         self._rate_limiter.backoff_wait(attempt)

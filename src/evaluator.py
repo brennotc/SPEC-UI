@@ -36,12 +36,13 @@ class CodeEvaluator:
                 self.api_key = keys[0].strip()
 
         if not self.api_key:
-            raise ValueError("Nenhuma GEMINI_API_KEY configurada no arquivo .env para o Evaluator!")
+            raise ValueError("Nenhuma GEMINI_API_KEY configurada no ambiente para o Evaluator!")
 
         self.screenshots_dir = Path("results") / "screenshots"
         self.screenshots_dir.mkdir(parents=True, exist_ok=True)
 
         self.model_name = self._discover_and_validate_model()
+        self._seen_feedbacks: List[str] = []
 
     def _discover_and_validate_model(self) -> str:
         if not USING_GENAI_SDK:
@@ -73,6 +74,31 @@ class CodeEvaluator:
 
         return "gemini-pro-latest"
 
+    def _clean_spec_for_judge(self, full_spec_text: str) -> str:
+        text = full_spec_text
+        for header in ["# 6. CRITÉRIOS DE VERIFICAÇÃO E TESTES", "## 6. CRITÉRIOS DE VERIFICAÇÃO", "CRITÉRIOS DE VERIFICAÇÃO E TESTES"]:
+            if header in text:
+                text = text.split(header)[0]
+
+        text = re.sub(r'```typescript.*?```', '[Contrato TypeScript omitido]', text, flags=re.DOTALL)
+        return text.strip()
+
+    def _sanitize_and_fix_html(self, html_code: str) -> str:
+        """Repara HTML/JS truncado para evitar quebras no Playwright."""
+        code = html_code.strip()
+        
+        open_scripts = len(re.findall(r'<script', code, re.IGNORECASE))
+        close_scripts = len(re.findall(r'</script>', code, re.IGNORECASE))
+        if open_scripts > close_scripts:
+            code += "\n</script>"
+
+        if "</body>" not in code.lower():
+            code += "\n</body>"
+        if "</html>" not in code.lower():
+            code += "\n</html>"
+
+        return code
+
     def _run_e2e_and_screenshot(self, html_path: Path, output_png_path: Path) -> Dict[str, Any]:
         e2e_report = {
             "success": False,
@@ -85,6 +111,13 @@ class CodeEvaluator:
 
         if not PLAYWRIGHT_AVAILABLE:
             return e2e_report
+
+        try:
+            raw_content = html_path.read_text(encoding="utf-8")
+            fixed_content = self._sanitize_and_fix_html(raw_content)
+            html_path.write_text(fixed_content, encoding="utf-8")
+        except Exception:
+            pass
 
         js_errors: List[str] = []
 
@@ -99,7 +132,7 @@ class CodeEvaluator:
                 time.sleep(1.5)
 
                 buttons = page.query_selector_all("button, input[type='button'], input[type='submit']")
-                inputs = page.query_selector_all("input[type='text'], input[type='email'], textarea")
+                inputs = page.query_selector_all("input[type='text'], input[type='email'], textarea, input[type='number']")
                 links = page.query_selector_all("a[href]")
 
                 total_interactive = len(buttons) + len(inputs) + len(links)
@@ -109,7 +142,7 @@ class CodeEvaluator:
                 for inp in inputs[:3]:
                     try:
                         if inp.is_visible() and inp.is_enabled():
-                            inp.fill("Teste E2E")
+                            inp.fill("10")
                             interactions_passed += 1
                     except Exception:
                         pass
@@ -138,6 +171,161 @@ class CodeEvaluator:
             e2e_report["js_errors"].append(f"Falha Playwright: {str(e)}")
 
         return e2e_report
+
+    def _parse_judge_json(self, raw_text: str) -> Dict[str, Any]:
+        """Extrai e repara dados de JSON do Juiz com múltiplos fallbacks."""
+        cleaned = raw_text.strip()
+        
+        if cleaned.startswith("```"):
+            cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned, flags=re.IGNORECASE)
+            cleaned = re.sub(r"\s*```$", "", cleaned)
+        cleaned = cleaned.strip()
+
+        # 1. Parse direto
+        try:
+            return json.loads(cleaned)
+        except Exception:
+            pass
+
+        # 2. Tenta fechar aspas e chaves truncadas
+        try:
+            repaired = cleaned
+            if not repaired.endswith("}"):
+                if not repaired.endswith('"'):
+                    repaired += '"'
+                repaired += '}'
+            return json.loads(repaired)
+        except Exception:
+            pass
+
+        # 3. Extração via Regex
+        extracted = {}
+        for key in ["layout_score", "design_score", "requirements_score", "total_score"]:
+            match = re.search(rf'"{key}"\s*:\s*(\d+)', cleaned)
+            if match:
+                extracted[key] = int(match.group(1))
+
+        v_match = re.search(r'"verdict"\s*:\s*"([^"]+)"', cleaned, re.IGNORECASE)
+        if v_match:
+            extracted["verdict"] = v_match.group(1).strip()
+
+        f_match = re.search(r'"feedback"\s*:\s*"((?:[^"\\]|\\.)*)"', cleaned, re.DOTALL)
+        if f_match:
+            extracted["feedback"] = f_match.group(1).replace('\\"', '"').replace('\n', ' ').strip()
+        else:
+            extracted["feedback"] = cleaned[:300].replace('\n', ' ')
+
+        if "total_score" not in extracted:
+            extracted["total_score"] = (
+                extracted.get("layout_score", 0) + 
+                extracted.get("design_score", 0) + 
+                extracted.get("requirements_score", 0)
+            )
+
+        extracted["verdict"] = "PASS" if extracted.get("total_score", 0) >= 70 else "FAIL"
+        return extracted
+
+    def _run_visual_judge(
+        self, 
+        item: BenchmarkItem, 
+        prompt_type: str,
+        screenshot_path: Optional[Path], 
+        generated_code: str,
+        e2e_report: Dict[str, Any]
+    ) -> Tuple[int, str, str, Dict[str, Any]]:
+        """Executa a avaliação do Juiz garantindo respostas completas e concisas."""
+        
+        system_prompt = (
+            "Você é um auditor sênior de UI/UX.\n"
+            "Sua função é avaliar a interface gerada em relação à ESPECIFICAÇÃO DE REFERÊNCIA.\n\n"
+            "REGRAS CRÍTICAS DE CONCISÃO:\n"
+            "- Responda ESTRITAMENTE em JSON válido.\n"
+            "- O campo 'feedback' DEVE ser extremamente conciso: no máximo 2 a 3 frases (limite estrito de 250 caracteres).\n"
+            "- Seja direto ao ponto sobre o que faltou ou acertou. NUNCA faça textos longos para não ser cortado.\n\n"
+            "ESTRUTURA DO JSON:\n"
+            "{\n"
+            '  "layout_score": <0-40>,\n'
+            '  "design_score": <0-30>,\n'
+            '  "requirements_score": <0-30>,\n'
+            '  "total_score": <0-100>,\n'
+            '  "verdict": "PASS" ou "FAIL",\n'
+            '  "feedback": "Crítica objetiva e curta em até 250 caracteres."\n'
+            "}"
+        )
+
+        ground_truth_spec = self._clean_spec_for_judge(item.prompt_with_spec)
+        contents = [system_prompt]
+
+        if screenshot_path and screenshot_path.is_file():
+            try:
+                with open(screenshot_path, "rb") as f:
+                    shot_bytes = f.read()
+                contents.append("📸 [SCREENSHOT DA INTERFACE GERADA]:")
+                contents.append(types.Part.from_bytes(data=shot_bytes, mime_type="image/png"))
+            except Exception:
+                contents.append(f"Código HTML:\n```html\n{generated_code[:2000]}\n```")
+        else:
+            contents.append(f"Código HTML:\n```html\n{generated_code[:2000]}\n```")
+
+        contents.append(
+            f"TAREFA: {item.id} ({item.benchmark_name}) | MODO: {prompt_type}\n\n"
+            f"ESPECIFICAÇÃO DE REFERÊNCIA:\n\"\"\"\n{ground_truth_spec[:1500]}\n\"\"\"\n\n"
+            "Avalie a interface e gere o JSON completo, mantendo o feedback conciso."
+        )
+
+        judge_schema = {
+            "type": "OBJECT",
+            "properties": {
+                "layout_score": {"type": "INTEGER"},
+                "design_score": {"type": "INTEGER"},
+                "requirements_score": {"type": "INTEGER"},
+                "total_score": {"type": "INTEGER"},
+                "verdict": {"type": "STRING", "enum": ["PASS", "FAIL"]},
+                "feedback": {"type": "STRING"}
+            },
+            "required": ["layout_score", "design_score", "requirements_score", "total_score", "verdict", "feedback"]
+        }
+
+        client = genai.Client(api_key=self.api_key)
+        
+        config = types.GenerateContentConfig(
+            temperature=0.1,
+            max_output_tokens=2048,
+            response_mime_type="application/json",
+            response_schema=judge_schema
+        )
+
+        try:
+            response = client.models.generate_content(
+                model=self.model_name,
+                contents=contents,
+                config=config
+            )
+            raw_text = (response.text or "").strip()
+            data = self._parse_judge_json(raw_text)
+
+            score = int(data.get("total_score", 0))
+            verdict = "PASS" if score >= 70 else "FAIL"
+            feedback = str(data.get("feedback", "Avaliação concluída.")).strip()
+
+            if feedback and not feedback.endswith(('.', '!', '?')):
+                feedback += "..."
+
+            print(f"      Breakdown -> Layout: {data.get('layout_score', '?')}/40 | Design: {data.get('design_score', '?')}/30 | Req: {data.get('requirements_score', '?')}/30")
+            return score, verdict, feedback, data
+
+        except Exception as err:
+            print(f"⚠️ Aviso: Juiz Visual falhou para {item.id} ({prompt_type}): {err}. Aplicando nota fallback.")
+            fallback_score = int(e2e_report.get("functional_score", 0) * 0.5)
+            fallback_dict = {
+                "layout_score": 0,
+                "design_score": 0,
+                "requirements_score": 0,
+                "total_score": fallback_score,
+                "verdict": "FAIL",
+                "feedback": f"Falha no processamento da crítica do Juiz: {str(err)}"
+            }
+            return fallback_score, "FAIL", fallback_dict["feedback"], fallback_dict
 
     def evaluate(
         self,
@@ -180,136 +368,3 @@ class CodeEvaluator:
             visual_feedback=feedback_dict,
             feedback=full_feedback_str
         )
-
-    def _parse_judge_json(self, raw_text: str) -> Dict[str, Any]:
-        cleaned = raw_text.strip()
-        if cleaned.startswith("```"):
-            cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
-            cleaned = re.sub(r"\s*```$", "", cleaned)
-        cleaned = cleaned.strip()
-
-        try:
-            return json.loads(cleaned)
-        except Exception:
-            pass
-
-        try:
-            sanitized = cleaned.replace("\n", " ").replace("\r", " ")
-            return json.loads(sanitized)
-        except Exception:
-            pass
-
-        extracted = {}
-        for key in ["layout_score", "design_score", "requirements_score", "total_score"]:
-            match = re.search(rf'"{key}"\s*:\s*(\d+)', cleaned)
-            if match:
-                extracted[key] = int(match.group(1))
-
-        v_match = re.search(r'"verdict"\s*:\s*"([^"]+)"', cleaned, re.IGNORECASE)
-        if v_match:
-            extracted["verdict"] = v_match.group(1).upper()
-
-        f_match = re.search(r'"feedback"\s*:\s*"([^"]+)"', cleaned)
-        if f_match:
-            extracted["feedback"] = f_match.group(1)
-        else:
-            extracted["feedback"] = "Avaliação parcial efetuada com sucesso via extrator de emergência."
-
-        if "total_score" not in extracted:
-            l = extracted.get("layout_score", 20)
-            d = extracted.get("design_score", 15)
-            r = extracted.get("requirements_score", 15)
-            extracted["total_score"] = l + d + r
-
-        if "verdict" not in extracted:
-            extracted["verdict"] = "PASS" if extracted.get("total_score", 0) >= 70 else "FAIL"
-
-        return extracted
-
-    def _run_visual_judge(
-        self, 
-        item: BenchmarkItem, 
-        prompt_type: str,
-        screenshot_path: Optional[Path], 
-        generated_code: str,
-        e2e_report: Dict[str, Any]
-    ) -> Tuple[int, str, str, Dict[str, Any]]:
-        system_prompt = (
-            "Você é um auditor sênior de Frontend e UI/UX.\n"
-            "Avalie a interface fornecida de 0 a 100 com base nestes critérios:\n"
-            "- Layout e Alinhamento (0-40 pts)\n"
-            "- Estilo e Cores (0-30 pts)\n"
-            "- Requisitos Solicitados (0-30 pts)\n\n"
-            "FORMATO DE RESPOSTA OBRIGATÓRIO EM JSON:\n"
-            "{\n"
-            '  "layout_score": 30,\n'
-            '  "design_score": 20,\n'
-            '  "requirements_score": 20,\n'
-            '  "total_score": 70,\n'
-            '  "verdict": "PASS",\n'
-            '  "feedback": "Interface limpa e bem alinhada."\n'
-            "}"
-        )
-
-        prompt_original = item.prompt_with_spec if prompt_type == "With_Spec" else item.prompt_no_spec
-        contents = [system_prompt]
-
-        if item.image_path and Path(item.image_path).is_file():
-            try:
-                with open(item.image_path, "rb") as f:
-                    ref_bytes = f.read()
-                contents.append("[GABARITO ORIGINAL DO BENCHMARK]:")
-                contents.append(types.Part.from_bytes(data=ref_bytes, mime_type="image/png"))
-            except Exception:
-                pass
-
-        if screenshot_path and screenshot_path.is_file():
-            try:
-                with open(screenshot_path, "rb") as f:
-                    shot_bytes = f.read()
-                contents.append("📸 [SCREENSHOT RENDERIZADO DA INTERFACE GERADA]:")
-                contents.append(types.Part.from_bytes(data=shot_bytes, mime_type="image/png"))
-            except Exception:
-                pass
-        else:
-            contents.append(f"Código HTML:\n```html\n{generated_code[:2000]}\n```")
-
-        contents.append(
-            f"TAREFA: {item.id} ({item.benchmark_name})\n"
-            f"VARIAÇÃO: {prompt_type}\n"
-            f"REQUISITOS DO BENCHMARK:\n\"{prompt_original}\"\n\n"
-            "Compare a interface com os requisitos acima e retorne o JSON de avaliação:"
-        )
-
-        client = genai.Client(api_key=self.api_key)
-        config = types.GenerateContentConfig(
-            temperature=0.1,
-            max_output_tokens=2048,
-            response_mime_type="application/json"
-        )
-
-        try:
-            response = client.models.generate_content(
-                model=self.model_name,
-                contents=contents,
-                config=config
-            )
-            raw_text = (response.text or "").strip()
-            
-            data = self._parse_judge_json(raw_text)
-
-            score = int(data.get("total_score", 50))
-            verdict = "PASS" if score >= 70 else "FAIL"
-            feedback = str(data.get("feedback", "Avaliação concluída."))
-            
-            print(f"      Breakdown -> Layout: {data.get('layout_score', '?')}/40 | Design: {data.get('design_score', '?')}/30 | Req: {data.get('requirements_score', '?')}/30")
-            return score, verdict, feedback, data
-
-        except Exception as err:
-            print(f"      Erro inesperado na API do Juiz Visual ({self.model_name}): {err}")
-
-        fallback_dict = {
-            "layout_score": 20, "design_score": 15, "requirements_score": 15,
-            "total_score": 50, "verdict": "FAIL", "feedback": "Falha no processamento do Juiz Visual."
-        }
-        return 50, "FAIL", "Falha na resposta do Juiz Visual.", fallback_dict
