@@ -11,6 +11,7 @@ from oracles.common.locators import (
     minutes_from_value,
     text_of,
     timer_display,
+    wait_display,
 )
 from specui.oracle import Checks
 
@@ -33,6 +34,15 @@ def locate(page: Page) -> tuple[Locator | None, Locator | None]:
 def display_text(page: Page) -> str:
     """Texto atual do visor (re-localizado a cada leitura)."""
     return text_of(timer_display(page))
+
+
+def shows(page: Page, expected: str, timeout_ms: int = 800) -> bool:
+    """O visor passa a mostrar `expected` dentro do prazo (False em vez de exceção: serve de pré-condição)."""
+    try:
+        wait_display(page, expected, timeout_ms)
+    except AssertionError:
+        return False
+    return True
 
 
 def seconds(text: str) -> int | None:

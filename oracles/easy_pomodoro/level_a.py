@@ -12,7 +12,6 @@ from oracles.common.locators import (
     find_text,
     icon_on_same_row,
     text_of,
-    wait_display,
 )
 from oracles.easy_pomodoro.helpers import (
     click,
@@ -23,6 +22,7 @@ from oracles.easy_pomodoro.helpers import (
     locate,
     read_inputs,
     seconds,
+    shows,
     type_minutes,
 )
 from specui.oracle import Checks, case
@@ -93,7 +93,7 @@ def play_counts_down(page: Page, t: Checks) -> None:
     t.require("existem visor e botão", display is not None and play is not None)
     click(t, "clicar em play", play)
     t.advance(3000)
-    t.eventually("visor mostra 24:57 após 3 s", lambda: wait_display(page, "24:57", 800))
+    t.require("visor mostra 24:57 após 3 s", shows(page, "24:57"), f"visor={display_text(page)!r}")  # efeito principal
     t.ok("o visor continua no formato MM:SS", bool(MMSS.match(display_text(page))), display_text(page))
 
 
@@ -156,14 +156,13 @@ def edit_focus_time(page: Page, t: Checks) -> None:
     t.require("existe o input de Foco Total", len(fields) >= 1)
     t.act("digitar 30 no input de Foco Total", lambda: _must(type_minutes(fields[0], 30)))
     page.wait_for_timeout(200)
-    t.ok("o input guarda 30", input_minutes(fields[0]) == 30, str(input_minutes(fields[0])))
-    if display_text(page) == "30:00":
-        t.ok("o visor reflete os 30 minutos", True)
-        return
-    # leitura alternativa do prompt: a configuração vale a partir do próximo play
-    click(t, "play", play)
-    t.advance(1000)
-    t.ok("o visor reflete os 30 minutos (29:59 após 1 s)", display_text(page) == "29:59", display_text(page))
+    t.require("o input guarda 30", input_minutes(fields[0]) == 30, str(input_minutes(fields[0])))
+    if display_text(page) != "30:00":
+        # leitura alternativa do prompt: a configuração vale a partir do próximo play
+        click(t, "play", play)
+        t.advance(1000)
+    t.ok("o visor reflete os 30 minutos (30:00 parado, ou 29:59 após 1 s de contagem)",
+         display_text(page) in ("30:00", "29:59"), display_text(page))
 
 
 def _must(done: bool) -> None:
@@ -185,9 +184,9 @@ def countdown_ends_cleanly(page: Page, t: Checks) -> None:
     for _ in range(14):
         t.advance(5000)
         seen.append(display_text(page))
+    t.require("a contagem chegou a decrescer", any((seconds(s) or 99999) < 60 for s in seen), f"leituras={seen}")
     bad = [s for s in seen if not MMSS.match(s)]
     t.ok("o visor sempre mostra MM:SS (sem '-' nem NaN)", not bad, f"leituras inválidas={bad[:3]}")
-    t.ok("a contagem chegou a decrescer", any((seconds(s) or 99999) < 60 for s in seen), f"leituras={seen}")
     t.ok("nenhum erro de página durante o fim da contagem", not t.js_errors(), "; ".join(t.js_errors()))
 
 

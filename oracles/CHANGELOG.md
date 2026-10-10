@@ -48,3 +48,12 @@ Cada item foi confirmado abrindo o código/app gerado: o app fazia o que o promp
   inteiramente quebrada valia 0,5 (PARTIAL) em vez de 0; 63 dos 140 pares da mutação do piloto 1 saíram WEAK por isso.
 - `oracle-lint` passa a exigir ao menos um `t.ok`/`t.eventually` por caso (senão o caso daria NO por "sem asserção pontuada").
   Nas três suítes: 0 casos acusados. Nenhum caso foi alterado neste item (as promoções a `require` vêm nos itens seguintes).
+
+### Efeito principal como pré-condição (revisão S2/S3/S4, PD-C3; um item por tarefa)
+Sob o protocolo de passos (acima), cada caso abaixo passa a ter o efeito principal como `require` e só o que vem depois como
+`ok`. Classe: **test_defect** (o caso dava PARTIAL a um app em que a feature não funciona). Mutação esperada: KILLED (era WEAK).
+
+- **easy_pomodoro**: `E-A-05` "visor mostra 24:57" (era `eventually`) vira `require`; `E-A-08` "o input guarda 30" vira
+  `require` e as duas leituras do prompt (30:00 imediato, ou 29:59 após play) viram uma única asserção; `E-A-09` "a contagem
+  chegou a decrescer" vira `require` (antes dos invariantes "sempre MM:SS" e "nenhum erro de página", que passam com o timer
+  parado). MUT-E1/E2/E4 sobre E-A-05/08/09: WEAK → KILLED.
