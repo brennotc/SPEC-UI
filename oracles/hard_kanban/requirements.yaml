@@ -65,7 +65,7 @@ requirements:
     text: "de \"Para fazer\", só pode ir para \"Em Progresso\" e assim sucessivamente (não pode pular etapas à direita)"
     category: a
     info_source: behavior
-    mention_patterns: ['n[ãa]o\s+pode\s+pular|s[óo]\s+pode\s+ir', 'sucessivamente']
+    mention_patterns: ['n[ãa]o\s+pode\s+pular|s[óo]\s+pode\s+ir', 'sucessivamente', 'pular\s+etapas', 'apenas\s+(?:1|uma)\s+etapa|imediatamente\s+adjacente']
   - id: H-14
     text: "Há a possibilidade de voltar para o lado esquerdo. Nesse caso, pode mover quantos passos quiser para à esquerda"
     category: a

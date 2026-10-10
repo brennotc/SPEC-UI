@@ -83,3 +83,10 @@ Sob o protocolo de passos (acima), cada caso abaixo passa a ter o efeito princip
   porque o `#C5CC9E` da spec cai na faixa do amarelo; era conhecimento da spec dentro de um teste "derivado só do prompt" sem
   registro. Agora é PD-H6 (regra 3): no nível A só a luminância nessa coluna; o matiz continua nas outras três. Vale igual para
   no_spec e with_spec. Sem mudança de comportamento.
+
+### mention_patterns (revisão I3)
+- **adapter_gap**: `H-13` não casava com a `## Specification` (que diz "Tentativa de Pular Etapas" e "apenas 1 etapa", não "não pode
+  pular"); ganhou `pular\s+etapas` e `apenas\s+(?:1|uma)\s+etapa|imediatamente\s+adjacente`. `E-01` trocou o padrão inerte
+  `p[áa]gina\s+branca` (não casava com nenhum dos dois textos) por variantes plausíveis em prompts livres. Antes da coleta de
+  prompts livres, então sem efeito em dados; muda o hash de `mention_patterns`. Teste novo: a spec cobre 100 % dos requisitos com
+  padrão e o prompt cobre 100 % dos de categoria a/c, nas três tarefas.

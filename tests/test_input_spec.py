@@ -107,3 +107,23 @@ def test_compute_input_spec_end_to_end(tasks):
     assert m.envelope_chars == 1234
     assert m.stack_requests.any is False
     assert compute_input_spec(easy.prompt_text).chars < m.chars
+
+
+def test_mention_patterns_cover_both_texts_of_every_task(repo_root):
+    """`with_spec` é a referência de 'cobertura total': todo requisito com padrão tem de ser citado pela spec; e todo requisito
+    testável a partir do prompt (categorias a e c) tem de ser citado pelo prompt. Os da spec (categoria s) não precisam estar
+    no prompt: é justamente o que ele não diz."""
+    import re
+
+    from specui.oracle.requirements import load_requirements
+    from specui.tasks import load_tasks
+
+    for task in load_tasks(repo_root / "benchmarks"):
+        reqs = [r for r in load_requirements(repo_root / "oracles", task.id) if r.mention_patterns]
+
+        def missed(text, selection):
+            return [r.id for r in selection if not any(re.search(p, text, re.IGNORECASE) for p in r.mention_patterns)]
+
+        assert missed(task.spec_text, reqs) == [], (task.id, "spec")
+        assert missed(task.prompt_text, [r for r in reqs if r.category in ("a", "c")]) == [], (task.id, "prompt")
+        assert requirement_coverage(task.spec_text, reqs).total == 1.0

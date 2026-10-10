@@ -6,7 +6,7 @@ requirements:
     text: "uma página com fundo branco"
     category: a
     info_source: image
-    mention_patterns: ['fundo\s+branco', 'p[áa]gina\s+branca']
+    mention_patterns: ['fundo\s+branco|background\s+branco', 'p[áa]gina\s+(?:toda\s+)?branca|tela\s+branca']
   - id: E-02
     text: "header vermelho claro com a logo de um tomate e Pomodoro escrito no canto superior esquerdo"
     category: a
