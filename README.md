@@ -1,5 +1,27 @@
 # SPEC-UI: uma especificação formal ajuda um designer a obter melhor código de front-end?
 
+## Estado em 2026-10-10 (código em `7bf6a49`; a documentação foi revisada nos commits seguintes)
+
+**Feito.** Piloto 1: 12 células (3 tarefas × `no_spec`/`with_spec` × texto/multimodal) do `gemini-3.8-flash`, 1 repetição, em
+[docs/pilot-1/](docs/pilot-1/README.md). Oráculo `oracle-v1` congelado (tag em `de50aa2`, 74 casos). Mutação do oráculo sobre o piloto:
+136 KILLED / 11 WEAK / 1 NOT_APPLIED / 0 SURVIVED. 434 testes rápidos e 53 lentos passam. O `preflight` do `run` principal passa.
+
+**Não feito.** A execução principal (60 células). `specui evaluate --rebuild` (um `metric_error` de infraestrutura antes do render não tem
+recuperação sem nova chamada de API). Análise de H3 e uso de `accuracy_b`/métricas visuais/de código no relatório (seção 12). Um segundo
+modelo (H4 não é testável com um gerador).
+
+**Decisões abertas que dependem da orientadora.**
+1. O teto do nível A é aceitável? `accuracy_a` é 1,000 em 9 das 12 células e 0,917–0,964 nas outras 3; o contraste da métrica primária só
+   pode valer 0 a +0,08. Causas no oráculo em [seção 16](#16-ameaças-à-validade); números em
+   [docs/revisoes/2026-10-10-como-o-spec-ui-mede-7bf6a49.md, seção 1.5](docs/revisoes/2026-10-10-como-o-spec-ui-mede-7bf6a49.md). Corrigir exige `oracle-v2`
+   e repetir piloto e mutação.
+2. Design2Code sem nenhum par casado vale 0,0 ou `None`? Hoje 0,0 (seção 10).
+3. Implementar `--rebuild` antes do `run` principal ou aceitar o custo de uma chamada de API por `metric_error` de infraestrutura.
+4. Segundo modelo Gemini e `analysis.equivalence_margin` antes do `run` (para H4).
+
+**Ordem de leitura.** Este README → [docs/revisoes/2026-10-10-execucao.md](docs/revisoes/2026-10-10-execucao.md) →
+[docs/pilot-1/README.md](docs/pilot-1/README.md) → `docs/revisoes/*como-o-spec-ui-mede*` (leituras do código; a mais recente é a de `7bf6a49`) → código.
+
 Framework de avaliação **100 % automática** de front-end gerado por LLMs a partir de (a) um pedido em texto simples e
 (b) o mesmo pedido como especificação formal, com ou sem a imagem do design do Figma. Nenhuma nota vem de juiz LLM, de
 agente LLM ou de pessoa: só métricas de três artigos revisados por pares.

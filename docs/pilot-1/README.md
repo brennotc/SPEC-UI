@@ -47,3 +47,22 @@ a uma mutação-alvo. Os WEAK que restam são PARTIAL legítimos de casos com ma
 MUT-M6×M-A-05, MUT-H4×H-A-03). O único NOT_APPLIED é MUT-H4×H-A-03 no run hard no_spec texto, cujo baseline é PARTIAL (`model_defect`).
 
 Decisões e correções do oráculo: `oracles/CHANGELOG.md`. Plano e execução: `docs/revisoes/`.
+
+## Campos dos records que não refletem o código atual
+
+Os 12 `runs/*/record.json` foram gerados em 2026-10-09/10 com o código de `b820545` (árvore suja, antes do refactor ser commitado) e
+reavaliados depois com `specui evaluate --groups functional` (reavaliação só do grupo funcional: o estágio regrava `functional`, os campos
+`oracle_*` e as versões do Playwright/Chromium; os demais campos continuam os da geração). Por isso:
+
+- `repo_commit = b820545+dirty` é o commit da geração, não o da reavaliação nem o atual.
+- `config_sha256` (`6822b0bd…`) foi calculado pela função antiga, que incluía os caminhos da máquina; não bate com o hash que o código atual
+  calcula para a mesma configuração (`config_sha256` atual exclui `repo_root`, `workspace_dir`, `model_cache_dir`, `results_dir`,
+  `benchmarks_dir`, `references_dir`, `oracles_dir` e `scaffold_dir`).
+- `finish_reason` é `null` (o campo existe a partir do commit `67e69d5`).
+- `embeddings.dinov2_model` e `embeddings.clip_model` têm só o nome do modelo, sem `@<sha do snapshot>` (a partir de `ab3c969`).
+- `accuracy_b`/`n_total` dos records em `antes/` usam o oráculo `94b727c0…` (anterior ao protocolo de passos).
+- Em `results/pilot/runs/` (fora do git) havia 4 pastas sem `record.json` (execuções interrompidas, só com `prompt.system.txt` e
+  `prompt.user.txt`); foram apagadas em 2026-10-10. Os `manifest.jsonl` (aqui e em `results/pilot/`) continuam listando as tentativas que
+  não geraram record.
+- `failure_report.csv`: a coluna `classification` está preenchida só nas 3 linhas de nível A (`model_defect`, copiadas de
+  `oracles/CHANGELOG.md`); as 59 linhas de nível B não têm classe por caso.
