@@ -18,10 +18,14 @@ FIXTURES = Path(__file__).resolve().parent / "fixtures" / "pages"
 INERT = [
     ("easy_pomodoro", "widgets_timer.html", ["E-A-05", "E-A-08", "E-A-09"]),
     ("medium_tarefas", "widgets_form.html", ["M-A-04", "M-A-09", "M-A-10", "M-A-11"]),
+    ("hard_kanban", "widgets_columns.html", ["H-A-06", "H-A-11", "H-A-14"]),  # o + e o check não criam nenhum card
+    ("hard_kanban", "blank.html", ["H-A-04"]),  # sem card esmaecido: antes dava PARTIAL (as 3 'outras colunas não têm' passavam)
 ]
 
 
 def _html(name: str) -> str:
+    if name == "blank.html":
+        return "<!doctype html><body><app-root><header>Kanban</header><main>vazio</main></app-root></body>"
     return (FIXTURES / name).read_text(encoding="utf-8").replace("__BUTTON_NAME__", "Iniciar temporizador").replace("__DATE_TYPE__", "text")
 
 

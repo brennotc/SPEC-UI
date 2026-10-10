@@ -63,3 +63,8 @@ Sob o protocolo de passos (acima), cada caso abaixo passa a ter o efeito princip
   "ao menos uma tarefa de outro dia fica oculta" vira `require` e passa a vir antes de "a filtrada continua visível" e "sem
   filtro as três voltam". Sob um filtro inerte esses casos davam 5/6 e 8/9 (PARTIAL); agora NO. MUT-M1/M2/M3/M5 (M-A-04/09):
   WEAK → KILLED; em M-A-10/11 o KILLED atual vinha da criação de tarefas falhar, e o MUT-M8 (próximo item) passa a exercitar o filtro.
+- **hard_kanban**: `H-A-04` "existe um card com contorno dashed na primeira coluna" vira `require` (as três "a coluna X não tem
+  card dashed" passavam vacuamente: um app SEM card esmaecido dava 4 passam / 3 falham = PARTIAL; agora NO); `H-A-06` criar os
+  dois cards (`need_cards`, em vez de `act` + `_must`) é o efeito principal; `H-A-11` "o card muda para Em Progresso" vira
+  `require` ("o card só existe uma vez" passa com o app inerte); `H-A-14` "arrastar B para cima do A reordena" vira `require`
+  ("mesma coluna" e "nenhum card se perdeu" passam com o app inerte). MUT-H1/H2/H3 sobre H-A-06/11/14: WEAK → KILLED.

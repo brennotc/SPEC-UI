@@ -56,3 +56,11 @@ pending:
     decision: "Margem de ±5° nos limites das faixas (HUE_TOLERANCE, hue_matches em common/colors.py), nos testes de nível A de todas as tarefas. Cinza nunca vira cor pela margem; laranja-âmbar (36°) continua não sendo amarelo; quase branco (250,245,255) continua não sendo roxo."
     decided_on: "2026-10-09"
     blocks: [H-A-01, H-A-03, H-A-05, H-A-08, H-A-10]
+  - id: PD-C3
+    question: "Quando uma ação do usuário funciona mas o efeito esperado não aparece (app inerte), o caso vale PARTIAL ou NO? O que é pontuado: a ação, a pré-condição ou só o resultado?"
+    rule: 2
+    options: ["só o resultado esperado pontua; o efeito principal é pré-condição", "ação e pré-condição também pontuam"]
+    status: decided
+    decision: "Só o Expected Result pontua (WebGen-Bench). Ações (act) e pré-condições (require) que dão certo são passos e não pontuam; o EFEITO PRINCIPAL do caso é pré-condição (require) dos invariantes: se ele não acontece o caso é NO, não PARTIAL. Invariantes que passam com o app inerte (formato, ausência de erro, 'o card só existe uma vez') continuam como ok, mas só valem depois do efeito. Casos com mais de um requisito independente (E-A-01, M-A-05, H-A-03) seguem podendo dar PARTIAL."
+    decided_on: "2026-10-10"
+    blocks: [H-A-04, H-A-06, H-A-11, H-A-14]

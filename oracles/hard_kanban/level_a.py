@@ -30,7 +30,6 @@ from oracles.hard_kanban.helpers import (
     check_and_cancel,
     column_index,
     column_rect,
-    create_card,
     input_in_column,
     is_off_white,
     move_to_column,
@@ -43,11 +42,6 @@ from oracles.hard_kanban.helpers import (
 from specui.oracle import Checks, case
 
 HUES = ("blue", "orange", "purple", "green")
-
-
-def _must(done: bool) -> None:
-    if not done:
-        raise ValueError("o gesto não funcionou")
 
 
 @case("H-A-01", requirements=["H-01"], level="A",
@@ -108,12 +102,12 @@ def placeholder_card(page: Page, t: Checks) -> None:
     col_ranges = ranges(page)
     t.require("as quatro colunas existem", col_ranges is not None)
     first = placeholder(page, col_ranges, 0)
-    t.ok("existe um card com contorno dashed na primeira coluna", first is not None)
+    t.require("existe um card com contorno dashed na primeira coluna", first is not None)  # efeito principal
     for index in (1, 2, 3):
         t.ok(f"a coluna '{COLUMN_TITLES[index]}' não tem card dashed", placeholder(page, col_ranges, index) is None)
-    t.ok("há um + no centro do card esmaecido", first is not None and _plus_at_center(page, first))
-    t.ok("o card esmaecido está esmaecido (opacidade, fundo ou contorno translúcidos)",
-         first is not None and _dim_at(page, first), "o placeholder parece opaco")
+    t.ok("há um + no centro do card esmaecido", _plus_at_center(page, first))
+    t.ok("o card esmaecido está esmaecido (opacidade, fundo ou contorno translúcidos)", _dim_at(page, first),
+         "o placeholder parece opaco")
 
 
 # "Esmaecido" e "ícone de +" não têm mecanismo no prompt (regra 2): vale opacidade OU fundo/contorno translúcidos,
@@ -185,8 +179,7 @@ def creation_mode(page: Page, t: Checks) -> None:
 def confirm_creates_card(page: Page, t: Checks) -> None:
     col_ranges = ranges(page)
     t.require("as quatro colunas existem", col_ranges is not None)
-    t.act("criar 'Novo Card de Teste'", lambda: _must(create_card(page, "Novo Card de Teste")))
-    t.act("criar 'Segundo Card'", lambda: _must(create_card(page, "Segundo Card")))
+    need_cards(page, t, ["Novo Card de Teste", "Segundo Card"])  # efeito principal: +, digitar e check criam os cards
     t.ok("o card está na coluna Para Fazer", column_index(page, col_ranges, "Novo Card de Teste") == 0)
     ph = placeholder(page, col_ranges)  # rola até o fim da coluna ANTES de medir: todas as caixas no mesmo referencial
     first, second = box(card_text(page, "Novo Card de Teste")), box(card_text(page, "Segundo Card"))
@@ -272,7 +265,7 @@ def drag_one_step_right(page: Page, t: Checks) -> None:
     need_cards(page, t, ["Mover 1"])
     t.require("o card começa em Para Fazer", column_index(page, col_ranges, "Mover 1") == 0)
     driver = DndDriver(page)
-    t.ok("o card muda para Em Progresso", move_to_column(page, driver, "Mover 1", col_ranges, 1))
+    t.require("o card muda para Em Progresso", move_to_column(page, driver, "Mover 1", col_ranges, 1))  # efeito principal
     t.ok("o card só existe uma vez", page.get_by_text("Mover 1", exact=True).count() == 1)
 
 
@@ -328,8 +321,8 @@ def reorder_within_column(page: Page, t: Checks) -> None:
         b, a = box(card_text(page, "Ordem B")), box(card_text(page, "Ordem A"))
         return bool(b and a and b.cy < a.cy)
 
-    t.ok("arrastar o card B para cima do A reordena a coluna",
-         driver.move_until(src, (target.cx, target.y + 0.25 * target.h), moved))
+    t.require("arrastar o card B para cima do A reordena a coluna",
+              driver.move_until(src, (target.cx, target.y + 0.25 * target.h), moved))  # efeito principal
     t.ok("o card continua na mesma coluna", column_index(page, col_ranges, "Ordem B") == 0)
     t.ok("nenhum card se perdeu", all(card_text(page, d) is not None for d in ("Ordem A", "Ordem B", "Ordem C")))
 
