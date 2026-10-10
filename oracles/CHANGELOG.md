@@ -90,3 +90,18 @@ Sob o protocolo de passos (acima), cada caso abaixo passa a ter o efeito princip
   `p[áa]gina\s+branca` (não casava com nenhum dos dois textos) por variantes plausíveis em prompts livres. Antes da coleta de
   prompts livres, então sem efeito em dados; muda o hash de `mention_patterns`. Teste novo: a spec cobre 100 % dos requisitos com
   padrão e o prompt cobre 100 % dos de categoria a/c, nas três tarefas.
+
+### Reavaliação do piloto 1 depois das mudanças acima (2026-10-10, `evaluate --groups functional` nos 12 runs do Gemini + `mutate`)
+Sem chamada a API; o oráculo que rodou é o hash `d7c7b3be…` (antes `94b727c0…`/`d41f9cdc…`). Baseline em `docs/pilot-1/antes/`.
+- **accuracy_a mudou em 1 célula**: medium no_spec multimodal, 0,958 → 0,917 (M-A-12 PARTIAL → NO; já classificado `model_defect`:
+  a linha acima do rodapé é cinza, não branca; o 0,5 anterior vinha do `require("existe o rodapé")`, que passou a ser passo).
+- **accuracy_b caiu nas 6 células no_spec** (with_spec inalterado), 12 casos PARTIAL → NO, todos já falhas do modelo: easy
+  multimodal `E-B-06`, `E-B-07`; easy texto `E-B-03`, `E-B-06`; medium multimodal `M-B-09`; medium texto `M-B-01`, `M-B-02`,
+  `M-B-06`, `M-B-09`; hard texto e multimodal `H-B-05` (2). Nenhum caso que era YES mudou; nenhum caso virou NO bloqueado.
+- **n_total de A: 48 / 99 / 113 → 25 / 50 / 71** (easy / medium / hard): as ações e pré-condições que deram certo saíram da
+  pontuação (viraram passos).
+- **Mutação**: 76 KILLED / 63 WEAK / 1 NOT_APPLIED → **136 KILLED / 10 WEAK / 2 NOT_APPLIED / 0 SURVIVED** (148 linhas, 8 delas do
+  MUT-M8, todas KILLED). Os 13 pares previstos (MUT-E1/E2/E4, M1/M2/M3/M5, H1/H2/H3 sobre E-A-05/08/09, M-A-04/09, H-A-06/11/14)
+  foram de WEAK para KILLED nos 4 runs. Os WEAK que restam são os previstos como PARTIAL legítimo (MUT-M6×M-A-05 ×4, MUT-E6×E-A-01
+  ×3, MUT-H4×H-A-03 ×3). Diferença para a previsão (11 WEAK / 1 NOT_APPLIED): em MUT-E6×E-A-01 o run easy no_spec texto teve
+  baseline NO na rodada de mutação (NOT_APPLIED) embora o `record.json` e 33 execuções isoladas deem YES: ver `docs/revisoes/`.
