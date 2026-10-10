@@ -407,6 +407,7 @@ class RunRecord(BaseModel):
     provider: Provider
     model_id_requested: str
     model_id_returned: str | None = None
+    finish_reason: str | None = None  # como o provedor encerrou a resposta (STOP, MAX_TOKENS, SAFETY, RECITATION, OTHER...)
     temperature: float | None = None
     thinking: dict[str, Any] = Field(default_factory=dict)
     seed: int | None = None

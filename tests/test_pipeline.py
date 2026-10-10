@@ -475,3 +475,15 @@ def test_configuration_errors_from_the_harness_still_stop_the_run(make_cfg, make
     pipeline, cells, *_ = make_pipeline(harness=BrokenHarness(tmp_path / "ws", ConfigurationError("npm não encontrado")))
     with pytest.raises(ConfigurationError, match="npm"):
         pipeline.run_cell(cells[0])  # o pesquisador precisa corrigir o ambiente: não vira metric_error
+
+
+def test_finish_reason_is_recorded_for_every_generation(make_cfg, make_pipeline):
+    cfg = make_cfg()
+    key = cfg.generators[0].key
+    refusal = good_response().model_copy(update={"text": "", "refused": True, "finish_reason": "RECITATION", "refusal_detail": "RECITATION"})
+    odd = good_response().model_copy(update={"text": "sem blocos de arquivo", "finish_reason": "OTHER"})
+    truncated = good_response().model_copy(update={"truncated": True, "finish_reason": "MAX_TOKENS"})
+    pipeline, cells, *_ = make_pipeline(cfg=cfg, clients={key: ScriptedClient([good_response(), refusal, odd, truncated])})
+    records = [pipeline.run_cell(c) for c in cells[:4]]
+    assert [(r.status, r.finish_reason) for r in records] == [
+        ("done", "STOP"), ("refusal", "RECITATION"), ("format_failure", "OTHER"), ("truncated", "MAX_TOKENS")]

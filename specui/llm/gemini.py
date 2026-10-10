@@ -22,7 +22,8 @@ from specui.models import Generator, PromptPackage
 
 logger = logging.getLogger(__name__)
 
-_REFUSAL_FINISH_REASONS = {"SAFETY", "PROHIBITED_CONTENT", "BLOCKLIST", "SPII", "IMAGE_SAFETY"}
+# RECITATION: o provedor bloqueia a resposta por reproduzir texto protegido; vem com texto vazio e não é "o modelo respondeu mal"
+_REFUSAL_FINISH_REASONS = {"SAFETY", "PROHIBITED_CONTENT", "BLOCKLIST", "SPII", "IMAGE_SAFETY", "RECITATION"}
 _TRANSIENT_MARKERS = ("500", "502", "503", "504", "unavailable", "overloaded", "deadline", "timed out")
 
 

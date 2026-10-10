@@ -204,6 +204,7 @@ class Pipeline:
             rec.errors.append(str(exc))
             return self._save(rec)
         rec.model_id_returned = response.model_returned
+        rec.finish_reason = response.finish_reason  # sempre: OTHER/MALFORMED... viram format_failure e precisam ser distinguíveis
         rec.cost = compute_cost(pkg, response, client)
         (out_dir / "response.raw.txt").write_text(response.text, encoding="utf-8", newline="\n")
         rec.paths["response_raw"] = str(out_dir / "response.raw.txt")

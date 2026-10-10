@@ -167,6 +167,12 @@ def test_gemini_truncated_and_refused_flags(pkg):
     assert r.refused is True and r.refusal_detail == "SAFETY"
     client, _ = _gemini([_gemini_response(text="", block="PROHIBITED_CONTENT")])
     assert client.generate(pkg, 1).refused is True
+    client, _ = _gemini([_gemini_response(text="", finish="RECITATION")])  # bloqueio por recitação: recusa, não formato errado
+    r = client.generate(pkg, 1)
+    assert r.refused is True and r.refusal_detail == "RECITATION" and r.truncated is False
+    client, _ = _gemini([_gemini_response(text="", finish="OTHER")])  # OTHER segue para o parser (e fica registrado)
+    r = client.generate(pkg, 1)
+    assert r.refused is False and r.finish_reason == "OTHER"
 
 
 def test_gemini_rate_limit_rotates_key_and_retries(pkg):
