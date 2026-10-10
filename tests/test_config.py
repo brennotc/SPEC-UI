@@ -110,3 +110,12 @@ def test_playwright_is_pinned_and_the_lock_agrees(repo_root):
     lock = (repo_root / "requirements.lock").read_text(encoding="utf-8").splitlines()
     assert f"playwright=={version}" in lock
     assert not any(line.startswith("specui") for line in lock)
+
+
+def test_config_hash_ignores_machine_paths_but_not_experiment_parameters(repo_root, tmp_path):
+    base = load_config(repo_root / "configs" / "default.yaml", overrides={"results_dir": str(tmp_path / "a")})
+    elsewhere = load_config(repo_root / "configs" / "default.yaml", overrides={
+        "results_dir": str(tmp_path / "b"), "workspace_dir": str(tmp_path / "ws"), "model_cache_dir": str(tmp_path / "hf")})
+    assert config_sha256(base) == config_sha256(elsewhere)
+    assert config_sha256(base) != config_sha256(load_config(repo_root / "configs" / "default.yaml", overrides={"repetitions": 2}))
+    assert config_sha256(base) != config_sha256(load_config(repo_root / "configs" / "default.yaml", overrides={"base_seed": 7}))

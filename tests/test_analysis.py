@@ -267,3 +267,13 @@ def test_analyze_frame_without_main_pairs_does_not_crash(repo_root, tmp_path):
     out = analyze_frame(df, cfg)
     assert out["models"] == ["google:g"] and out["consistency"]["differences"] == []
     assert records_to_dataframe([]).empty
+
+
+def test_freeze_meta_warns_when_the_config_hash_changes_but_only_refuses_a_new_margin(tmp_path, caplog):
+    store = RunStore(tmp_path, "main")
+    store.freeze_meta(None, "hash-a" * 8)
+    with caplog.at_level("WARNING", logger="specui.storage"):
+        assert store.freeze_meta(None, "hash-b" * 8)["config_sha256"] == "hash-a" * 8
+    assert "configuração mudou" in caplog.text
+    with pytest.raises(ValueError, match="mudou depois do congelamento"):
+        store.freeze_meta(0.1, "hash-a" * 8)

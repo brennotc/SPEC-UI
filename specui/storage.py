@@ -8,6 +8,7 @@
 
 import hashlib
 import json
+import logging
 import re
 import subprocess
 from collections.abc import Iterable
@@ -18,6 +19,8 @@ from typing import Any
 import pandas as pd
 
 from specui.models import Cell, RunKind, RunRecord
+
+logger = logging.getLogger(__name__)
 
 # Status cuja célula NÃO está concluída: o `run` seguinte a executa de novo.
 RETRY_STATUSES = frozenset({"api_error", "model_mismatch"})
@@ -108,10 +111,14 @@ class RunStore:
         return json.loads(self.meta_path.read_text(encoding="utf-8")) if self.meta_path.is_file() else None
 
     def freeze_meta(self, equivalence_margin: float | None, config_sha256: str) -> dict[str, Any]:
-        """Grava (uma vez) o que não pode mudar durante a execução principal. Se já existe, confere:
-        a margem de equivalência diferente do congelado levanta ValueError."""
+        """Grava (uma vez) o que fica congelado na execução principal. Se já existe, confere SÓ a margem de
+        equivalência (diferente do congelado: ValueError). O `config_sha256` é informativo: se mudou, avisa no log
+        (mudar repetições ou fontes entre sessões é legítimo; mudar o gerador não, e o record de cada célula diz qual foi)."""
         existing = self.read_meta()
         if existing is not None:
+            if existing.get("config_sha256") not in (None, config_sha256):
+                logger.warning("a configuração mudou desde o congelamento (run_meta.json: %s, agora: %s)",
+                               str(existing.get("config_sha256"))[:12], config_sha256[:12])
             if existing.get("equivalence_margin") != equivalence_margin:
                 raise ValueError(
                     f"analysis.equivalence_margin mudou depois do congelamento "

@@ -80,8 +80,17 @@ def load_config(
     return RunConfig.model_validate(data)
 
 
+# Onde as coisas ficam na máquina de quem roda: não são parâmetros do experimento e não entram no hash.
+MACHINE_PATH_FIELDS = {
+    "repo_root", "workspace_dir", "model_cache_dir", "results_dir", "benchmarks_dir", "references_dir",
+    "oracles_dir", "scaffold_dir",
+}
+
+
 def config_sha256(cfg: RunConfig) -> str:
-    """Hash estável da configuração (ignora o caminho absoluto do repositório)."""
-    payload = cfg.model_dump(mode="json", exclude={"repo_root"})
+    """Hash estável dos PARÂMETROS do experimento (geradores, repetições, fontes, semente, análise...).
+
+    Ignora os diretórios da máquina: dois pesquisadores com o mesmo experimento e pastas diferentes têm o mesmo hash."""
+    payload = cfg.model_dump(mode="json", exclude=MACHINE_PATH_FIELDS)
     blob = json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()
