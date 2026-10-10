@@ -34,10 +34,6 @@ class DailyQuotaExceededError(QuotaExceededError):
     """Cota diária do Gemini esgotada (não adianta tentar de novo hoje)."""
 
 
-class ProviderQuotaExceededError(QuotaExceededError):
-    """Crédito/limite persistente esgotado em um provedor (não adianta repetir a chamada)."""
-
-
 class ModelMismatchError(RuntimeError):
     """O modelo devolvido difere do solicitado de novo, na mesma célula: interrompe o run."""
 

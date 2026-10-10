@@ -15,7 +15,6 @@ from specui.llm import (
     LLMResponse,
     MockClient,
     ModelMismatchError,
-    ProviderQuotaExceededError,
 )
 from specui.models import Generator, ScaffoldInfo
 from specui.pipeline import Pipeline, plan_cells, stage_technical
@@ -338,7 +337,7 @@ def test_quota_pauses_only_that_provider_and_continues(make_cfg, make_pipeline):
 def test_all_providers_exhausted_stops_the_run(make_cfg, make_pipeline):
     cfg = make_cfg()
     key = cfg.generators[0].key
-    client = ScriptedClient([ProviderQuotaExceededError("sem crédito", provider="mock")])
+    client = ScriptedClient([DailyQuotaExceededError("sem crédito", provider="mock")])
     pipeline, cells, *_ = make_pipeline(cfg=cfg, clients={key: client})
     summary = pipeline.run(cells[:5])
     assert summary.executed == 0 and client.calls == 1 and summary.paused_providers == ["mock"]

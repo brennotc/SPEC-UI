@@ -27,7 +27,6 @@ scaffold/**/node_modules/
 scaffold/**/dist/
 scaffold/**/.angular/
 .angular-cache/
-scaffold/.angular-cache/
 
 # Configuracao local do Claude Code
 .claude/settings.local.json

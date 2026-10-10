@@ -169,7 +169,6 @@ class CaseSpec:
     task: str  # passos (o "Task" do WebGen-Bench)
     expected: str  # o "Expected Result"
     task_id: str = ""
-    tags: tuple[str, ...] = ()
     pending: str | None = None  # PD-*: o caso é listado mas não executado (fora de N_total)
     uses_clock: bool = True
     fixed_now: str | None = None
@@ -186,7 +185,6 @@ def case(
     level: Level,
     task: str,
     expected: str,
-    tags: tuple[str, ...] = (),
     pending: str | None = None,
     uses_clock: bool = True,
     fixed_now: str | None = None,
@@ -200,7 +198,7 @@ def case(
         task_id = parts[1]
         REGISTRY.setdefault(task_id, []).append(
             CaseSpec(id=id, requirements=tuple(requirements), level=level, task=task, expected=expected,
-                     task_id=task_id, tags=tags, pending=pending, uses_clock=uses_clock, fixed_now=fixed_now, fn=fn)
+                     task_id=task_id, pending=pending, uses_clock=uses_clock, fixed_now=fixed_now, fn=fn)
         )
         return fn
 

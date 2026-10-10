@@ -78,7 +78,7 @@ def split_sections(markdown: str) -> tuple[dict[str, str], str, str]:
 
 
 def load_figma_frames(tasks_dir: Path) -> dict[str, dict]:
-    """Lê benchmarks/tasks/figma_frames.yaml (tarefa -> node_id/png/expected_scale)."""
+    """Lê benchmarks/tasks/figma_frames.yaml (tarefa -> node_id/png)."""
     path = tasks_dir / "figma_frames.yaml"
     if not path.is_file():
         return {}

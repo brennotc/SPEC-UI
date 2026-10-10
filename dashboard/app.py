@@ -143,7 +143,7 @@ with tabs[4]:
     if rec.technical:
         with st.expander("Console / axe"):
             st.json({"console": rec.technical.console_errors, "bloqueadas": rec.technical.blocked_requests, "axe": rec.technical.axe_violations})
-    pairs = base / rec.paths["pairs"] if "pairs" in rec.paths else (base / rec.design2code.pairs_path if rec.design2code and rec.design2code.pairs_path else None)
+    pairs = base / rec.design2code.pairs_path if rec.design2code and rec.design2code.pairs_path else None
     if pairs and pairs.is_file():
         with st.expander("Pares de blocos e fusões (Design2Code)"):
             st.json(json.loads(pairs.read_text(encoding="utf-8")))
