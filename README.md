@@ -1,26 +1,5 @@
 # SPEC-UI: uma especificação formal ajuda um designer a obter melhor código de front-end?
 
-## Estado em 2026-10-10 (código em `90b0a67`, o último commit que altera código; os commits seguintes só alteram documentação)
-
-**Feito.** Piloto 1: 12 células (3 tarefas × `no_spec`/`with_spec` × texto/multimodal) do `gemini-3.8-flash`, 1 repetição, em
-[docs/pilot-1/](docs/pilot-1/README.md). Oráculo `oracle-v1` congelado (tag `oracle-v1`, commit `d3a312c`, 74 casos). Mutação do oráculo sobre o piloto:
-136 KILLED / 11 WEAK / 1 NOT_APPLIED / 0 SURVIVED. 434 testes rápidos e 53 lentos passam. O `preflight` do `run` principal passa.
-
-**Não feito.** A execução principal (60 execuções: 12 células × 5 repetições). `specui evaluate --rebuild` (um `metric_error` de infraestrutura antes do render não tem
-recuperação sem nova chamada de API). Análise de H3 e uso de `accuracy_b`/métricas visuais/de código no relatório (seção 12). Um segundo
-modelo (H4 não é testável com um gerador).
-
-**Decisões abertas que dependem da orientadora.**
-1. O teto do nível A é aceitável? `accuracy_a` é 1,000 em 9 das 12 células e 0,917–0,964 nas outras 3; o Δ `with_spec − no_spec` por
-   tarefa × modalidade vai de 0 a +0,083, e o contraste principal (a média dos Δ) seria +0,027 se o padrão do piloto se repetisse. Causas no oráculo em [seção 16](#16-ameaças-à-validade); números por célula em
-   [docs/pilot-1/README.md](docs/pilot-1/README.md). Corrigir exige `oracle-v2`
-   e repetir piloto e mutação.
-2. Design2Code sem nenhum par casado vale 0,0 ou `None`? Hoje 0,0 (seção 10).
-3. Implementar `--rebuild` antes do `run` principal ou aceitar o custo de uma chamada de API por `metric_error` de infraestrutura.
-4. Segundo modelo Gemini e `analysis.equivalence_margin` antes do `run` (para H4).
-
-**Ordem de leitura.** Este README → [docs/pilot-1/README.md](docs/pilot-1/README.md) (evidência do piloto) → `oracles/CHANGELOG.md` → código.
-
 Framework de avaliação **100 % automática** de front-end gerado por LLMs a partir de (a) um pedido em texto simples e
 (b) o mesmo pedido como especificação formal, com ou sem a imagem do design do Figma. Nenhuma nota vem de juiz LLM, de
 agente LLM ou de pessoa: só métricas de três artigos revisados por pares.
@@ -53,8 +32,8 @@ front-end gerado? E isso muda com a complexidade do sistema (easy, medium, hard)
 2. **H2 (interação spec × modalidade):** o benefício da spec é menor quando o modelo também recebe a imagem (a imagem já carrega
    parte do que a spec descreve).
 3. **H3 (fidelidade × manutenibilidade):** a spec muda a fidelidade visual (Design2Code, VES) e a qualidade de código
-   (Figma2Code) em sentidos possivelmente distintos. **Limitação atual:** o código não tem análise para H3 (seção 12); as métricas
-   visuais e de código são calculadas e gravadas, mas o relatório só usa `accuracy_a`.
+   (Figma2Code) em sentidos possivelmente distintos. As métricas visuais e de código são calculadas e gravadas por record; o
+   relatório estatístico usa `accuracy_a` (seção 12).
 4. **H4 (consistência, exige k ≥ 2 modelos):** o efeito da spec segue a mesma tendência **nos modelos testados**. Redação
    padrão: "nos modelos testados"; nunca "independentemente do modelo". Interação não significativa **não** é evidência de
    igualdade. Com um único gerador, H4 não é testada.
@@ -136,8 +115,8 @@ run**, em `model_cache_dir` (padrão `~/.cache/specui-models`). O experimento **
 (`local_files_only=True`, `HF_HUB_OFFLINE=1`), e a ausência de um modelo é um erro de configuração que o `preflight` aponta antes de qualquer chamada
 paga. Para baixar uma vez, com rede:
 `python -c "import os; os.environ['HF_HUB_OFFLINE']='0'; from huggingface_hub import snapshot_download; [snapshot_download(m, cache_dir=r'C:/Users/<você>/.cache/specui-models') for m in ('facebook/dinov2-base', 'openai/clip-vit-base-patch32')]"`.
-Cada record grava `<modelo>@<sha do snapshot>` em `embeddings.dinov2_model` e `embeddings.clip_model` **a partir do commit `27cef6c`**;
-os records do piloto 1 (`docs/pilot-1/`) foram gravados antes, em `b820545+dirty`, e têm só o nome do modelo.
+Cada record grava `<modelo>@<sha do snapshot>` em `embeddings.dinov2_model` e `embeddings.clip_model`; os records do piloto 1
+(`docs/pilot-1/`) são anteriores a esse campo e têm só o nome do modelo.
 
 A instalação é **editável** (`pip install -e .`): `oracles/`, `configs/`, `benchmarks/` e `scaffold/` não são empacotados, são lidos do repositório. Python 3.12 é exigido (`requires-python` em `pyproject.toml`; o harness usa `os.path.isjunction`).
 
@@ -164,9 +143,9 @@ escala (frame 1440×900 == PNG). Os `node_id` já estão em [benchmarks/tasks/fi
 
 O envelope (`ENVELOPE_VERSION = "2"`) descreve só a stack e o contrato (arquivos permitidos, proibições, "testes não serão
 executados", formato de saída, **sem rede em runtime**, e a cláusula de que as restrições técnicas **prevalecem** sobre qualquer
-pedido de tecnologia do usuário). Nada sobre a interface. **Inconsistência conhecida e não corrigida:** o envelope diz "Sem roteamento"
-(`specui/prompting.py`) e, ao mesmo tempo, lista `@angular/router` entre os pacotes disponíveis (a lista vem do `package.json` do
-scaffold). Não foi alterada para preservar `envelope_version = 2` e a comparabilidade com o piloto 1. Formato de saída: blocos ```` ```ts file=src/app/app.ts ````. O contrato exige
+pedido de tecnologia do usuário). Nada sobre a interface. O envelope diz "Sem roteamento" (`specui/prompting.py`) e lista
+`@angular/router` entre os pacotes disponíveis, porque a lista vem do `package.json` do scaffold; o texto do envelope é fixo
+(`envelope_version = 2`) para manter a comparabilidade entre execuções. Formato de saída: blocos ```` ```ts file=src/app/app.ts ````. O contrato exige
 `export class App` em `src/app/app.ts`. O `styles.css` do scaffold é fixo; o do modelo vira `src/app.styles.css`.
 
 Statuses: `done`, `format_failure`, `contract_failure`, `truncated` (antes do parser), `refusal`, `nonexecutable` (build/render),
@@ -174,16 +153,16 @@ e as falhas de infraestrutura `api_error` (a célula é refeita), `metric_error`
 `model_mismatch` (modelo devolvido ≠ solicitado: a célula é refeita; **se repetir, o run é interrompido** com
 `ModelMismatchError`, checkpoint intacto). Não existe fallback de modelo nem de provedor.
 
-Todo record com resposta do provedor grava `finish_reason` (o motivo de parada devolvido pelo provedor) **a partir do commit `fac1b50`** (um `api_error`, sem resposta, fica `null`); nos records do piloto 1 ele é `null`. `RECITATION`, `SAFETY`, `PROHIBITED_CONTENT`, `BLOCKLIST`, `SPII` e `IMAGE_SAFETY` (e o bloqueio do prompt) são motivos de
+Todo record com resposta do provedor grava `finish_reason` (o motivo de parada devolvido pelo provedor; um `api_error`, sem resposta, fica `null`). Os records do piloto 1 são anteriores a esse campo e o têm `null`. `RECITATION`, `SAFETY`, `PROHIBITED_CONTENT`, `BLOCKLIST`, `SPII` e `IMAGE_SAFETY` (e o bloqueio do prompt) são motivos de
 recusa e valem `refusal`; `MAX_TOKENS` vale `truncated`. Exceção de **infraestrutura** no build ou no render
 (disco, navegador fechado, `OSError`) vira `metric_error` **gravado** (a resposta paga já está em `response.raw.txt`) e a execução segue
 para a próxima célula. Já o app que não carrega em 30 s é falha do app: `render_ok = false` e status `nonexecutable`. Se a extração do DOM falhar
 com o render ok, Design2Code e CLIP ficam `null` com a nota no record. Já página renderizada sem nenhum bloco de texto, ou sem nenhum par
 casado com a referência, vale 0,0 (seção 10).
-**Ainda não existe comando para recuperar um `metric_error` de infraestrutura gravado antes do render** (sem `screenshot`):
-`specui evaluate --rebuild` (refazer build e render a partir de `response.raw.txt`, sem API) está planejado e adiado para depois do `analyze`;
-até lá, `analyze` recusa enquanto houver um desses records, e `evaluate` não o recupera: sem `screenshot` nem `dist/` os estágios falham e o record segue `metric_error`
-(com `--groups functional` só se registra a nota "sem servidor/navegador" e o record passa a `done` sem nota funcional, que o `analyze` também recusa).
+Um `metric_error` de infraestrutura gravado antes do render (sem `screenshot`) não tem comando de recuperação: `analyze` recusa enquanto
+houver um desses records, e `evaluate` não refaz build nem render (sem `screenshot` nem `dist/` os estágios falham e o record segue
+`metric_error`; com `--groups functional` só se registra a nota "sem servidor/navegador" e o record passa a `done` sem nota funcional, que o
+`analyze` também recusa). Resolver exige repetir a geração da célula.
 
 ## 9. Execução
 
@@ -234,8 +213,7 @@ blocos de referência e para a falta de `torch`/`transformers`. Há duas exceç�
 **(2) Design2Code (`specui/metrics/design2code.py:251-252`):** com blocos
 de referência presentes e nenhum par casado (o app renderizou sem nenhum bloco correspondente, ou sem nenhum bloco de texto), `text`,
 `position` e `color` valem 0,0 e `block_match` vale `área pareada / área total` (0,0 sem pares); o docstring da função diz "valem 0 por
-definição (nenhum bloco casou)". A média de um conjunto vazio não existe e 0,0 é o pior valor da escala. Essa decisão não foi validada
-contra o artigo e segue aberta para revisão (alternativa: `None`, que tira a célula dessas métricas em vez de pontuá-la com 0).
+definição (nenhum bloco casou)". A média de um conjunto vazio não existe e 0,0 é o pior valor da escala.
 
 ## 11. Oráculos
 
@@ -259,10 +237,10 @@ geometria que o prompt dá); `oracle-lint` rejeita `#id`, `.classe`, `data-testi
   3. exigência específica da spec → nível B (ex.: hex exato).
   Cada decisão está em `oracles/<tarefa>/pending.yaml`; o hash entra na proveniência.
 - **Dados criados pela UI:** os testes criam as próprias tarefas/cards; dados iniciais do app não afetam nenhuma asserção.
-- **Piloto:** todos os geradores, N = 1, em `results/pilot/`. As falhas são classificadas **por você** em `test_defect` |
+- **Piloto:** todos os geradores, N = 1, em `results/pilot/`. As falhas são classificadas pelo pesquisador em `test_defect` |
   `model_defect` | `ambiguity` | `adapter_gap`; só `test_defect` e `adapter_gap` justificam editar o teste (registrado em
   `oracles/CHANGELOG.md`). Uma `ambiguity` vira decisão em `pending.yaml` e só altera o oráculo quando a decisão muda o teste (PD-C1, PD-C2 e PD-H6 no CHANGELOG). A classificação do piloto 1 está em `oracles/CHANGELOG.md` (seção "Classificação do pesquisador"), que
-  classifica os 3 casos de nível A que não deram YES (`M-A-06`, `M-A-12`, `H-A-03`: `model_defect`). Esses 3 foram copiados do CHANGELOG, por um script pontual (não versionado), para a coluna `classification` de `docs/pilot-1/failure_report.csv`; as outras 59 linhas (nível B) ficam sem classificação por
+  classifica os 3 casos de nível A que não deram YES (`M-A-06`, `M-A-12`, `H-A-03`: `model_defect`). Esses 3 estão também na coluna `classification` de `docs/pilot-1/failure_report.csv`; as outras 59 linhas (nível B) não têm classe por
   caso: o CHANGELOG registra as correções do oráculo que saíram delas, não uma classe por linha. O oráculo **nunca foi exercitado contra uma implementação real** antes do piloto: não há implementação
   de referência das tarefas, de propósito.
 - **Mutação** (`specui mutate`): sobre saídas do piloto que deram YES, estraga o app em tempo de execução (remover elementos, engolir
@@ -297,9 +275,9 @@ geometria que o prompt dá); `oracle-lint` rejeita `#id`, `.classe`, `data-testi
 - **Itens:** `flag_floor` / `flag_ceiling`, `blocked_rate`, discriminação por spec/modalidade/modelo, nota com e sem os casos marcados.
 - **Livres:** regressão da nota sobre cobertura e densidade com erros agrupados por participante, ITT por padrão, `accuracy_a_restricted`.
 - **`contract_failure`** por fonte do prompt, cruzada com `stack_requests` (`stack_any`; o cruzamento é calculado para todas as fontes, e é nos livres que ele interessa).
-- **Limitação atual:** o relatório (`results/aggregate/report.md`) usa só `accuracy_a`. `accuracy_b`, as métricas visuais (Design2Code,
+- **Escopo do relatório:** o relatório (`results/aggregate/report.md`) usa só `accuracy_a`. `accuracy_b`, as métricas visuais (Design2Code,
   VES, CLIP, MAE, SSIM) e as de qualidade de código não entram em nenhum contraste; ficam em `runs.parquet` e `metrics_long.csv`, e o
-  painel mostra qualidade de código × VES sem teste estatístico. **H3 não tem análise implementada.**
+  painel mostra qualidade de código × VES sem teste estatístico. Não há análise estatística para H3.
 - `analyze` **recusa**: runs `metric_error` em `main` (lista quais), versões diferentes do oráculo, hashes de `mention_patterns`
   diferentes nas análises de livres, margem de equivalência alterada, runs do piloto, runs do gerador simulado e **navegadores
   diferentes** (`playwright_version` ou `browser_version`): reavaliar numa máquina ou Chromium diferente exige reavaliar todas as células.
@@ -315,8 +293,8 @@ console, axe, prompt + sha); prompts livres.
 `results/` é **inteiramente ignorado pelo git** (sem negações). Cada `record.json` reúne caminhos relativos, hashes de
 prompt/imagem/envelope/scaffold/oráculo, id solicitado e devolvido e parâmetros enviados, mas **não é autossuficiente**: grava só o
 `config_sha256` (não a configuração), e o código gerado, a resposta bruta e a captura ficam em arquivos ao lado dele. Os records do
-piloto 1 (`docs/pilot-1/`) ainda têm três limites: `config_sha256` calculado pela função antiga (que incluía os caminhos da máquina; não
-bate com o hash atual da mesma configuração), `repo_commit` = `b820545+dirty` (o commit da geração, não o da reavaliação) e nenhum
+piloto 1 (`docs/pilot-1/`) foram gerados por uma versão anterior do código: `config_sha256` calculado pela função antiga (que incluía os
+caminhos da máquina e não bate com o hash atual da mesma configuração), `repo_commit` do commit da geração (não o da reavaliação), e sem
 `finish_reason` nem `@sha` dos modelos de embedding. Detalhes em [docs/pilot-1/README.md](docs/pilot-1/README.md). `specui export` é um utilitário opcional,
 fora do fluxo principal, para depositar os dados com DOI (`MANIFEST.json` com sha256).
 
@@ -339,14 +317,11 @@ A proveniência do oráculo (tag, hash da árvore e do conteúdo, `pending.yaml`
 
 ## 16. Ameaças à validade
 
-- **Oráculos redigidos com apoio de um assistente de IA** (Claude Code, usado só na escrita do código, nunca como gerador nem como
-  avaliador) podem refletir convenções de código gerado por LLM; mitigado por seletores semânticos, aceitação de leituras múltiplas
-  (regra 1) e pela mutação/piloto, mas não eliminado.
 - **Recusas e truncamento** valem 0 na ITT; o relatório traz a taxa de executabilidade e a de `contract_failure`, e o painel mostra a contagem de execuções por status (`recusa` e `truncado` entre elas), mas não há taxa própria de recusa ou truncamento.
 - **Oráculo não validado contra implementação real** antes do piloto; defeitos de teste são corrigidos só depois, com registro.
-- **Teto da nota do nível A** (`accuracy_a` = 1,00 em 9 das 12 células do piloto 1; nas outras três, 0,92, 0,96 e 0,96). O que no código do oráculo contribui para isso, declarado como
-  ameaça e não corrigido: (a) PARTIAL vale 0,5, então asserções de invariante que passam com a funcionalidade quebrada davam piso de
-  0,5 (tratado: passos não pontuam e o efeito principal é pré-condição, seção 11); (b) `find_play_button` aceita, sem nome acessível,
+- **Teto da nota do nível A** (`accuracy_a` = 1,00 em 9 das 12 células do piloto 1; nas outras três, 0,92, 0,96 e 0,96). O que no código do oráculo contribui para isso:
+  (a) PARTIAL vale 0,5, então asserções de invariante que passam com a funcionalidade quebrada davam piso de 0,5 (passos não pontuam e o
+  efeito principal é pré-condição, seção 11); (b) `find_play_button` aceita, sem nome acessível,
   qualquer botão abaixo do visor; (c) E-A-03 ("fundo branco") passa de graça com o `preflight` do Tailwind; (d) as faixas de matiz
   são largas (verde 76°–166°, azul 190°–251°) e somam ±5° (PD-C2) e o limite de croma do cinza; (e) a isenção de matiz do corpo
   de "Aprovado" em H-A-03 (PD-H6). No piloto, as únicas asserções A que caíram foram três leituras de cor (M-A-06, M-A-12, H-A-03),

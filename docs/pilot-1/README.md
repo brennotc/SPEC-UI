@@ -48,21 +48,20 @@ MUT-M6×M-A-05, MUT-H4×H-A-03). O único NOT_APPLIED é MUT-H4×H-A-03 no run h
 
 Decisões e correções do oráculo: `oracles/CHANGELOG.md`.
 
-## Campos dos records que não refletem o código atual
+## Campos dos records gerados pela versão anterior do código
 
-Os 12 `runs/*/record.json` foram gerados em 2026-10-09/10 com o código de `b820545` (árvore suja, antes do refactor ser commitado) e
+Os 12 `runs/*/record.json` foram gerados por uma versão anterior do código e
 reavaliados depois com `specui evaluate --groups functional` (reavaliação só do grupo funcional: o estágio regrava `functional`, os campos
 `oracle_*` e as versões do Playwright/Chromium; os demais campos continuam os da geração). Por isso:
 
-- `repo_commit = b820545+dirty` é o commit da geração, não o da reavaliação nem o atual.
+- `repo_commit` aponta para o commit da geração (com `+dirty`), não para o da reavaliação.
 - `config_sha256` (`6822b0bd…`) foi calculado pela função antiga, que incluía os caminhos da máquina; não bate com o hash que o código atual
   calcula para a mesma configuração (`config_sha256` atual exclui `repo_root`, `workspace_dir`, `model_cache_dir`, `results_dir`,
   `benchmarks_dir`, `references_dir`, `oracles_dir` e `scaffold_dir`).
-- `finish_reason` é `null` (o campo existe a partir do commit `fac1b50`).
-- `embeddings.dinov2_model` e `embeddings.clip_model` têm só o nome do modelo, sem `@<sha do snapshot>` (a partir de `27cef6c`).
+- `finish_reason` é `null` (o campo foi acrescentado depois do piloto).
+- `embeddings.dinov2_model` e `embeddings.clip_model` têm só o nome do modelo, sem `@<sha do snapshot>` (sufixo acrescentado depois do piloto).
 - `accuracy_b`/`n_total` dos records em `antes/` usam o oráculo `94b727c0…` (anterior ao protocolo de passos).
-- Em `results/pilot/runs/` (fora do git) havia 4 pastas sem `record.json` (execuções interrompidas, só com `prompt.system.txt` e
-  `prompt.user.txt`); foram apagadas em 2026-10-10. Os `manifest.jsonl` (aqui e em `results/pilot/`) continuam listando as tentativas que
-  não geraram record.
+- O `manifest.jsonl` lista todas as tentativas por célula, inclusive as 2 com `api_error` que foram refeitas; o snapshot só traz as pastas
+  dos 12 runs `done` (em `results/pilot/`, fora do git, os `api_error` têm pasta e `record.json` próprios).
 - `failure_report.csv`: a coluna `classification` está preenchida só nas 3 linhas de nível A (`model_defect`, copiadas de
   `oracles/CHANGELOG.md`); as 59 linhas de nível B não têm classe por caso.
