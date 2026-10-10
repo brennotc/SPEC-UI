@@ -3,7 +3,7 @@
 import pytest
 
 from specui.harness import BrowserSession, StaticServer
-from specui.oracle import load_suite, run_suite
+from specui.oracle import load_suite, run_case, run_suite
 
 pytestmark = pytest.mark.slow
 
@@ -62,6 +62,10 @@ def audio_case(page, t):
 
 @case("R-A-10", requirements=["R-01"], level="A", task="erros", expected="só o erro real")
 def errors_case(page, t):
+    # como os casos reais (easy_pomodoro.helpers.locate): congela o relógio antes de agendar timers. Com o relógio correndo
+    # solto, o timer de 10 ms pode disparar sozinho entre o evaluate e o run_for e o resultado deixa de ser determinístico
+    # (medido: 4 em 40 rodadas com render_settle_ms=800; 0 em 40 com o relógio pausado).
+    page.clock.pause_at("2026-03-10T10:01:00")
     page.evaluate("setTimeout(() => { throw new Error('boom'); }, 10)")
     page.evaluate("setTimeout(() => { throw new Error('NotAllowedError: play() failed'); }, 20)")
     t.ok("run_for não levanta com erro do app", t.advance(100) is False)
@@ -142,3 +146,54 @@ def test_app_that_does_not_render_blocks_every_case(tmp_path):
     executed = [o for o in outcomes if o.outcome != "PENDING"]
     assert executed and all(o.outcome == "NO" and o.blocked for o in executed)
     assert "o app renderizou (app-root com conteúdo)" in executed[0].failed[0]
+
+
+LATE_PAGE = """<!doctype html><meta charset="utf-8"><body><app-root><p>carregando...</p></app-root>
+<script>setTimeout(() => { document.querySelector('app-root').innerHTML = '<div>25:00</div><button>play</button>'; }, 300);</script></body>"""
+
+LATE_CASE = '''
+from specui.oracle import case
+
+@case("L-A-01", requirements=["L-01"], level="A", task="abrir", expected="o visor aparece")
+def late_display(page, t):
+    t.require("o visor 25:00 está na tela", page.get_by_text("25:00").count() == 1)
+    t.ok("o botão está na tela", page.get_by_role("button", name="play").count() == 1)
+'''
+
+
+def test_case_waits_for_the_same_settle_as_the_initial_render(tmp_path):
+    """`app-root` com um filho ("carregando...") não é app pronto: o caso só começa depois de `render_settle_ms`, como o render
+    inicial. Sem a espera (render_settle_ms=0, o comportamento antigo) o primeiro caso lia a tela antes do conteúdo montar."""
+    root = tmp_path / "oracles"
+    (root / "late").mkdir(parents=True)
+    for pkg in (root, root / "late"):
+        (pkg / "__init__.py").write_text("", encoding="utf-8")
+    (root / "late" / "level_a.py").write_text(LATE_CASE, encoding="utf-8")
+    site = tmp_path / "site"
+    site.mkdir()
+    (site / "index.html").write_text(LATE_PAGE, encoding="utf-8")
+    spec = load_suite(root, "late").cases[0]
+    with StaticServer(site) as server:
+        with BrowserSession(render_settle_ms=0) as impatient:
+            before = run_case(spec, impatient, server.url, (1440, 900))
+        with BrowserSession(render_settle_ms=800) as settled:
+            after = run_case(spec, settled, server.url, (1440, 900))
+    assert before.outcome == "NO" and before.blocked and "o visor 25:00 está na tela" in before.failed[0]  # antes: falhava
+    assert after.outcome == "YES" and not after.blocked  # depois: passa
+
+
+def test_unrendered_app_does_not_wait_for_the_settle(tmp_path):
+    """Um app que nunca monta bloqueia o caso depressa: a espera de assentamento só vale para apps que renderizaram."""
+    root = tmp_path / "oracles"
+    (root / "late").mkdir(parents=True)
+    for pkg in (root, root / "late"):
+        (pkg / "__init__.py").write_text("", encoding="utf-8")
+    (root / "late" / "level_a.py").write_text(LATE_CASE, encoding="utf-8")
+    site = tmp_path / "site"
+    site.mkdir()
+    (site / "index.html").write_text("<!doctype html><body><app-root></app-root></body>", encoding="utf-8")
+    spec = load_suite(root, "late").cases[0]
+    with StaticServer(site) as server, BrowserSession(render_settle_ms=5000) as session:
+        out = run_case(spec, session, server.url, (1440, 900), root_timeout_ms=500)
+    assert out.outcome == "NO" and out.blocked
+    assert out.duration_ms < 4000  # a duração do próprio caso (sem abrir/fechar o Chromium): não esperou os 5 s do assentamento

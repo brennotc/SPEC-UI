@@ -1,0 +1,26 @@
+run: easy_pomodoro-no_spec__text__google__r0__20261009T220520
+caso: E-A-01 (easy_pomodoro)
+rodadas: 20, um Chromium novo por rodada
+
+01  YES     blocked=False pass=4/4 steps=1  10.8s  failed=[]  error=None
+02  YES     blocked=False pass=4/4 steps=1   4.6s  failed=[]  error=None
+03  YES     blocked=False pass=4/4 steps=1   3.1s  failed=[]  error=None
+04  YES     blocked=False pass=4/4 steps=1   2.5s  failed=[]  error=None
+05  YES     blocked=False pass=4/4 steps=1   2.4s  failed=[]  error=None
+06  YES     blocked=False pass=4/4 steps=1   2.2s  failed=[]  error=None
+07  YES     blocked=False pass=4/4 steps=1   2.3s  failed=[]  error=None
+08  YES     blocked=False pass=4/4 steps=1   3.2s  failed=[]  error=None
+09  YES     blocked=False pass=4/4 steps=1   3.7s  failed=[]  error=None
+10  YES     blocked=False pass=4/4 steps=1   4.2s  failed=[]  error=None
+11  YES     blocked=False pass=4/4 steps=1   3.1s  failed=[]  error=None
+12  YES     blocked=False pass=4/4 steps=1   2.9s  failed=[]  error=None
+13  YES     blocked=False pass=4/4 steps=1   3.9s  failed=[]  error=None
+14  YES     blocked=False pass=4/4 steps=1   1.7s  failed=[]  error=None
+15  YES     blocked=False pass=4/4 steps=1   2.4s  failed=[]  error=None
+16  YES     blocked=False pass=4/4 steps=1   2.2s  failed=[]  error=None
+17  YES     blocked=False pass=4/4 steps=1   2.3s  failed=[]  error=None
+18  YES     blocked=False pass=4/4 steps=1   2.1s  failed=[]  error=None
+19  YES     blocked=False pass=4/4 steps=1   1.6s  failed=[]  error=None
+20  YES     blocked=False pass=4/4 steps=1   1.8s  failed=[]  error=None
+
+resumo: {'YES': 20}

@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 from playwright.sync_api import expect
 
 from specui.clock import FIXED_NOW
-from specui.harness.browser import BrowserSession
+from specui.harness.browser import BrowserSession, load_app
 from specui.models import CaseOutcome
 from specui.oracle.protocol import REGISTRY, BlockedError, CaseSpec, Checks, classify, now_ms
 from specui.oracle.requirements import Requirement, load_pending, load_requirements
@@ -39,7 +39,6 @@ SPIES_JS = """
   }
 })();
 """
-_ROOT_READY = "() => { const r = document.querySelector('app-root'); return !!r && r.childElementCount > 0; }"
 
 
 @dataclass
@@ -126,12 +125,12 @@ def run_case(
         if block_network:
             session.install_network_policy(context, f"{parsed.scheme}://{parsed.netloc}", blocked_urls)
         checks = Checks(page, page_errors)
-        page.goto(url, wait_until="load", timeout=30_000)
-        try:
-            page.wait_for_function(_ROOT_READY, timeout=root_timeout_ms)
-        except Exception as exc:
-            checks.ok("o app renderizou (app-root com conteúdo)", False, type(exc).__name__)
-            raise BlockedError("app-root não renderizou") from exc
+        # a MESMA sequência do render inicial (goto -> app-root -> fonts.ready -> render_settle_ms): sem a espera de
+        # assentamento, o primeiro caso de um Chromium recém-aberto podia começar antes do conteúdo montar
+        load_error = load_app(page, url, session.render_settle_ms, root_timeout_ms, settle_if_failed=False)
+        if load_error is not None:
+            checks.ok("o app renderizou (app-root com conteúdo)", False, load_error)
+            raise BlockedError("app-root não renderizou")
         if mutation is not None:
             applied = bool(page.evaluate(mutation.after_js)) if mutation.after_js else True
             if mutation_applied is not None:

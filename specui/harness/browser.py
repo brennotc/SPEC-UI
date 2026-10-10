@@ -23,10 +23,32 @@ from specui.clock import FIXED_NOW
 logger = logging.getLogger(__name__)
 
 _JS_DIR = Path(__file__).parent / "js"
-_ROOT_READY = (
-    "() => { const r = document.querySelector('app-root'); return !!r && r.childElementCount > 0; }"
-)
+ROOT_READY = "() => { const r = document.querySelector('app-root'); return !!r && r.childElementCount > 0; }"
+GOTO_TIMEOUT_MS = 30_000
+ROOT_TIMEOUT_MS = 15_000
 _AXE_IMPACTS = ("critical", "serious", "moderate", "minor")
+
+
+def load_app(
+    page: Page, url: str, settle_ms: int, root_timeout_ms: int = ROOT_TIMEOUT_MS, settle_if_failed: bool = True
+) -> str | None:
+    """A sequência ÚNICA que leva uma página ao "app pronto": o render inicial e cada caso do oráculo usam esta função.
+
+    goto(load) -> `app-root` com ao menos 1 filho -> `document.fonts.ready` -> espera de `settle_ms` (render_settle_ms).
+    O `app-root` com um filho é só "o Angular montou algo": o conteúdo real pode vir depois (um `@if` que espera o estado
+    inicial, um setTimeout, a fonte), e o primeiro caso de um Chromium recém-aberto é o que mais sofre com isso.
+    Devolve None se o app-root renderizou, ou o nome da exceção (ex.: TimeoutError) se não; com `settle_if_failed=False` não
+    espera os 800 ms numa página que nunca montou (o oráculo só vai bloquear o caso)."""
+    page.goto(url, wait_until="load", timeout=GOTO_TIMEOUT_MS)
+    error: str | None = None
+    try:
+        page.wait_for_function(ROOT_READY, timeout=root_timeout_ms)
+    except Exception as exc:  # noqa: BLE001 - timeout = app-root nunca renderizou
+        error = type(exc).__name__
+    if error is None or settle_if_failed:
+        page.evaluate("document.fonts.ready")
+        page.wait_for_timeout(settle_ms)
+    return error
 
 
 def _js(name: str) -> str:
@@ -148,14 +170,11 @@ class BrowserSession:
             page.on("pageerror", lambda err: art.page_errors.append(str(err)))
             page.on("console", lambda msg: art.console_errors.append(msg.text) if msg.type == "error" else None)
 
-            page.goto(url, wait_until="load", timeout=30_000)
-            try:
-                page.wait_for_function(_ROOT_READY, timeout=15_000)
+            error = load_app(page, url, self.render_settle_ms)
+            if error is None:
                 art.render_ok = True
-            except Exception as exc:  # noqa: BLE001 - timeout = app-root nunca renderizou
-                art.errors.append(f"app-root não renderizou: {type(exc).__name__}")
-            page.evaluate("document.fonts.ready")
-            page.wait_for_timeout(self.render_settle_ms)
+            else:
+                art.errors.append(f"app-root não renderizou: {error}")
 
             shot = out_dir / "screenshot.png"
             page.screenshot(path=str(shot), full_page=False)
