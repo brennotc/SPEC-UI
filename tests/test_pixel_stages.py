@@ -222,3 +222,27 @@ def test_reevaluate_rejects_runs_without_render(cfg, task, tmp_path):
     root, rec = _stored_run(tmp_path, task, status="format_failure")
     with pytest.raises(ValueError, match="não tem render"):
         reevaluate_record(cfg, root, rec, task)
+
+
+def test_design2code_is_none_not_zero_when_the_dom_extraction_failed(cfg, task, tmp_path):
+    """Falha ao extrair os blocos do DOM não pode virar nota 0 (= página vazia): a métrica fica None com o motivo."""
+    ctx = _ctx(cfg, task, tmp_path, dom=[])
+    ctx.render.errors.append("dom_blocks falhou: Execution context was destroyed")
+    stage_design2code(ctx)
+    assert ctx.record.design2code is None
+    assert any("design2code: blocos do DOM indisponíveis" in e and "Execution context" in e for e in ctx.record.errors)
+    assert ctx.record.status == "done"  # falha de extração não é falha do modelo
+
+
+def test_design2code_still_scores_zero_for_a_legitimately_empty_page(cfg, task, tmp_path):
+    ctx = _ctx(cfg, task, tmp_path, dom=[])  # extraiu e a página não tem nenhum texto
+    stage_design2code(ctx)
+    m = ctx.record.design2code
+    assert m is not None and (m.block_match, m.text, m.position, m.color) == (0.0, 0.0, 0.0, 0.0)
+
+
+def test_reevaluation_without_the_stored_blocks_file_leaves_design2code_none(cfg, task, tmp_path):
+    root, rec = _stored_run(tmp_path, task)
+    (root / "runs" / "run-1" / "dom_blocks.json").unlink()
+    out = reevaluate_record(cfg, root, rec, task, groups=["visual"])
+    assert out.design2code is None and any("dom_blocks.json ausente" in e for e in out.errors)

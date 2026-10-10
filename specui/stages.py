@@ -74,8 +74,23 @@ def stage_technical(ctx: StageContext) -> None:
     ctx.record.technical = compute_technical(ctx.render)
 
 
+def _dom_blocks_failed(ctx: StageContext) -> str | None:
+    """Mensagem se a extração dos blocos de texto do DOM falhou (ou o arquivo sumiu), senão None.
+
+    Sem blocos NÃO se pode medir Design2Code: `[]` por falha daria block_match = text = position = color = 0,0, que é
+    indistinguível de uma página legitimamente vazia. Falha de extração => métrica `None` com o motivo em `errors`."""
+    for message in (*ctx.render.errors, *ctx.record.errors):
+        if message.startswith("dom_blocks falhou"):
+            return message
+    return None
+
+
 def stage_design2code(ctx: StageContext) -> None:
     """Block-Match, Text, Position e Color contra os blocos do design do Figma."""
+    failed = _dom_blocks_failed(ctx)
+    if failed is not None:
+        _note(ctx, f"design2code: blocos do DOM indisponíveis ({failed})")
+        return
     try:
         refs, source = load_reference_blocks(
             ctx.task, ctx.cfg.path("references_dir"), ctx.cfg.enable_ocr_fallback
@@ -211,8 +226,9 @@ def render_from_disk(rec: RunRecord, run_dir: Path, viewport: tuple[int, int]) -
         return json.loads(path.read_text(encoding="utf-8")) if path and path.is_file() else None
 
     tech = rec.technical
+    missing = [] if load("dom_blocks") is not None else ["dom_blocks falhou: dom_blocks.json ausente nos artefatos gravados"]
     return RenderArtifacts(
-        render_ok=bool(rec.exec.render_ok),
+        render_ok=bool(rec.exec.render_ok), errors=missing,
         viewport=viewport,
         screenshot_path=str(run_dir / rec.paths["screenshot"]) if "screenshot" in rec.paths else None,
         console_errors=list(tech.console_errors) if tech else [],
