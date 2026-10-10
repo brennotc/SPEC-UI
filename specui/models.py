@@ -303,7 +303,8 @@ class CaseOutcome(BaseModel):
     outcome: Literal["YES", "PARTIAL", "NO", "PENDING"]
     blocked: bool = False  # pré-condição não atendida: o caso não pôde ser concluído (vale NO)
     n_pass: int = 0
-    n_total: int = 0  # asserções pontuadas (pass + fail); as PENDING ficam de fora
+    n_total: int = 0  # asserções pontuadas (pass + fail); PENDING e passos (ações/pré-condições que deram certo) ficam de fora
+    n_steps: int = 0  # passos executados com sucesso (não pontuam)
     requirements: list[str] = Field(default_factory=list)
     failed: list[str] = Field(default_factory=list)  # "<asserção> :: <detalhe>" das que falharam
     error: str | None = None  # exceção inesperada (bug do oráculo ou do app), não falha de asserção

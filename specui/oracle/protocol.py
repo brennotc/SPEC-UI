@@ -9,8 +9,15 @@ YES / PARTIAL / NO, calculado a partir das asserções que o próprio script reg
     NO       nenhuma passou, OU uma exceção inesperada escapou, OU uma pré-condição falhou
              (`blocked=True`: o caso não pôde ser concluído; vale 0, fica no denominador)
 
-As asserções NUNCA levantam exceção: um locator que não achou nada vira asserção falha, o caso
-segue, e "elemento presente mas inerte" (PARTIAL) se distingue de "elemento ausente" (NO).
+Como no WebGen-Bench, só o *Expected Result* pontua; o *Task* (o que o usuário faz) são PASSOS:
+
+    ok / eventually   asserção sobre o resultado: PONTUA (pass ou fail)
+    act               ação do usuário (clicar, digitar, arrastar): se funciona é um PASSO (não pontua); se levanta, é fail
+    require           pré-condição: se passa é um PASSO (não pontua); se falha, o caso termina NO (`blocked=True`)
+
+Sem isso, "o clique aconteceu" valeria ponto mesmo com o app inerte, e uma feature inteiramente quebrada custaria 0,5
+em vez de 0. As asserções NUNCA levantam exceção: um locator que não achou nada vira asserção falha, o caso segue,
+e "elemento presente mas inerte" (PARTIAL) se distingue de "elemento ausente" (NO).
 Asserções PENDING (decisão do pesquisador ainda aberta) ficam fora do numerador e do denominador.
 """
 
@@ -25,7 +32,7 @@ from playwright.sync_api import Page
 from playwright.sync_api import TimeoutError as PlaywrightTimeout
 
 Level = Literal["A", "B"]
-Status = Literal["pass", "fail", "pending"]
+Status = Literal["pass", "fail", "pending", "step"]
 Outcome = Literal["YES", "PARTIAL", "NO"]
 
 # Erros que o app não causa de verdade: o navegador sem interação do usuário recusa tocar áudio.
@@ -76,19 +83,24 @@ class Checks:
         return True
 
     def act(self, name: str, fn: Callable[[], Any]) -> bool:
-        """Ação do usuário (clicar, digitar, arrastar). Se falhar, é uma asserção falha, não exceção."""
+        """Ação do usuário (clicar, digitar, arrastar). Funcionou: é um PASSO (não pontua). Falhou (o elemento não
+        existe, não aceita o gesto): é uma asserção falha, não exceção."""
         try:
             fn()
         except (AssertionError, PlaywrightTimeout, PlaywrightError, ValueError) as exc:
             self.records.append(AssertionRecord(name, "fail", _first_line(exc)))
             return False
-        self.records.append(AssertionRecord(name, "pass"))
+        self.records.append(AssertionRecord(name, "step"))
         return True
 
     def require(self, name: str, condition: Any, detail: str = "") -> None:
-        """Pré-condição: registra a asserção e, se falhar, interrompe o caso (NO, blocked)."""
-        if not self.ok(name, condition, detail):
-            raise BlockedError(name)
+        """Pré-condição. Passou: é um PASSO (não pontua). Falhou: registra a asserção falha e interrompe o caso
+        (NO, blocked). Use `require` para o efeito principal antes dos invariantes que passam com o app inerte."""
+        if condition:
+            self.records.append(AssertionRecord(name, "step"))
+            return
+        self.records.append(AssertionRecord(name, "fail", detail))
+        raise BlockedError(name)
 
     def advance(self, ms: int) -> bool:
         """Avança o relógio falso disparando TODOS os timers vencidos (`run_for`, não `fast_forward`:
@@ -115,6 +127,11 @@ class Checks:
     @property
     def n_pass(self) -> int:
         return sum(r.status == "pass" for r in self.records)
+
+    @property
+    def n_steps(self) -> int:
+        """Passos executados (ações e pré-condições que deram certo): contexto do caso, fora da pontuação."""
+        return sum(r.status == "step" for r in self.records)
 
     @property
     def n_fail(self) -> int:

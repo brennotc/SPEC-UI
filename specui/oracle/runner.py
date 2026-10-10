@@ -149,7 +149,7 @@ def run_case(
     return CaseOutcome(
         case_id=spec.id, level=spec.level, outcome=classify(records, crashed=crashed, blocked=blocked),
         blocked=blocked, n_pass=sum(r.status == "pass" for r in records),
-        n_total=sum(r.status in ("pass", "fail") for r in records),
+        n_total=sum(r.status in ("pass", "fail") for r in records), n_steps=sum(r.status == "step" for r in records),
         requirements=list(spec.requirements), failed=checks.failed() if checks else [],
         error=error, duration_ms=int(now_ms() - started),
     )
@@ -181,7 +181,7 @@ _FORBIDDEN = [
     (re.compile(r"""\[(?:class|id)\s*[\^$*~|]?="""), "atributo class/id em seletor"),
     (re.compile(r"""locator\(\s*(?:f|r)?["']\s*css\s*="""), "css= explícito"),
 ]
-_BODY_USES_CHECKS = re.compile(r"\bt\b")
+_BODY_SCORES = re.compile(r"\bt\.(?:ok|eventually)\(")  # só ok/eventually pontuam; act e require são passos
 
 
 def _strip_comment(line: str) -> str:
@@ -221,8 +221,11 @@ def lint_suite(suite: Suite, oracles_dir: str | Path) -> list[str]:
             problems.append(f"{spec.id}: pendência {spec.pending} não existe em pending.yaml")
         if not spec.pending and spec.fn is not None:
             body = inspect.getsource(spec.fn).split("\n", 2)[-1]
-            if not _BODY_USES_CHECKS.search(body):
-                problems.append(f"{spec.id}: o caso não registra nenhuma asserção")
+            if not _BODY_SCORES.search(body):
+                problems.append(
+                    f"{spec.id}: o caso não tem nenhuma asserção pontuada (t.ok/t.eventually); act e require são passos, "
+                    "então ele daria NO por 'sem asserção pontuada'"
+                )
 
     sources = sorted(suite.root.glob("*.py")) + sorted((oracles_dir / "common").glob("*.py"))
     for path in sources:

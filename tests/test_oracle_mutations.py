@@ -110,12 +110,12 @@ def test_mutations_are_killed_or_survive_as_expected(served, tmp_path):
     with BrowserSession() as session:
         rows = run_mutations(suite, session, dist, (1440, 900), "run-x", catalog)
     by = {(r.mutation_id, r.case_id): r for r in rows}
-    assert by[("X1", "D-A-01")].verdict == "WEAK"  # o clique acontece, o efeito não: 1 de 2 asserções cai
+    assert by[("X1", "D-A-01")].verdict == "KILLED"  # o clique é só um passo: sem o efeito não sobra nenhum ponto
     assert by[("X2", "D-A-01")].verdict == "KILLED"
     assert by[("X3", "D-A-02")].verdict == "KILLED"
     assert by[("X4", "D-A-03")].verdict == "KILLED"
     assert by[("X5", "D-A-03")].verdict == "SURVIVED"  # a página demo não depende do evento input: o teste não deve cair
-    assert by[("X6", "D-A-04")].verdict == "WEAK"  # iniciar passa, a contagem não: 1 de 2
+    assert by[("X6", "D-A-04")].verdict == "KILLED"  # iniciar é passo; a contagem era a única asserção
     assert by[("X7", "D-A-06")].verdict == "KILLED"
     assert by[("X8", "D-A-02")].verdict == "KILLED"
     assert by[("X9", "D-A-05")].verdict == "NOT_APPLIED"  # nada para remover

@@ -40,3 +40,11 @@ Cada item foi confirmado abrindo o código/app gerado: o app fazia o que o promp
   (`GRAY_MAX_CHROMA`, `HUE_TOLERANCE`, `hue_matches`) e nos testes de nível A das três tarefas; registradas em cada `pending.yaml`.
   Efeito no piloto: `H-A-01` (cinza-azulado), `H-A-05/08/10` (vermelho-rosado a 344°) e `H-A-03` no Kanban no_spec
   multimodal (lilás a 249°) passam.
+
+### Protocolo de pontuação (revisão S2, `specui/oracle/protocol.py`)
+- **test_defect (protocolo)**: `act` bem-sucedido e `require` que passa deixam de pontuar: viram **passos** (`status="step"`,
+  `n_steps` no `CaseOutcome`). Só `ok`/`eventually` pontuam (o *Expected Result* do WebGen-Bench); `act` que falha continua `fail`
+  e `require` que falha continua encerrando o caso em NO (`blocked`). Motivo: com ação e pré-condição pontuando, uma feature
+  inteiramente quebrada valia 0,5 (PARTIAL) em vez de 0; 63 dos 140 pares da mutação do piloto 1 saíram WEAK por isso.
+- `oracle-lint` passa a exigir ao menos um `t.ok`/`t.eventually` por caso (senão o caso daria NO por "sem asserção pontuada").
+  Nas três suítes: 0 casos acusados. Nenhum caso foi alterado neste item (as promoções a `require` vêm nos itens seguintes).

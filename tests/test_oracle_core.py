@@ -42,6 +42,10 @@ def rec(*statuses: str) -> list[AssertionRecord]:
         (("fail", "pass", "fail"), False, False, "PARTIAL"),
         (("fail", "fail"), False, False, "NO"),
         ((), False, False, "NO"),  # sem asserção nenhuma: NO (o lint pega o caso mal escrito)
+        (("step", "step", "pass"), False, False, "YES"),  # passos (ações/pré-condições que deram certo) não pontuam
+        (("step", "step", "fail"), False, False, "NO"),  # o app fez a ação e o resultado não veio: antes valia PARTIAL
+        (("step", "step"), False, False, "NO"),  # só passos: nenhuma asserção pontuada
+        (("step", "pass", "fail"), False, False, "PARTIAL"),
         (("pass", "pass"), True, False, "NO"),  # exceção inesperada escapou
         (("pass", "pass"), False, True, "NO"),  # pré-condição falhou
         (("pass", "pending", "pending"), False, False, "YES"),  # PENDING não pontua
@@ -61,6 +65,8 @@ def test_checks_never_raise_on_failed_assertions():
     assert not t.act("ação que quebra", lambda: (_ for _ in ()).throw(PlaywrightError("elemento sumiu")))
     t.pending("depende de decisão", "PD-E1")
     assert (t.n_pass, t.n_fail) == (2, 3) and len(t.scored) == 5 and len(t.records) == 6
+    assert t.act("ação que funciona", lambda: None) is True
+    assert (t.n_pass, t.n_steps, len(t.scored)) == (2, 1, 5)  # o passo bem-sucedido não pontua
     assert t.failed()[0] == "falsa :: motivo" and "AssertionError: x != y" in t.failed()[1]
 
 
@@ -71,7 +77,8 @@ def test_require_blocks_the_case():
     t.require("pré-condição boa", True)
     with pytest.raises(BlockedError):
         t.require("pré-condição ruim", False, "faltou o botão")
-    assert t.n_pass == 1 and t.n_fail == 1
+    assert (t.n_pass, t.n_steps, t.n_fail) == (0, 1, 1)  # a que passou é passo; a que falhou pontua como falha
+    assert t.failed() == ["pré-condição ruim :: faltou o botão"]
 
 
 def test_advance_swallows_errors_thrown_by_app_timers():
@@ -163,6 +170,11 @@ def unknown_requirement(page, t):
 @case("D-A-04", requirements=["D-01"], level="A", task="x", expected="y")
 def no_assertions(page, t):
     page.title()
+
+@case("D-A-05", requirements=["D-01"], level="A", task="x", expected="y")
+def only_steps(page, t):
+    t.require("a página existe", page.title() is not None)
+    t.act("clicar", lambda: page.locator("body").click())
 '''
 
 DEMO_REQS = """
@@ -219,7 +231,7 @@ def test_invalid_requirement_data_fails_on_load(tmp_path):
 
 def test_load_suite_orders_cases_and_marks_pending(demo_oracles):
     suite = load_suite(demo_oracles, "demo")
-    assert [c.id for c in suite.cases] == ["D-A-01", "D-A-02", "D-A-03", "D-A-04", "D-A-10"]  # ordem natural
+    assert [c.id for c in suite.cases] == ["D-A-01", "D-A-02", "D-A-03", "D-A-04", "D-A-05", "D-A-10"]  # ordem natural
     assert suite.cases[-1].pending == "PD-D1" and suite.cases[0].task_id == "demo"
     assert load_suite(demo_oracles, "demo").cases == suite.cases  # recarregar não duplica o registro
 
@@ -228,7 +240,8 @@ def test_lint_finds_authoring_problems(demo_oracles):
     suite = load_suite(demo_oracles, "demo")
     problems = "\n".join(lint_suite(suite, demo_oracles))
     assert "D-A-03: requisitos inexistentes ['D-99']" in problems
-    assert "D-A-04: o caso não registra nenhuma asserção" in problems
+    assert "D-A-04: o caso não tem nenhuma asserção pontuada" in problems
+    assert "D-A-05: o caso não tem nenhuma asserção pontuada" in problems  # só require/act: daria NO por "sem asserção pontuada"
     assert "D-A-01:" not in problems and "D-A-02:" not in problems  # os casos corretos passam no lint
     assert "D-A-10" not in problems  # caso pendente válido
 

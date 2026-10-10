@@ -93,7 +93,8 @@ def test_runner_outcomes_flags_and_environment(served):
     suite = load_suite(root, "demo2")
     outcomes = {o.case_id: o for o in run_suite(suite, session, url, (1440, 900))}
 
-    assert outcomes["R-A-01"].outcome == "YES" and outcomes["R-A-01"].n_pass == 2 == outcomes["R-A-01"].n_total
+    first = outcomes["R-A-01"]  # act (passo) + eventually (pontua)
+    assert first.outcome == "YES" and (first.n_pass, first.n_total, first.n_steps) == (1, 1, 1)
     p = outcomes["R-A-02"]
     assert (p.outcome, p.n_pass, p.n_total) == ("PARTIAL", 1, 2) and p.failed == ["não existe :: faltou o Tchau"]
     n = outcomes["R-A-03"]
