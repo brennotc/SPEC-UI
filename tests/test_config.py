@@ -99,3 +99,14 @@ def test_workspace_dir_default_depends_on_the_platform(monkeypatch):
 def test_default_yaml_does_not_pin_a_windows_workspace(repo_root):
     lines = (repo_root / "configs" / "default.yaml").read_text(encoding="utf-8").splitlines()
     assert not [line for line in lines if line.startswith("workspace_dir:")]  # comentários não contam
+
+
+def test_playwright_is_pinned_and_the_lock_agrees(repo_root):
+    """A versão do Playwright define o Chromium (render, métricas visuais, cores do oráculo): precisa ser exata."""
+    req = (repo_root / "requirements.txt").read_text(encoding="utf-8")
+    pinned = [line for line in req.splitlines() if line.startswith("playwright==")]
+    assert len(pinned) == 1
+    version = pinned[0].split("==")[1].split()[0]
+    lock = (repo_root / "requirements.lock").read_text(encoding="utf-8").splitlines()
+    assert f"playwright=={version}" in lock
+    assert not any(line.startswith("specui") for line in lock)

@@ -95,7 +95,8 @@ Python 3.12 e Node 22 (`.nvmrc`).
 
 ```bash
 python -m venv .venv && .venv\Scripts\activate          # Windows
-pip install -e . -r requirements.txt -r requirements-dev.txt
+pip install -e . -r requirements.txt -r requirements-dev.txt   # versões mínimas; para o ambiente exato do piloto:
+# pip install -r requirements.lock && pip install -e . --no-deps
 pip install -r requirements-ml.txt                       # DINOv2/CLIP (torch-cpu); sem isso VES/CLIP ficam null com o motivo
 pip install -r requirements-ocr.txt                      # opcional: referência por OCR quando falta o JSON do Figma
 playwright install chromium
@@ -104,7 +105,8 @@ specui scaffold-check                                    # npm ci uma vez e buil
 specui check-model                                       # confirma os ids dos dois modelos (recusa alias -latest/-preview)
 ```
 
-Windows: `git config core.longpaths true`. O `workspace_dir` (`C:/specui-work`) é curto de propósito (limite de caminho).
+`requirements.lock` é o `pip freeze` do ambiente do piloto 1 (Playwright 1.62.0 → Chromium 151.0.7922.34, torch 2.14.1, transformers 5.19.0);
+`playwright` é a única dependência pinada em `requirements.txt`, porque a versão define o navegador. Windows: `git config core.longpaths true`. O `workspace_dir` (`C:/specui-work`) é curto de propósito (limite de caminho).
 
 ## 6. Tarefas, requisitos e rastreabilidade
 
