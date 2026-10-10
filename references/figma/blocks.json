@@ -1,0 +1,674 @@
+{
+ "easy_pomodoro": {
+  "node_id": "9:46",
+  "frame": {
+   "width": 1440.0,
+   "height": 900.0
+  },
+  "blocks": [
+   {
+    "text": "Pomodoro",
+    "x0": 69.0,
+    "y0": 13.0,
+    "x1": 245.0,
+    "y1": 57.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 36.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Foco Total",
+    "x0": 631.0,
+    "y0": 288.0,
+    "x1": 808.0,
+    "y1": 332.0,
+    "color_rgb": [
+     113,
+     108,
+     108
+    ],
+    "font_size": 36.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "25:00",
+    "x0": 544.0,
+    "y0": 372.0,
+    "x1": 895.0,
+    "y1": 527.0,
+    "color_rgb": [
+     113,
+     108,
+     108
+    ],
+    "font_size": 128.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Foco Total:",
+    "x0": 24.0,
+    "y0": 822.0,
+    "x1": 149.0,
+    "y1": 851.0,
+    "color_rgb": [
+     215,
+     71,
+     71
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "25:00",
+    "x0": 166.0,
+    "y0": 822.0,
+    "x1": 232.0,
+    "y1": 851.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Pausa Curta:",
+    "x0": 600.0,
+    "y0": 822.0,
+    "x1": 746.0,
+    "y1": 851.0,
+    "color_rgb": [
+     101,
+     139,
+     92
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "05:00",
+    "x0": 762.0,
+    "y0": 822.0,
+    "x1": 829.0,
+    "y1": 851.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Pausa Longa:",
+    "x0": 1169.0,
+    "y0": 822.0,
+    "x1": 1322.0,
+    "y1": 851.0,
+    "color_rgb": [
+     86,
+     132,
+     217
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "15:00",
+    "x0": 1340.0,
+    "y0": 822.0,
+    "x1": 1403.0,
+    "y1": 851.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   }
+  ]
+ },
+ "medium_tarefas": {
+  "node_id": "9:47",
+  "frame": {
+   "width": 1440.00390625,
+   "height": 900.0
+  },
+  "blocks": [
+   {
+    "text": "Tarefas Para Fazer",
+    "x0": 69.0,
+    "y0": 13.0,
+    "x1": 387.0,
+    "y1": 57.0,
+    "color_rgb": [
+     0,
+     0,
+     0
+    ],
+    "font_size": 36.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "__/__/__",
+    "x0": 144.0,
+    "y0": 113.0,
+    "x1": 268.0,
+    "y1": 157.0,
+    "color_rgb": [
+     0,
+     0,
+     0
+    ],
+    "font_size": 36.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Prioridade:",
+    "x0": 368.0,
+    "y0": 113.0,
+    "x1": 533.0,
+    "y1": 157.0,
+    "color_rgb": [
+     213,
+     208,
+     208
+    ],
+    "font_size": 36.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Data:",
+    "x0": 24.0,
+    "y0": 115.0,
+    "x1": 104.0,
+    "y1": 154.0,
+    "color_rgb": [
+     213,
+     208,
+     208
+    ],
+    "font_size": 32.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Selecione",
+    "x0": 581.0,
+    "y0": 120.0,
+    "x1": 692.0,
+    "y1": 149.0,
+    "color_rgb": [
+     0,
+     0,
+     0
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Hoje",
+    "x0": 59.0,
+    "y0": 228.0,
+    "x1": 128.0,
+    "y1": 267.0,
+    "color_rgb": [
+     96,
+     194,
+     229
+    ],
+    "font_size": 32.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Lavar a louça",
+    "x0": 308.0,
+    "y0": 307.0,
+    "x1": 458.0,
+    "y1": 336.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "URGENTE",
+    "x0": 90.0,
+    "y0": 310.0,
+    "x1": 186.0,
+    "y1": 334.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 20.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Organizar o lixo para a reciclagem",
+    "x0": 308.0,
+    "y0": 393.0,
+    "x1": 693.0,
+    "y1": 422.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "RELAXA",
+    "x0": 98.0,
+    "y0": 396.0,
+    "x1": 178.0,
+    "y1": 420.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 20.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Fazer mercado",
+    "x0": 308.0,
+    "y0": 479.0,
+    "x1": 478.0,
+    "y1": 508.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "MÉDIO",
+    "x0": 104.0,
+    "y0": 483.0,
+    "x1": 170.0,
+    "y1": 507.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 20.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Amanhã",
+    "x0": 59.0,
+    "y0": 558.0,
+    "x1": 183.0,
+    "y1": 597.0,
+    "color_rgb": [
+     96,
+     194,
+     229
+    ],
+    "font_size": 32.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Lavar roupas",
+    "x0": 308.0,
+    "y0": 637.0,
+    "x1": 455.0,
+    "y1": 666.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "URGENTE",
+    "x0": 90.0,
+    "y0": 640.0,
+    "x1": 186.0,
+    "y1": 664.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 20.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Organizar o lixo para a reciclagem",
+    "x0": 308.0,
+    "y0": 723.0,
+    "x1": 693.0,
+    "y1": 752.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "RELAXA",
+    "x0": 98.0,
+    "y0": 726.0,
+    "x1": 178.0,
+    "y1": 750.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 20.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Nova tarefa:",
+    "x0": 24.0,
+    "y0": 845.0,
+    "x1": 163.0,
+    "y1": 874.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "__/__/__",
+    "x0": 198.0,
+    "y0": 846.0,
+    "x1": 281.0,
+    "y1": 873.0,
+    "color_rgb": [
+     0,
+     0,
+     0
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Descrição da tarefa",
+    "x0": 503.0,
+    "y0": 848.0,
+    "x1": 688.0,
+    "y1": 872.0,
+    "color_rgb": [
+     0,
+     0,
+     0
+    ],
+    "font_size": 20.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Prioridade",
+    "x0": 333.0,
+    "y0": 850.0,
+    "x1": 430.0,
+    "y1": 874.0,
+    "color_rgb": [
+     0,
+     0,
+     0
+    ],
+    "font_size": 20.0,
+    "source": "figma",
+    "confidence": 1.0
+   }
+  ]
+ },
+ "hard_kanban": {
+  "node_id": "9:48",
+  "frame": {
+   "width": 1440.0,
+   "height": 900.0
+  },
+  "blocks": [
+   {
+    "text": "Kanban",
+    "x0": 69.0,
+    "y0": 12.0,
+    "x1": 198.0,
+    "y1": 56.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 36.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Para fazer",
+    "x0": 117.0,
+    "y0": 120.0,
+    "x1": 271.0,
+    "y1": 159.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 32.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Em Progresso",
+    "x0": 442.0,
+    "y0": 120.0,
+    "x1": 651.0,
+    "y1": 159.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 32.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Feito",
+    "x0": 858.0,
+    "y0": 120.0,
+    "x1": 933.0,
+    "y1": 159.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 32.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Aprovado",
+    "x0": 1173.0,
+    "y0": 120.0,
+    "x1": 1319.0,
+    "y1": 159.0,
+    "color_rgb": [
+     255,
+     255,
+     255
+    ],
+    "font_size": 32.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Testes end-to-end para garantir o funcionamento do site",
+    "x0": 84.0,
+    "y0": 253.0,
+    "x1": 319.0,
+    "y1": 369.0,
+    "color_rgb": [
+     0,
+     0,
+     0
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Testes end-to-end para garantir o funcionamento do site",
+    "x0": 436.0,
+    "y0": 253.0,
+    "x1": 671.0,
+    "y1": 369.0,
+    "color_rgb": [
+     0,
+     0,
+     0
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Testes end-to-end para garantir o funcionamento do site",
+    "x0": 786.0,
+    "y0": 253.0,
+    "x1": 1021.0,
+    "y1": 369.0,
+    "color_rgb": [
+     0,
+     0,
+     0
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Testes end-to-end para garantir o funcionamento do site",
+    "x0": 1136.0,
+    "y0": 253.0,
+    "x1": 1371.0,
+    "y1": 369.0,
+    "color_rgb": [
+     0,
+     0,
+     0
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Testes unitários no backend para garantir respostas consistentes",
+    "x0": 84.0,
+    "y0": 475.0,
+    "x1": 319.0,
+    "y1": 591.0,
+    "color_rgb": [
+     0,
+     0,
+     0
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Testes unitários no backend para garantir respostas consistentes",
+    "x0": 436.0,
+    "y0": 475.0,
+    "x1": 671.0,
+    "y1": 591.0,
+    "color_rgb": [
+     0,
+     0,
+     0
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Testes unitários no backend para garantir respostas consistentes",
+    "x0": 786.0,
+    "y0": 475.0,
+    "x1": 1021.0,
+    "y1": 591.0,
+    "color_rgb": [
+     0,
+     0,
+     0
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   },
+   {
+    "text": "Testes unitários no backend para garantir respostas consistentes",
+    "x0": 1136.0,
+    "y0": 475.0,
+    "x1": 1371.0,
+    "y1": 591.0,
+    "color_rgb": [
+     0,
+     0,
+     0
+    ],
+    "font_size": 24.0,
+    "source": "figma",
+    "confidence": 1.0
+   }
+  ]
+ }
+}

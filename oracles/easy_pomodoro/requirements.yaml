@@ -1,0 +1,121 @@
+# Requisitos de easy_pomodoro. `text` cita o `## Prompt` (categoria a/b/c) ou a `## Specification` (categoria s).
+# a = testável a partir do prompt | b = só visual (Design2Code/Figma2Code) | c = ambíguo (pendência) | s = só da spec
+# info_source: image = a imagem do Figma mostra | behavior = o texto descreve o comportamento | spec_only = só a spec
+requirements:
+  - id: E-01
+    text: "uma página com fundo branco"
+    category: a
+    info_source: image
+    mention_patterns: ['fundo\s+branco', 'p[áa]gina\s+branca']
+  - id: E-02
+    text: "header vermelho claro com a logo de um tomate e Pomodoro escrito no canto superior esquerdo"
+    category: a
+    info_source: image
+    mention_patterns: ['header|cabe[çc]alho|barra\s+(?:do\s+)?topo', 'tomate', 'logo|[íi]cone']
+  - id: E-03
+    text: "No centro da página, um círculo com uma borda que troca de cor: vermelho para Foco Total (o modo inicial)"
+    category: a
+    info_source: image
+    mention_patterns: ['c[íi]rculo|circular|redond']
+  - id: E-04
+    text: "Em cima do número tem o nome do período do Pomodoro"
+    category: a
+    info_source: behavior
+    mention_patterns: ['foco\s+total', 'nome\s+do\s+per[íi]odo|per[íi]odo']
+  - id: E-05
+    text: "o tempo no formato 00:00 que vai decrescendo"
+    category: a
+    info_source: behavior
+    mention_patterns: ['00:00|mm:ss|formato', 'decresc|regressiv|contagem']
+  - id: E-06
+    text: "abaixo dos números tem um símbolo redondo de play/pause. Se o usuário clicar no botão ele dá play se o timer estiver parado ou dá pause se estiver rodando"
+    category: a
+    info_source: behavior
+    mention_patterns: ['play|pause|pausar|iniciar', 'bot[ãa]o']
+  - id: E-07
+    text: "Na parte de baixo tem uma linha de divisão em cinza, embaixo dela tem o tempo que está configurado para cada parte do pomodoro"
+    category: a
+    info_source: image
+    mention_patterns: ['linha\s+(?:de\s+divis[ãa]o|divis[óo]ria)', 'cinza', 'configur']
+  - id: E-08
+    text: "O default é 25 minutos para Foco total, 5 minutos para pausa curta e 15 minutos para Pausa longa"
+    category: a
+    info_source: behavior
+    mention_patterns: ['25\s*min', '\b5\s*min', '15\s*min']
+  - id: E-09
+    text: "O usuário pode editar o tempo de cada um deles porque o tempo está dentro de um input"
+    category: a
+    info_source: behavior
+    mention_patterns: ['input|campo', 'edit']
+  - id: E-10
+    text: "um círculo com uma borda que troca de cor: vermelho para Foco Total, Verde para Pausa Curta e Azul para Pausa Longa (a troca de modo não tem mecanismo descrito)"
+    category: c
+    info_source: image
+    pending: [PD-E2]
+    mention_patterns: ['vermelh', 'verde', 'azul']
+  - id: E-11
+    text: "Ao final de cada parte do pomodoro, o site pode realizar um aviso sonoro"
+    category: c
+    info_source: behavior
+    pending: [PD-E5]
+    mention_patterns: ['sonoro|som\b|[áa]udio|alarme|beep']
+  - id: E-12
+    text: "Dentro do círculo tem o tempo no formato 00:00 que vai decrescendo (a contagem termina sem valores negativos)"
+    category: a
+    info_source: behavior
+    mention_patterns: ['zerar|chegar\s+a\s+zero|termin|final']
+  - id: E-S01
+    text: "Header: fundo #E56060, 70px de altura, ícone do tomate e texto \"Pomodoro\" em branco"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['#E56060', '70\s*px']
+  - id: E-S02
+    text: "Círculo de 503px x 503px; nome do período fonte 36; tempo fonte 128; texto em Inter"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['503', '128', '\binter\b']
+  - id: E-S03
+    text: "Cores dos modos: Foco #D74747, Pausa Curta #658B5C, Pausa Longa #5684D9; cinza #716C6C"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['#D74747', '#658B5C', '#5684D9', '#716C6C']
+  - id: E-S04
+    text: "Rodando: inputs de configuração desabilitados; parado: habilitados"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['desabilit', 'disabled']
+  - id: E-S05
+    text: "Semântica HTML: <header>, <main> e <section>"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['<header>|<main>|<section>', 'sem[âa]ntic']
+  - id: E-S06
+    text: "aria-label do botão alterna entre \"Iniciar temporizador\" e \"Pausar temporizador\""
+    category: s
+    info_source: spec_only
+    mention_patterns: ['aria']
+  - id: E-S07
+    text: "Inputs de configuração com <label> associado (htmlFor)"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['htmlFor|<label>|r[óo]tulo']
+  - id: E-S08
+    text: "Elementos interativos exibem anel de foco visível"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['anel\s+de\s+foco|foco\s+vis[íi]vel|focus']
+  - id: E-S09
+    text: "Rodapé: três campos \"[Nome do Modo]: retângulo 89px x 40px\" na cor do modo, fonte branca, alinhados à esquerda/centro/direita"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['89\s*px', '40\s*px']
+  - id: E-S10
+    text: "Os campos de configuração são <input type=\"number\">"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['type="?number', 'number']
+  - id: E-S11
+    text: "Finalizado: emite som (audio.play()) e o timer retorna ao estado pausado"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['audio\.play|new\s+audio|web\s*audio']

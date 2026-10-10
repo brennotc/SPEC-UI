@@ -1,0 +1,128 @@
+# Requisitos de hard_kanban (categorias e fontes: ver easy_pomodoro/requirements.yaml).
+requirements:
+  - id: H-01
+    text: "uma página com fundo cinza, header verde com ícone de lista e escrito \"Kanban\" no canto superior esquerdo"
+    category: a
+    info_source: image
+    mention_patterns: ['fundo\s+cinza', 'header|cabe[çc]alho', 'verde', '[íi]cone\s+de\s+lista', 'kanban']
+  - id: H-02
+    text: "Todo o restante da tela é ocupado por quatro colunas de mesma largura"
+    category: a
+    info_source: image
+    mention_patterns: ['quatro\s+colunas|4\s+colunas', 'mesma\s+largura|largura\s+(?:igual|id[êe]ntica)']
+  - id: H-03
+    text: "Cada coluna tem um título e uma cor associada. Da esquerda para a direita, \"Para Fazer\" (azul), \"Em Progresso\" (laranja), \"Feito\" (roxo) e \"Aprovado\" (verde)"
+    category: a
+    info_source: image
+    mention_patterns: ['para\s+fazer', 'em\s+progresso', '\bfeito\b', 'aprovado']
+  - id: H-04
+    text: "Cada coluna tem um header com o título em branco com a determinada cor mais forte e o restante da coluna é da respectiva cor só que num tom mais fraco"
+    category: a
+    info_source: image
+    mention_patterns: ['t[íi]tulo\s+em\s+branco', 'tom\s+mais\s+(?:fraco|claro|suave)|cor\s+mais\s+forte']
+  - id: H-05
+    text: "Cada coluna possui cards quadrados off-white com bordas arredondadas. No canto superior direito de cada card há o ícone de um lápis azul e de uma lixeira vermelha. No centro, a descrição da tarefa em preto"
+    category: a
+    info_source: image
+    mention_patterns: ['cards?', 'off-?white', 'bordas?\s+arredondad', 'l[áa]pis', 'lixeira']
+  - id: H-06
+    text: "A primeira coluna é a única que tem o desenho de um card esmaecido no final da coluna com um contorno dashed e um ícone de + no centro em cinza"
+    category: a
+    info_source: image
+    mention_patterns: ['esmaecid', 'dashed|tracejad|pontilhad', '\+']
+  - id: H-07
+    text: "Se o usuário clicar nesse +, o cartão fica na cor dos restantes e surge um input no centro para escrever a descrição; no lugar dos ícones, um \"check\" verde e um \"X\" vermelho"
+    category: a
+    info_source: behavior
+    mention_patterns: ['input', 'check', '\bX\b|cancelar']
+  - id: H-08
+    text: "Se clicar no \"check\" ele confirma a criação do card"
+    category: a
+    info_source: behavior
+    mention_patterns: ['confirm', 'criar|cria[çc][ãa]o']
+  - id: H-09
+    text: "Se clicar no X, ele cancela a adição e o card volta para o estado inicial esmaecido"
+    category: a
+    info_source: behavior
+    mention_patterns: ['cancela', 'volta']
+  - id: H-10
+    text: "o ícone de uma lixeira vermelha para deletar"
+    category: a
+    info_source: behavior
+    mention_patterns: ['lixeira|deletar|excluir|remover']
+  - id: H-11
+    text: "o ícone de um lápis azul para editar (o mecanismo de edição não é descrito)"
+    category: c
+    info_source: behavior
+    pending: [PD-H2]
+    mention_patterns: ['l[áa]pis|editar']
+  - id: H-12
+    text: "O usuário pode mover o card (drag-and-drop) apenas uma etapa da coluna à direita"
+    category: a
+    info_source: behavior
+    mention_patterns: ['drag|arrastar', 'uma\s+etapa|apenas\s+uma']
+  - id: H-13
+    text: "de \"Para fazer\", só pode ir para \"Em Progresso\" e assim sucessivamente (não pode pular etapas à direita)"
+    category: a
+    info_source: behavior
+    mention_patterns: ['n[ãa]o\s+pode\s+pular|s[óo]\s+pode\s+ir', 'sucessivamente']
+  - id: H-14
+    text: "Há a possibilidade de voltar para o lado esquerdo. Nesse caso, pode mover quantos passos quiser para à esquerda"
+    category: a
+    info_source: behavior
+    mention_patterns: ['voltar', 'esquerda']
+  - id: H-15
+    text: "Também pode mover o card para cima e para baixo dentro da mesma coluna para reordenar os cards daquela coluna"
+    category: a
+    info_source: behavior
+    mention_patterns: ['reordenar', 'cima\s+e\s+para\s+baixo']
+  - id: H-S01
+    text: "Header de 70 px, fundo #105610, ícone e texto \"Kanban\" brancos; fundo geral #D7CFCF"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['#105610', '#D7CFCF', '70\s*px']
+  - id: H-S02
+    text: "Cabeçalho e corpo das colunas: #0B73B7/#9FBACC, #B77A0B/#CCB59F, #440BB7/#AA9FCC, #105610/#C5CC9F; largura mínima 340 px"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['#0B73B7', '#B77A0B', '#440BB7', '340\s*px']
+  - id: H-S03
+    text: "Card de criação: opacity-70, borda dashed cinza #656060, ícone + cinza"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['opacity-?70|70\s*%', '#656060']
+  - id: H-S04
+    text: "Cards de 274 x 191 px, fundo #D7CFCF, descrição preta 24 px centralizada, lápis azul, lixeira #B50000"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['274', '191', '#B50000']
+  - id: H-S05
+    text: "Modo de criação: input centralizado com aria-label \"Descrição da nova tarefa\"; check verde #105610 e X vermelho #B50000"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['Descri[çc][ãa]o\s+da\s+nova\s+tarefa']
+  - id: H-S06
+    text: "Confirmar insere o card como ÚLTIMO da coluna \"Para Fazer\" e o placeholder volta a 70% de opacidade"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['[úu]ltimo']
+  - id: H-S07
+    text: "Lápis transforma o texto em campo editável com check (salva) e X (descarta a edição)"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['campo\s+de\s+texto\s+edit[áa]vel|edi[çc][ãa]o\s+inline']
+  - id: H-S08
+    text: "Semântica: <header>, <main>, <section> por coluna e <article> por card"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['<article>|<section>']
+  - id: H-S09
+    text: "Botões só de ícone (lápis, lixeira, plus, check, X) têm aria-label descritivo"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['aria']
+  - id: H-S10
+    text: "Tab alcança botões, placeholder e campos com anel de foco visível"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['anel\s+de\s+foco|foco\s+vis[íi]vel']

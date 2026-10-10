@@ -1,4 +1,4 @@
-# Arquivos de ambiente e segredos (NUNCA subir para o GitHub)
+# Segredos (NUNCA subir para o GitHub)
 .env
 
 # Ambientes virtuais Python
@@ -6,19 +6,31 @@ venv/
 .venv/
 env/
 
-# Cache do Python e Bytecodes
+# Cache do Python, testes e linters
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
 
-# Resultados e Artefatos gerados pela execução
+# Resultados gerados pela execução: results/ fica INTEIRO fora do git (sem negações).
+# Para depositar resultados use `specui export` (opcional).
 results/
-artifacts/
-screenshots/
 
-# Datasets brutos baixados/gerados localmente
-designbench_data/
+# Dados privados da coleta de prompts livres (export bruto do formulario, antes da remocao de PII)
+private/
+
+# Scaffold Angular: dependencias, caches de build e saidas (o lockfile e commitado)
+scaffold/**/node_modules/
+scaffold/**/dist/
+scaffold/**/.angular/
+.angular-cache/
+scaffold/.angular-cache/
+
+# Configuracao local do Claude Code
+.claude/settings.local.json
 
 # VS Code / IDEs
 .vscode/

@@ -1,0 +1,26 @@
+<!doctype html><meta charset="utf-8"><title>fixture: arrastar e soltar (__MODE__)</title>
+<body style="margin:0;font-family:sans-serif"><app-root>
+<div style="display:flex;gap:40px;padding:20px">
+  <div id="z1" class="zone" style="width:300px;height:300px;border:1px solid #333"><h3>Zona 1</h3><div id="it" __DRAGGABLE__ style="width:100px;height:60px;background:#9cf;user-select:none">ITEM</div></div>
+  <div id="z2" class="zone" style="width:300px;height:300px;border:1px solid #333"><h3>Zona 2</h3></div>
+</div>
+<script>
+  const it = document.getElementById('it');
+  if ('__MODE__' === 'html5') {
+    it.addEventListener('dragstart', (e) => e.dataTransfer.setData('text', 'x'));
+    document.querySelectorAll('.zone').forEach((z) => {
+      z.addEventListener('dragover', (e) => e.preventDefault());
+      z.addEventListener('drop', (e) => { e.preventDefault(); z.appendChild(it); });
+    });
+  } else {
+    let down = null;
+    it.addEventListener('pointerdown', (e) => { down = { x: e.clientX, y: e.clientY }; });
+    document.addEventListener('pointerup', (e) => {
+      if (!down) return;
+      const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y) > 5; down = null;
+      if (!moved) return;
+      const z = document.elementsFromPoint(e.clientX, e.clientY).find((n) => n.classList.contains('zone'));
+      if (z) z.appendChild(it);
+    });
+  }
+</script></app-root></body>

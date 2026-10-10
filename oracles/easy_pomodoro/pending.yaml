@@ -1,0 +1,58 @@
+# Decisões pendentes de easy_pomodoro (regras 1/2/3 em specui/oracle/requirements.py).
+pending:
+  - id: PD-E1
+    question: "O input de configuração mostra '25' (number) ou '25:00' (MM:SS)? O prompt só diz 'o tempo está dentro de um input'; a spec pede type=number E formato MM:SS."
+    rule: 1
+    options: ["25", "25:00"]
+    status: decided
+    decision: "O nível A aceita as duas leituras: para definir 30 min digita o formato que o input já exibe. Nada é testado sobre o formato do input."
+    decided_on: "2026-10-09"
+    blocks: [E-A-07, E-A-08]
+  - id: PD-E2
+    question: "Como o usuário troca de modo (Foco / Pausa Curta / Pausa Longa)? O prompt não descreve o mecanismo (abas, clique no nome, ciclo automático)."
+    rule: 2
+    options: ["botões/abas de modo", "clique no nome do período", "ciclo automático ao fim"]
+    status: decided
+    decision: "Nível A testa só a borda vermelha inicial em Foco Total (E-A-04). Borda verde/azul fica fora do nível A: não testável a partir do prompt."
+    decided_on: "2026-10-09"
+    blocks: [E-A-10]
+  - id: PD-E3
+    question: "O que acontece quando a contagem chega a 00:00 (para, troca de modo, reinicia)? O prompt não diz."
+    rule: 2
+    options: ["para em 00:00", "troca para o próximo modo", "reinicia"]
+    status: decided
+    decision: "Nível A testa só o observável: o visor nunca mostra valor negativo/NaN e não há erro de página. O restante vai ao nível B (spec: 'retorna ao estado pausado')."
+    decided_on: "2026-10-09"
+    blocks: [E-A-09]
+  - id: PD-E4
+    question: "Hex exato das cores dos modos e do header? O prompt só dá os nomes das cores."
+    rule: 3
+    options: []
+    status: decided
+    decision: "Nível A compara por faixa de matiz; o hex (ΔE2000 ≤ 5) é exigência da spec e vai ao nível B."
+    decided_on: "2026-10-09"
+    blocks: [E-A-02, E-A-04, E-B-03]
+  - id: PD-E5
+    question: "O aviso sonoro é obrigatório? O prompt diz 'o site pode realizar um aviso sonoro'."
+    rule: 3
+    options: []
+    status: decided
+    decision: "Opcional no prompt; só a spec exige audio.play() ao zerar (nível B, com espião)."
+    decided_on: "2026-10-09"
+    blocks: [E-B-11]
+  - id: PD-C1
+    question: "Um cinza levemente tingido (ex.: cinza-azulado claro, 226,232,240) conta como 'cinza'? (piloto 1, H-A-01)"
+    rule: 1
+    options: ["sim, cinza tingido é cinza", "não, só cinza neutro"]
+    status: decided
+    decision: "Sim (decisão do pesquisador). Conta como cinza quem tem saturação HSL < 0,15 OU croma (máx − mín) ≤ 6 % da escala (GRAY_MAX_CHROMA em common/colors.py). Vale para todas as tarefas."
+    decided_on: "2026-10-09"
+    blocks: [E-A-07]
+  - id: PD-C2
+    question: "Cores perto do limite entre duas faixas de matiz (ex.: vermelho-rosado a 344° com o vermelho começando em 345°; lilás a 249° com o roxo começando em 251°) contam como a cor pedida? (piloto 1, H-A-03/05/08/10)"
+    rule: 1
+    options: ["margem nos limites", "faixas exatas"]
+    status: decided
+    decision: "Margem de ±5° nos limites das faixas (HUE_TOLERANCE, hue_matches em common/colors.py), nos testes de nível A de todas as tarefas. Cinza nunca vira cor pela margem; laranja-âmbar (36°) continua não sendo amarelo; quase branco (250,245,255) continua não sendo roxo."
+    decided_on: "2026-10-09"
+    blocks: [E-A-02, E-A-04, E-A-11]

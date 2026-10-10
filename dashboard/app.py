@@ -1,301 +1,168 @@
-import sys
+"""Painel SPEC-UI (Streamlit): `streamlit run dashboard/app.py`.
+
+Lê só `results/` da execução PRINCIPAL (`results/aggregate/` e os records); o piloto (`results/pilot/`) nunca aparece.
+Nenhuma nota vem de juiz: tudo é métrica automática (Design2Code, Figma2Code, WebGen-Bench).
+"""
+
 import json
-import os
+import sys
 from pathlib import Path
+
 import pandas as pd
+import plotly.express as px
 import streamlit as st
 
-# ----------------------------------------------------
-# 1. SYS PATH SETUP (Garantir importação da pasta 'src')
-# ----------------------------------------------------
-ROOT_DIR = Path(__file__).resolve().parent.parent
-SRC_DIR = ROOT_DIR / "src"
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
-if str(ROOT_DIR) not in sys.path:
-    sys.path.insert(0, str(ROOT_DIR))
-if str(SRC_DIR) not in sys.path:
-    sys.path.insert(0, str(SRC_DIR))
+from specui.analysis import AnalysisRefused
+from specui.analysis.contrasts import forest_figure
+from specui.analysis.items import item_analysis
+from specui.analysis.panel import free_rows, grid, load_main, status_counts
+from specui.analysis.report import analyze_frame
+from specui.config import load_config
 
-try:
-    from loaders import BenchmarkDataLoader
-except ImportError:
+st.set_page_config(page_title="SPEC-UI", layout="wide")
+st.title("SPEC-UI: a especificação formal ajuda a gerar front-end?")
+
+
+@st.cache_data(show_spinner="Lendo results/ ...")
+def _load(results_dir: str):
+    records, df = load_main(results_dir)
+    return records, df
+
+
+cfg = load_config(ROOT / "configs" / "default.yaml")
+results_dir = st.sidebar.text_input("Pasta de resultados", str(cfg.path("results_dir")))
+records, df = _load(results_dir)
+if df.empty:
+    st.info("Nenhuma execução principal em results/. Rode `specui run` (o piloto fica em results/pilot/ e não aparece aqui).")
+    st.stop()
+
+df["model"] = df["provider"] + ":" + df["model_id_requested"]
+models = sorted(df["model"].unique())
+chosen = st.sidebar.multiselect("Modelos", models, default=models)
+view = df[df["model"].isin(chosen)]
+st.sidebar.caption(f"{len(view)} execuções · oráculo: {', '.join(sorted(df.get('oracle_suite_tag', pd.Series(dtype=str)).dropna().unique())) or 'sem tag'}")
+
+tabs = st.tabs(["Grade de células", "Contraste da spec", "Oráculo e itens", "Qualidade de código", "Inspeção de execução", "Prompts livres"])
+
+# --------------------------------------------------------------------------- 1. grade
+with tabs[0]:
+    st.subheader("Células por modelo")
+    g = grid(view)
+    st.dataframe(g, use_container_width=True)
+    st.caption("Formato sobre todas as gerações; contrato sobre as de formato ok; build e executabilidade sobre as de contrato ok. "
+               "`accuracy_a` e `ves` só contam quem executou (condicional).")
+    st.dataframe(status_counts(view), use_container_width=True)
+
+# --------------------------------------------------------------------------- 2. contraste
+with tabs[1]:
+    st.subheader("Efeito da spec (accuracy_a, ITT)")
     try:
-        from src.loaders import BenchmarkDataLoader
-    except ImportError:
-        BenchmarkDataLoader = None
+        analysis = analyze_frame(df, cfg, records)
+    except (AnalysisRefused, ValueError) as exc:
+        st.error(f"A análise recusou os dados: {exc}")
+        analysis = None
+    if analysis:
+        res_itt, res_cond = analysis["_results"]
+        if res_itt:
+            st.plotly_chart(forest_figure(res_itt, (analysis.get("consistency") or {}).get("differences")), use_container_width=True)
+            st.dataframe(pd.DataFrame([r.as_dict() for r in res_itt.values()]).drop(columns=["strata"]), use_container_width=True)
+        st.markdown("**Δ por tarefa × modalidade × modelo (ITT)**")
+        strata = pd.DataFrame(analysis["strata_itt"])
+        if not strata.empty:
+            st.plotly_chart(px.bar(strata, x="task_id", y="delta", color="model", facet_col="modality", barmode="group",
+                                   error_y=strata["ci_high"] - strata["delta"], error_y_minus=strata["delta"] - strata["ci_low"]),
+                            use_container_width=True)
+            st.markdown("**Texto × multimodal** (Δ médio por modalidade)")
+            by_modality = strata.groupby(["model", "modality"])["delta"].mean().reset_index()
+            st.dataframe(by_modality, use_container_width=True)
+        with st.expander("Condicional (só executáveis) e taxa de executabilidade"):
+            st.dataframe(pd.DataFrame([r.as_dict() for r in res_cond.values()]).drop(columns=["strata"], errors="ignore"), use_container_width=True)
+            st.dataframe(pd.DataFrame(analysis["executability"]), use_container_width=True)
+        with st.expander("Consistência entre modelos"):
+            cons = analysis.get("consistency") or {}
+            st.write(f"Estratos com o mesmo sinal em todos os modelos: {cons.get('n_strata_same_sign')} de {cons.get('n_strata')}")
+            st.dataframe(pd.DataFrame(cons.get("signs", [])), use_container_width=True)
+            st.dataframe(pd.DataFrame(cons.get("differences", [])), use_container_width=True)
+            st.caption("Leitura: robustez do efeito nos modelos testados; interação não significativa não é igualdade.")
 
-# ----------------------------------------------------
-# 2. STREAMLIT CONFIG
-# ----------------------------------------------------
-st.set_page_config(
-    page_title="SPEC-UI (Specification-Driven UI Evaluation Framework)",
-    page_icon="⚡",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# --------------------------------------------------------------------------- 3. oráculo
+with tabs[2]:
+    st.subheader("Análise de itens")
+    items = item_analysis([r for r in records if f"{r.provider}:{r.model_id_requested}" in chosen])
+    if items.empty:
+        st.info("Sem casos executados ainda.")
+    else:
+        st.dataframe(items, use_container_width=True)
+        st.caption("flag_floor: 0 % em todas as condições · flag_ceiling: 100 % em todas · blocked_rate: pré-condição falhou.")
+        st.plotly_chart(px.bar(items, x="case_id", y="mean_score", color="level", hover_data=["task_id"]), use_container_width=True)
 
-RESULTS_PATH = ROOT_DIR / "results" / "eval_results.json"
-ARTIFACTS_DIR = ROOT_DIR / "results" / "artifacts"
-SCREENSHOTS_DIR = ROOT_DIR / "results" / "screenshots"
+# --------------------------------------------------------------------------- 4. código
+with tabs[3]:
+    st.subheader("Qualidade de código (Figma2Code) × fidelidade visual")
+    cols = ["cq_rur", "cq_apr", "cq_fu", "cq_bc", "cq_str", "cq_avu", "cq_isr", "cq_ccr"]
+    present = [c for c in cols if c in view]
+    if present and "emb_ves_dinov2" in view:
+        st.plotly_chart(px.scatter(view.dropna(subset=["emb_ves_dinov2"]), x="emb_ves_dinov2", y=present[1] if len(present) > 1 else present[0],
+                                   color="prompt_kind", symbol="model", hover_data=["run_id"]), use_container_width=True)
+        st.dataframe(view.groupby(["model", "prompt_kind"])[present].mean().reset_index(), use_container_width=True)
+    else:
+        st.info("Métricas de código/VES ainda não calculadas (`specui evaluate --all --groups code,visual`).")
 
-# ----------------------------------------------------
-# 3. DATA LOADERS (Opção 2 Integrada)
-# ----------------------------------------------------
-@st.cache_data
-def _load_data():
-    """Carrega os dados em JSON e os itens do benchmark de forma resiliente."""
-    results = []
-    if RESULTS_PATH.exists():
-        try:
-            with open(RESULTS_PATH, "r", encoding="utf-8") as f:
-                results = json.load(f)
-        except Exception as e:
-            st.error(f"Erro ao carregar 'eval_results.json': {e}")
+# --------------------------------------------------------------------------- 5. inspeção
+with tabs[4]:
+    st.subheader("Inspeção de uma execução")
+    run_id = st.selectbox("Execução", view["run_id"].tolist())
+    rec = next(r for r in records if r.run_id == run_id)
+    base = Path(results_dir) / rec.paths["run_dir"]
+    left, right = st.columns(2)
+    task_png = ROOT / "benchmarks" / "tasks" / rec.difficulty / f"{rec.task_id}.png"
+    if task_png.is_file():
+        left.image(str(task_png), caption="Design (Figma)")
+    shot = base / rec.paths.get("screenshot", "screenshot.png")
+    if shot.is_file():
+        right.image(str(shot), caption="Render do app gerado")
+    st.write({"status": rec.status, "modelo pedido": rec.model_id_requested, "modelo devolvido": rec.model_id_returned,
+              "prompt sha256": rec.prompt_sha256, "envelope": rec.envelope_version, "scaffold": rec.scaffold_version,
+              "oráculo": rec.oracle_suite_tag})
+    if rec.functional:
+        st.dataframe(pd.DataFrame([c.model_dump() for c in rec.functional.cases]), use_container_width=True)
+    for title, name in (("Prompt (usuário)", "prompt.user.txt"), ("Resposta bruta", "response.raw.txt")):
+        path = base / name
+        if path.is_file():
+            with st.expander(title):
+                st.code(path.read_text(encoding="utf-8")[:20000])
+    for title, key in (("Build (stderr)", "build_stderr"), ("Console e erros", None)):
+        path = base / rec.paths[key] if key and key in rec.paths else None
+        if path and path.is_file() and path.read_text(encoding="utf-8").strip():
+            with st.expander(title):
+                st.code(path.read_text(encoding="utf-8")[:8000])
+    if rec.technical:
+        with st.expander("Console / axe"):
+            st.json({"console": rec.technical.console_errors, "bloqueadas": rec.technical.blocked_requests, "axe": rec.technical.axe_violations})
+    pairs = base / rec.paths["pairs"] if "pairs" in rec.paths else (base / rec.design2code.pairs_path if rec.design2code and rec.design2code.pairs_path else None)
+    if pairs and pairs.is_file():
+        with st.expander("Pares de blocos e fusões (Design2Code)"):
+            st.json(json.loads(pairs.read_text(encoding="utf-8")))
+    generated = base / "generated"
+    if generated.is_dir():
+        with st.expander("Arquivos gerados"):
+            for f in sorted(generated.rglob("*")):
+                if f.is_file():
+                    st.write(f.relative_to(generated).as_posix())
 
-    benchmark_items = []
-    if BenchmarkDataLoader is not None:
-        try:
-            data_dir = ROOT_DIR / "data"
-            benchmarks_dir = ROOT_DIR / "benchmarks"
-            loader = BenchmarkDataLoader(data_dir=data_dir, benchmarks_dir=benchmarks_dir) if "data_dir" in BenchmarkDataLoader.__init__.__code__.co_varnames else BenchmarkDataLoader()
-            
-            # --- OPÇÃO 2: Verificação do método correto ---
-            if hasattr(loader, "load_all"):
-                benchmark_items = loader.load_all()
-            elif hasattr(loader, "load"):
-                benchmark_items = loader.load(benchmarks_dir)
-        except Exception as e:
-            st.warning(f"Aviso ao carregar BenchmarkDataLoader: {e}")
-
-    return results, benchmark_items
-
-# ----------------------------------------------------
-# 4. DASHBOARD PRINCIPAL
-# ----------------------------------------------------
-def main():
-    st.title("SPEC-UI (Specification-Driven UI Evaluation Framework) Dashboard")
-    st.caption("Análise comparativa de geração de código Frontend: **No_Spec** vs **With_Spec**")
-
-    results, benchmark_items = _load_data()
-
-    if not results:
-        st.warning(f"Nenhum resultado encontrado em `{RESULTS_PATH}`. Execute `python main.py` primeiro!")
-        st.stop()
-
-    df = pd.DataFrame(results)
-
-    # Garantia de colunas básicas
-    if "visual_score" not in df.columns:
-        df["visual_score"] = 0
-    if "visual_verdict" not in df.columns:
-        df["visual_verdict"] = "FAIL"
-    if "prompt_type" not in df.columns:
-        df["prompt_type"] = "Unknown"
-
-    if "complexity" not in df.columns:
-        def extract_complexity(item_id):
-            id_str = str(item_id).lower()
-            if "easy" in id_str:
-                return "Easy"
-            elif "medium" in id_str:
-                return "Medium"
-            elif "hard" in id_str:
-                return "Hard"
-            return "Unknown"
-        df["complexity"] = df["item_id"].apply(extract_complexity)
-
-    # ----------------------------------------------------
-    # FILTROS LATERAIS
-    # ----------------------------------------------------
-    st.sidebar.header("Filtros de Visualização")
-
-    all_benchmarks = list(df["benchmark_name"].unique()) if "benchmark_name" in df.columns else []
-    selected_benchmarks = st.sidebar.multiselect("Benchmarks", all_benchmarks, default=all_benchmarks)
-
-    all_complexities = ["Easy", "Medium", "Hard"]
-    selected_complexities = st.sidebar.multiselect("Complexidade", all_complexities, default=all_complexities)
-
-    all_prompts = list(df["prompt_type"].unique())
-    selected_prompts = st.sidebar.multiselect("Modo do Prompt", all_prompts, default=all_prompts)
-
-    filtered_df = df.copy()
-    if selected_benchmarks and "benchmark_name" in filtered_df.columns:
-        filtered_df = filtered_df[filtered_df["benchmark_name"].isin(selected_benchmarks)]
-    if selected_complexities:
-        filtered_df = filtered_df[filtered_df["complexity"].isin(selected_complexities)]
-    if selected_prompts:
-        filtered_df = filtered_df[filtered_df["prompt_type"].isin(selected_prompts)]
-
-    # ----------------------------------------------------
-    # CARDS DE MÉTRICAS (KPIS)
-    # ----------------------------------------------------
-    total_tests = len(filtered_df)
-    passed_tests = len(filtered_df[filtered_df["visual_verdict"] == "PASS"])
-    pass_rate = (passed_tests / total_tests * 100) if total_tests > 0 else 0
-    avg_score = filtered_df["visual_score"].mean() if total_tests > 0 else 0
-
-    spec_wins = 0
-    total_pairs = 0
-    unique_items = filtered_df["item_id"].unique() if "item_id" in filtered_df.columns else []
-
-    for i_id in unique_items:
-        item_df = filtered_df[filtered_df["item_id"] == i_id]
-        no_s = item_df[item_df["prompt_type"] == "No_Spec"]
-        with_s = item_df[item_df["prompt_type"] == "With_Spec"]
-        if not no_s.empty and not with_s.empty:
-            total_pairs += 1
-            if with_s["visual_score"].values[0] > no_s["visual_score"].values[0]:
-                spec_wins += 1
-
-    spec_win_rate = (spec_wins / total_pairs * 100) if total_pairs > 0 else 0
-
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Total de Testes", total_tests)
-    col2.metric("Média Visual", f"{avg_score:.1f} / 100")
-    col3.metric("Taxa de Aprovação", f"{pass_rate:.1f}%", f"{passed_tests}/{total_tests}")
-    col4.metric("Spec Win Rate", f"{spec_win_rate:.1f}%", f"{spec_wins}/{total_pairs} pares")
-
-    st.divider()
-
-    # ----------------------------------------------------
-    # TABS INTERATIVAS
-    # ----------------------------------------------------
-    tab1, tab2, tab4 = st.tabs([
-        "📊 Visão Geral",
-        "🧩 No_Spec vs With_Spec",
-        "🔎 Inspeção de Artefatos"
-    ])
-
-    # TAB 1: VISÃO GERAL
-    with tab1:
-        st.subheader("Desempenho por Complexidade e Prompt")
-        if not filtered_df.empty:
-            chart_data = filtered_df.groupby(["complexity", "prompt_type"])["visual_score"].mean().reset_index()
-            st.bar_chart(
-                chart_data,
-                x="complexity",
-                y="visual_score",
-                color="prompt_type",
-                stack=False
-            )
-
-        st.subheader("Tabela Geral de Resultados")
-        disp_cols = ["item_id", "benchmark_name", "complexity", "prompt_type", "visual_score", "visual_verdict", "execution_time_ms"]
-        available_disp_cols = [c for c in disp_cols if c in filtered_df.columns]
-        st.dataframe(filtered_df[available_disp_cols], use_container_width=True)
-
-    # TAB 2: NO_SPEC vs WITH_SPEC
-    with tab2:
-        st.subheader("Estratégias de Prompt: Sem Especificação vs Com Especificação")
-        
-        no_spec_df = filtered_df[filtered_df["prompt_type"] == "No_Spec"]
-        with_spec_df = filtered_df[filtered_df["prompt_type"] == "With_Spec"]
-
-        c1, c2 = st.columns(2)
-        with c1:
-            st.markdown("### Modo: No_Spec")
-            avg_no = no_spec_df["visual_score"].mean() if not no_spec_df.empty else 0
-            pass_no = (len(no_spec_df[no_spec_df["visual_verdict"] == "PASS"]) / len(no_spec_df) * 100) if not no_spec_df.empty else 0
-            st.metric("Média de Nota", f"{avg_no:.2f}")
-            st.metric("Taxa de Aprovação", f"{pass_no:.1f}%")
-
-        with c2:
-            st.markdown("### Modo: With_Spec")
-            avg_with = with_spec_df["visual_score"].mean() if not with_spec_df.empty else 0
-            pass_with = (len(with_spec_df[with_spec_df["visual_verdict"] == "PASS"]) / len(with_spec_df) * 100) if not with_spec_df.empty else 0
-            st.metric("Média de Nota", f"{avg_with:.2f}", f"{avg_with - avg_no:+.2f} pts")
-            st.metric("Taxa de Aprovação", f"{pass_with:.1f}%", f"{pass_with - pass_no:+.1f}%")
-
-        st.divider()
-        st.markdown("### Comparativo por Tarefa")
-        
-        comparison_list = []
-        for i_id in unique_items:
-            item_df = filtered_df[filtered_df["item_id"] == i_id]
-            no_row = item_df[item_df["prompt_type"] == "No_Spec"]
-            with_row = item_df[item_df["prompt_type"] == "With_Spec"]
-
-            if not no_row.empty and not with_row.empty:
-                score_no = no_row["visual_score"].values[0]
-                score_with = with_row["visual_score"].values[0]
-                bench = no_row["benchmark_name"].values[0] if "benchmark_name" in no_row.columns else ""
-                comp = no_row["complexity"].values[0] if "complexity" in no_row.columns else ""
-
-                comparison_list.append({
-                    "ID": i_id,
-                    "Benchmark": bench,
-                    "Complexidade": comp,
-                    "Nota No_Spec": score_no,
-                    "Nota With_Spec": score_with,
-                    "Diferença": score_with - score_no,
-                    "Vencedor": "With_Spec" if score_with > score_no else ("No_Spec" if score_no > score_with else "Empate")
-                })
-
-        if comparison_list:
-            st.dataframe(pd.DataFrame(comparison_list), use_container_width=True)
-
-        st.subheader("Comparativo entre Suítes de Benchmark")
-        
-        if "benchmark_name" in filtered_df.columns:
-            bench_summary = filtered_df.groupby(["benchmark_name", "prompt_type"]).agg(
-                Media_Nota=("visual_score", "mean"),
-                Total=("visual_score", "count"),
-                Aprovados=("visual_verdict", lambda x: (x == "PASS").sum())
-            ).reset_index()
-
-            bench_summary["Taxa_Aprovacao_%"] = (bench_summary["Aprovados"] / bench_summary["Total"]) * 100
-            st.dataframe(bench_summary, use_container_width=True)
-
-            st.bar_chart(
-                bench_summary,
-                x="benchmark_name",
-                y="Media_Nota",
-                color="prompt_type",
-                stack=False
-            )
-
-    # TAB 4: INSPEÇÃO INDIVIDUAL
-    with tab4:
-        st.subheader("Auditoria de Telas e Código HTML")
-        
-        selected_item_id = st.selectbox("Selecione o Item do Benchmark", df["item_id"].unique())
-        selected_mode = st.radio("Modo do Prompt", ["No_Spec", "With_Spec"], horizontal=True)
-
-        item_records = df[(df["item_id"] == selected_item_id) & (df["prompt_type"] == selected_mode)]
-
-        if not item_records.empty:
-            rec = item_records.iloc[0]
-
-            c1, c2 = st.columns([1, 1])
-
-            with c1:
-                st.markdown("#### 📊 Parecer do Juiz Visual")
-                st.write(f"**Benchmark:** {rec.get('benchmark_name', 'N/A')}")
-                st.write(f"**Nota:** {rec.get('visual_score', 0)} / 100")
-                st.write(f"**Status:** {rec.get('visual_verdict', 'N/A')}")
-
-                feedback_data = rec.get("visual_feedback", {})
-                if isinstance(feedback_data, dict):
-                    st.json(feedback_data)
-                else:
-                    st.info(f"Feedback: {rec.get('feedback', feedback_data)}")
-
-            with c2:
-                st.markdown("#### Captura Playwright")
-                shot_path = SCREENSHOTS_DIR / f"{selected_item_id}_{selected_mode}.png"
-                if shot_path.exists():
-                    st.image(str(shot_path), caption=f"Screenshot: {selected_item_id} ({selected_mode})")
-                else:
-                    st.warning("Screenshot não localizado na pasta `results/screenshots/`.")
-
-            st.divider()
-            st.markdown("#### HTML Renderizado")
-            html_path = ARTIFACTS_DIR / f"{selected_item_id}_{selected_mode}.html"
-            if html_path.exists():
-                st.code(html_path.read_text(encoding="utf-8"), language="html")
-            elif "raw_code" in rec and rec["raw_code"]:
-                st.code(rec["raw_code"], language="html")
-
-
-if __name__ == "__main__":
-    main()
+# --------------------------------------------------------------------------- 6. livres
+with tabs[5]:
+    st.subheader("Prompts livres de participantes")
+    free = free_rows(view)
+    if free.empty:
+        st.info("Nenhuma execução de prompt livre (`specui run --prompt-sources free:<coleta>`).")
+    else:
+        st.dataframe(free, use_container_width=True)
+        if len(free) >= 10:
+            st.plotly_chart(px.scatter(free, x="in_requirement_coverage_total", y="fn_accuracy_a_restricted", color="task_id", trendline="ols"),
+                            use_container_width=True)
+        st.caption("O perfil dos participantes só aparece agregado e nunca com n pequeno; o texto é anônimo (p001…).")

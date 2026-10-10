@@ -1,0 +1,58 @@
+# Decisões pendentes de hard_kanban (regras 1/2/3 em specui/oracle/requirements.py).
+pending:
+  - id: PD-H1
+    question: "O app nasce com cards de exemplo? O prompt não fala em dados iniciais."
+    rule: 2
+    options: ["quadro vazio", "cards de exemplo"]
+    status: decided
+    decision: "Os testes criam os próprios cards pelo +/check e só olham para eles; cards iniciais do app não afetam nenhuma asserção (cada card é identificado pela sua descrição)."
+    decided_on: "2026-10-09"
+    blocks: [H-A-05, H-A-08, H-A-11, H-A-12, H-A-13, H-A-14]
+  - id: PD-H2
+    question: "O que o lápis faz? O prompt só diz 'ícone de lápis para editar' (edição inline, modal...)."
+    rule: 2
+    options: ["texto vira input com check/X (spec)", "modal"]
+    status: decided
+    decision: "Nível A testa só que o card tem um controle de edição (lápis) no canto superior direito. O fluxo da spec (input + check/X, descartar com X) é nível B."
+    decided_on: "2026-10-09"
+    blocks: [H-A-09, H-A-15, H-B-07]
+  - id: PD-H3
+    question: "Como arrastar? Há duas implementações legítimas (eventos de ponteiro/CDK e draggable nativo do HTML5)."
+    rule: 1
+    options: ["mouse real com passos intermediários", "locator.drag_to"]
+    status: decided
+    decision: "Adaptador DndDriver: tenta o mouse real e depois drag_to; a estratégia que funcionou num movimento permitido é reutilizada nos movimentos proibidos, para distinguir 'o card não moveu' de 'o gesto não funciona'."
+    decided_on: "2026-10-09"
+    blocks: [H-A-11, H-A-12, H-A-13, H-A-14]
+  - id: PD-H4
+    question: "Qual a coluna de um card? O DOM não precisa aninhar o card na coluna."
+    rule: 1
+    options: []
+    status: decided
+    decision: "A coluna do card é a faixa de x (pontos médios entre os centros dos quatro títulos) que contém o centro do texto do card."
+    decided_on: "2026-10-09"
+    blocks: [H-A-11, H-A-12, H-A-13, H-A-14]
+  - id: PD-H5
+    question: "Spec §3: o card (#D7CFCF) tem o mesmo hex do fundo geral. É defeito de spec?"
+    rule: 3
+    options: []
+    status: decided
+    decision: "Não é defeito: os cards estão sobre o corpo das colunas, não sobre o fundo geral. Nível A pede 'off-white' (claro, pouco saturado, mais claro que o corpo da coluna); o hex é nível B."
+    decided_on: "2026-10-09"
+    blocks: [H-A-08, H-B-04]
+  - id: PD-C1
+    question: "Um cinza levemente tingido (ex.: cinza-azulado claro, 226,232,240) conta como 'cinza'? (piloto 1, H-A-01)"
+    rule: 1
+    options: ["sim, cinza tingido é cinza", "não, só cinza neutro"]
+    status: decided
+    decision: "Sim (decisão do pesquisador). Conta como cinza quem tem saturação HSL < 0,15 OU croma (máx − mín) ≤ 6 % da escala (GRAY_MAX_CHROMA em common/colors.py). Vale para todas as tarefas."
+    decided_on: "2026-10-09"
+    blocks: [H-A-01]
+  - id: PD-C2
+    question: "Cores perto do limite entre duas faixas de matiz (ex.: vermelho-rosado a 344° com o vermelho começando em 345°; lilás a 249° com o roxo começando em 251°) contam como a cor pedida? (piloto 1, H-A-03/05/08/10)"
+    rule: 1
+    options: ["margem nos limites", "faixas exatas"]
+    status: decided
+    decision: "Margem de ±5° nos limites das faixas (HUE_TOLERANCE, hue_matches em common/colors.py), nos testes de nível A de todas as tarefas. Cinza nunca vira cor pela margem; laranja-âmbar (36°) continua não sendo amarelo; quase branco (250,245,255) continua não sendo roxo."
+    decided_on: "2026-10-09"
+    blocks: [H-A-01, H-A-03, H-A-05, H-A-08, H-A-10]

@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "specui"
+version = "0.1.0"
+description = "SPEC-UI: avaliacao automatica do efeito de especificacoes na geracao de front-end por LLMs"
+readme = "README.md"
+requires-python = ">=3.11"
+dynamic = ["dependencies"]
+
+[project.scripts]
+specui = "specui.cli:app"
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools.package-data]
+specui = ["harness/js/*.js", "llm/mock_bundle/*"]
+
+[tool.setuptools.packages.find]
+include = ["specui*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-m 'not slow'"
+markers = [
+  "slow: usa Node/Angular/navegador reais (rode com: pytest -m slow)",
+]
+
+[tool.ruff]
+line-length = 100

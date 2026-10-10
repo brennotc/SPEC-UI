@@ -1,0 +1,8 @@
+# Registro das suítes de oráculo. A ordem e os ids são estáveis; mudar qualquer arquivo de oracles/ exige nova tag.
+suites:
+  - task: easy_pomodoro
+    levels: [A, B]
+  - task: medium_tarefas
+    levels: [A, B]
+  - task: hard_kanban
+    levels: [A, B]

@@ -1,0 +1,143 @@
+# Requisitos de medium_tarefas (categorias e fontes: ver easy_pomodoro/requirements.yaml).
+requirements:
+  - id: M-01
+    text: "uma página com fundo preto, header azul com ícone de lista e escrito \"Tarefas Para Fazer\" no canto superior esquerdo"
+    category: a
+    info_source: image
+    mention_patterns: ['fundo\s+preto', 'header|cabe[çc]alho', 'azul', '[íi]cone\s+de\s+lista']
+  - id: M-02
+    text: "Abaixo da header, alinhado a esquerda também um filtro de Data e um do lado o de Prioridade. O filtro de data é um input com uma máscara de data e o de Prioridade é um input de seleção"
+    category: a
+    info_source: image
+    mention_patterns: ['filtro', 'data', 'prioridade', 'm[áa]scara', 'sele[çc][ãa]o|select']
+  - id: M-03
+    text: "uma lista agrupada por dias, começando por Hoje, seguida por Amanhã e depois os dias escritos"
+    category: a
+    info_source: behavior
+    mention_patterns: ['agrupad', '\bhoje\b', 'amanh[ãa]']
+  - id: M-04
+    text: "O primeiro item da lista é a prioridade que está dentro de um retângulo. O vermelho tem escrito URGENTE, o verde RELAXA e o amarelo MÉDIO, texto em branco"
+    category: a
+    info_source: image
+    mention_patterns: ['urgente', 'relaxa', 'm[ée]dio', 'ret[âa]ngulo']
+  - id: M-05
+    text: "No lado direito da prioridade tem uma checkbox para marcar se a tarefa foi feita ou não"
+    category: a
+    info_source: behavior
+    mention_patterns: ['checkbox|caixa\s+de\s+sele[çc][ãa]o|marcar']
+  - id: M-06
+    text: "o nome da tarefa e no final da linha na extremidade direita tem os ícones de lápis e lixeira"
+    category: a
+    info_source: image
+    mention_patterns: ['l[áa]pis', 'lixeira', 'editar|excluir']
+  - id: M-07
+    text: "lixeira para excluir a tarefa"
+    category: a
+    info_source: behavior
+    mention_patterns: ['lixeira|excluir|deletar|remover']
+  - id: M-08
+    text: "lápis para editar a tarefa (o mecanismo de edição não é descrito)"
+    category: c
+    info_source: behavior
+    pending: [PD-M3]
+    mention_patterns: ['l[áa]pis', 'editar']
+  - id: M-09
+    text: "Se a lista for maior que o espaço disponível, faz um scroll só na lista"
+    category: a
+    info_source: behavior
+    mention_patterns: ['scroll|rolagem|rolar']
+  - id: M-10
+    text: "Na parte de baixo tem uma linha branca que separa da lista. Abaixo da linha, \"Nova tarefa:\" seguido de um input vazio com máscara de data, um input de seleção \"Prioridade\", um longo input com label \"Descrição da tarefa\" e, no extremo direito, um ícone de +"
+    category: a
+    info_source: image
+    mention_patterns: ['nova\s+tarefa', 'descri[çc][ãa]o', '\+|[íi]cone\s+de\s+mais|adicionar']
+  - id: M-11
+    text: "Quando o usuário preencher esses ítens, e clicar no ícone de + ele adiciona uma nova tarefa à lista"
+    category: a
+    info_source: behavior
+    mention_patterns: ['adiciona|adicionar|criar|nova\s+tarefa']
+  - id: M-12
+    text: "um filtro de Data e um do lado o de Prioridade (o comportamento do filtro: só as tarefas que correspondem ficam na lista)"
+    category: a
+    info_source: behavior
+    mention_patterns: ['filtr']
+  - id: M-S01
+    text: "Header de 70 px, fundo #60C2E5, ícone e texto \"Tarefas Para Fazer\" em preto"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['#60C2E5', '70\s*px']
+  - id: M-S02
+    text: "Filtros: textos \"Data:\" e \"Prioridade:\" em cinza tamanho 32; campos em retângulos cinza 170 x 55, texto preto; select com \"Selecione\""
+    category: s
+    info_source: spec_only
+    mention_patterns: ['170\s*(?:px)?\s*x\s*55', 'selecione']
+  - id: M-S03
+    text: "Título do dia em azul do header, tamanho 32; linhas brancas de 1327 px (grupo) e 1247 px (tarefa)"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['1327', '1247']
+  - id: M-S04
+    text: "Badges 146 x 36 px com fundos #FF0000, #8D8A31 e #0F633F e texto branco"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['146\s*(?:px)?\s*x\s*36', '#FF0000', '#8D8A31', '#0F633F']
+  - id: M-S05
+    text: "Tarefas concluídas exibem texto tachado e opacidade reduzida"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['tachad', 'opacidade']
+  - id: M-S06
+    text: "Lápis em azul do header e lixeira em vermelho URGENTE"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['l[áa]pis\s+(?:em\s+)?azul', 'lixeira\s+(?:em\s+)?vermelh']
+  - id: M-S07
+    text: "Lápis: a linha vira a linha de adição preenchida, lápis/lixeira dão lugar ao check; ao confirmar, volta com os dados atualizados"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['check', 'volta\s+para\s+o\s+modo']
+  - id: M-S08
+    text: "Após adicionar com sucesso, os inputs do formulário são limpos"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['limpar|limpos']
+  - id: M-S09
+    text: "Ordenar as tarefas da mais prioritária para a menos prioritária"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['ordenar|ordem\s+de\s+prioridade|mais\s+priorit']
+  - id: M-S10
+    text: "Prioridade tem um item \"Selecione\" neutro que remove o filtro; apagar a data remove o filtro de data"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['selecione', 'apagar\s+a\s+data']
+  - id: M-S11
+    text: "Botões só de ícone têm aria-label descritivo (ex.: \"Excluir tarefa\")"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['aria']
+  - id: M-S12
+    text: "<input> e <select> do formulário e dos filtros têm <label> ou aria-label"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['<label>|aria-label']
+  - id: M-S13
+    text: "Semântica: <header>, <main>, <section> e <footer> (ou <form>)"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['<header>|<main>|<footer>|sem[âa]ntic']
+  - id: M-S14
+    text: "Navegação por Tab com anel de foco visível"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['anel\s+de\s+foco|foco\s+vis[íi]vel|tecla\s+tab']
+  - id: M-S15
+    text: "Data sempre no formato DD/MM/AAAA"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['DD/MM/AAAA']
+  - id: M-S16
+    text: "Rodapé: linha cinza, \"Nova tarefa:\" à esquerda, campos cinza #D5D0D0, botão + azul do header na extremidade direita"
+    category: s
+    info_source: spec_only
+    mention_patterns: ['#D5D0D0', '[+] azul']

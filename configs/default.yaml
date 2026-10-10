@@ -1,0 +1,51 @@
+# Experimento principal do SPEC-UI. Tudo aqui e copiado para cada record.json.
+run_kind: main
+repetitions: 5            # repeticoes independentes por celula
+free_repetitions: 3       # repeticoes para prompts livres de participantes
+
+tasks: [easy, medium, hard]
+modalities: [text, multimodal]
+prompt_sources: [no_spec, with_spec]   # acrescente "free:<collection_id>" para prompts livres
+free_modalities: intended              # intended | both
+
+# Geradores: hoje um (Gemini Flash). Para o fator modelo (consistencia do efeito da spec entre modelos),
+# acrescente outra entrada `provider: google` com outro id fixo; a analise funciona para qualquer k >= 1,
+# mas a secao de consistencia entre modelos so existe com k >= 2.
+generators:
+  - provider: google
+    # Confirme com `specui check-model` ANTES de fixar. Sem aliases (-latest, -preview).
+    model_id: "gemini-3.8-flash"
+    temperature: null          # null = padrao do provedor (nunca 0)
+    max_output_tokens: 32768
+    thinking: {thinking_budget: 8192}
+    request_delay_s: 4.0
+    max_retries: 5
+
+analysis:
+  # Margem do TOST entre modelos. Sem default: se continuar null ate a execucao principal,
+  # o teste de equivalencia NAO roda. E gravada no manifest e nao muda apos o congelamento.
+  equivalence_margin: null
+
+base_seed: 20260101
+
+# Diretorios (relativos a raiz do repositorio, exceto workspace_dir)
+benchmarks_dir: benchmarks
+references_dir: references/figma
+oracles_dir: oracles
+scaffold_dir: scaffold/angular-base
+results_dir: results
+workspace_dir: "C:/specui-work"   # caminho curto: MAX_PATH do Windows com node_modules
+model_cache_dir: "~/.cache/specui-models"
+
+# Harness
+build_timeout_s: 180
+build_configuration: development   # development | production
+viewport: null                     # null = tamanho do PNG da tarefa (1440x900)
+render_settle_ms: 800
+clock_epoch_iso: "2026-03-10T10:00:00"
+block_network: true
+
+# Metricas
+enable_embeddings: true            # DINOv2 + CLIP (requer requirements-ml.txt)
+enable_ocr_fallback: false         # EasyOCR (requer requirements-ocr.txt)
+oracle_levels: ["A", "B"]

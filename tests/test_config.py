@@ -1,0 +1,77 @@
+import pytest
+from pydantic import ValidationError
+
+from specui.config import config_sha256, load_config
+from specui.models import Generator, RunConfig
+
+
+def test_default_config_loads(repo_root):
+    cfg = load_config(repo_root / "configs" / "default.yaml")
+    assert cfg.run_kind == "main"
+    assert cfg.repetitions == 5
+    assert [g.provider for g in cfg.generators] == ["google"]
+    assert all(g.temperature is None for g in cfg.generators)
+    assert cfg.analysis.equivalence_margin is None
+    assert cfg.path("benchmarks_dir") == (repo_root / "benchmarks").resolve()
+
+
+def test_pilot_extends_default(repo_root):
+    default = load_config(repo_root / "configs" / "default.yaml")
+    pilot = load_config(repo_root / "configs" / "pilot.yaml")
+    assert pilot.run_kind == "pilot"
+    assert pilot.repetitions == 1
+    assert pilot.free_repetitions == 1
+    # tudo o mais é herdado: mesmos geradores e mesmo harness
+    assert pilot.generators == default.generators
+    assert pilot.build_timeout_s == default.build_timeout_s
+    assert config_sha256(pilot) != config_sha256(default)
+
+
+def test_overrides_merge_over_yaml(repo_root):
+    cfg = load_config(
+        repo_root / "configs" / "default.yaml",
+        overrides={"repetitions": 2, "analysis": {"equivalence_margin": 0.1}},
+    )
+    assert cfg.repetitions == 2
+    assert cfg.analysis.equivalence_margin == 0.1
+    assert cfg.analysis.n_boot == 10_000  # mesclado, não substituído
+
+
+def test_config_sha_is_stable_and_root_independent(repo_root):
+    a = load_config(repo_root / "configs" / "default.yaml")
+    b = a.model_copy(update={"repo_root": "/outro/lugar"})
+    assert config_sha256(a) == config_sha256(b)
+
+
+def test_extends_cycle_is_detected(tmp_path):
+    (tmp_path / "pyproject.toml").write_text("", encoding="utf-8")
+    (tmp_path / "a.yaml").write_text("extends: b.yaml\n", encoding="utf-8")
+    (tmp_path / "b.yaml").write_text("extends: a.yaml\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="ciclo"):
+        load_config(tmp_path / "a.yaml", repo_root=tmp_path)
+
+
+@pytest.mark.parametrize("model_id", ["gemini-flash-latest", "gemini-3-pro-preview", "foo-exp"])
+def test_aliases_are_rejected(model_id):
+    with pytest.raises(ValidationError, match="alias"):
+        Generator(provider="google", model_id=model_id)
+
+
+def test_alias_allowed_for_mock():
+    Generator(provider="mock", model_id="mock-latest")
+
+
+def test_temperature_zero_is_rejected():
+    with pytest.raises(ValidationError, match="nunca 0"):
+        Generator(provider="google", model_id="gemini-2.5-flash", temperature=0.0)
+
+
+def test_duplicate_generators_and_bad_sources_are_rejected():
+    gen = {"provider": "google", "model_id": "gemini-2.5-flash"}
+    with pytest.raises(ValidationError, match="repetidos"):
+        RunConfig(generators=[gen, gen])
+    with pytest.raises(ValidationError, match="inválida"):
+        RunConfig(generators=[gen], prompt_sources=["no_spec", "livre"])
+    with pytest.raises(ValidationError):
+        RunConfig(generators=[])
+    RunConfig(generators=[gen], prompt_sources=["no_spec", "with_spec", "free:coleta_2026_11"])

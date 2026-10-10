@@ -1,0 +1,8 @@
+# Metricas de embedding (VES com DINOv2 e CLIP). Instale com:
+#   pip install -r requirements-ml.txt
+# Os modelos (~350 MB + ~600 MB) sao baixados no primeiro `specui smoke` para model_cache_dir.
+# Sem estes pacotes, o pipeline roda com enable_embeddings: false (campos ficam null).
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.3
+torchvision>=0.18
+transformers>=4.44

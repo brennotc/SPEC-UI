@@ -1,0 +1,7 @@
+# Piloto: mesma configuracao do experimento principal, com 1 repeticao.
+# Grava em results/pilot/ (fora da analise e do painel). Roda todos os geradores de default.yaml.
+extends: default.yaml
+
+run_kind: pilot
+repetitions: 1
+free_repetitions: 1

@@ -1,0 +1,33 @@
+<!doctype html><meta charset="utf-8"><title>fixture: widgets de formulario e lista</title>
+<body style="margin:0;background:#000;color:#fff;font-family:sans-serif"><app-root>
+<header style="height:70px;background:#60C2E5;color:#000;display:flex;align-items:center;gap:8px;padding:0 24px">
+  <svg width="28" height="28"><rect width="28" height="28"/></svg><span>Tarefas Para Fazer</span>
+</header>
+<section style="display:flex;gap:24px;padding:16px 24px;align-items:center">
+  <label>Data: <input type="text" placeholder="__/__/__" style="width:120px"></label>
+  <label>Prioridade: <select><option>Selecione</option><option>URGENTE</option><option>MÉDIO</option><option>RELAXA</option></select></label>
+</section>
+<main style="padding:0 24px;height:260px;overflow:auto">
+  <h2 style="color:#60C2E5">Hoje</h2>
+  <div class="row" style="display:flex;align-items:center;gap:16px;height:44px">
+    <span style="background:#f00;color:#fff;width:146px;text-align:center">URGENTE</span>
+    <input type="checkbox" aria-label="feita"><span>Lavar a louça</span>
+    <span style="margin-left:auto;display:flex;gap:12px">
+      <button aria-label="Editar tarefa">E</button><button aria-label="Excluir tarefa">X</button>
+    </span>
+  </div>
+  <div class="row" style="display:flex;align-items:center;gap:16px;height:44px">
+    <span style="background:#0F633F;color:#fff;width:146px;text-align:center">RELAXA</span>
+    <input type="checkbox"><span>Fazer mercado</span>
+    <span style="margin-left:auto;display:flex;gap:12px">
+      <svg width="20" height="20"><rect width="20" height="20" fill="#60C2E5"/></svg><svg width="20" height="20"><rect width="20" height="20" fill="#f00"/></svg>
+    </span>
+  </div>
+</main>
+<footer style="border-top:1px solid #fff;padding:12px 24px;display:flex;gap:12px;align-items:center">
+  <span>Nova tarefa:</span>
+  <input type="__DATE_TYPE__" placeholder="__/__/____" style="width:120px">
+  <select><option>Prioridade</option><option>URGENTE</option><option>MÉDIO</option><option>RELAXA</option></select>
+  <input type="text" aria-label="Descrição da tarefa" placeholder="" style="flex:1">
+  <button aria-label="Adicionar tarefa">+</button>
+</footer></app-root></body>

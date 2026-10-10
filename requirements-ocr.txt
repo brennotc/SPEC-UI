@@ -1,0 +1,3 @@
+# Fallback de OCR para os blocos de referencia quando references/figma/blocks.json nao existe.
+# Puxa o torch como dependencia. Ative com enable_ocr_fallback: true.
+easyocr>=1.7
