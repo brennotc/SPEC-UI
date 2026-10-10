@@ -12,7 +12,7 @@ import logging
 import re
 import subprocess
 from collections.abc import Iterable
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -28,9 +28,22 @@ RETRY_STATUSES = frozenset({"api_error", "model_mismatch"})
 _SAFE = re.compile(r"[^A-Za-z0-9_.-]+")
 
 
+_LAST_STAMP = [datetime.min.replace(tzinfo=UTC)]
+
+
+def _unique_now() -> datetime:
+    """`now` estritamente crescente dentro do processo: em relógios de resolução grossa (Windows) duas chamadas seguidas
+    podem devolver o mesmo instante, e a refeita de uma célula (model_mismatch) sobrescreveria a tentativa anterior."""
+    now = datetime.now(UTC)
+    if now <= _LAST_STAMP[0]:
+        now = _LAST_STAMP[0] + timedelta(microseconds=1)
+    _LAST_STAMP[0] = now
+    return now
+
+
 def make_run_id(cell: Cell, now: datetime | None = None) -> str:
     """`<prompt>__<modalidade>__<provedor>__r<rep>__<AAAAMMDDTHHMMSS>`, seguro para diretório."""
-    stamp = (now or datetime.now(UTC)).strftime("%Y%m%dT%H%M%S")
+    stamp = (now or _unique_now()).strftime("%Y%m%dT%H%M%S%f")  # microssegundos: a refeita de um model_mismatch nunca colide
     prompt = _SAFE.sub("-", cell.prompt_source.prompt_id).strip("-")
     return f"{prompt}__{cell.modality}__{cell.provider}__r{cell.rep}__{stamp}"
 

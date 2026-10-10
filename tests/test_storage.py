@@ -36,8 +36,11 @@ def test_run_id_is_filesystem_safe_and_unique_per_attempt(tasks):
                 modality="multimodal", rep=3, provider="google", model_id="m")
     a = make_run_id(cell, datetime(2026, 10, 9, 14, 30, 5, tzinfo=UTC))
     b = make_run_id(cell, datetime(2026, 10, 9, 14, 30, 6, tzinfo=UTC))
-    assert a == "easy_pomodoro-with_spec__multimodal__google__r3__20261009T143005"
+    assert a == "easy_pomodoro-with_spec__multimodal__google__r3__20261009T143005000000"
     assert a != b and all(c.isalnum() or c in "_.-" for c in a)
+    same_second = datetime(2026, 10, 9, 14, 30, 5, 250, tzinfo=UTC)
+    assert make_run_id(cell, same_second) != a  # duas tentativas da mesma célula no mesmo segundo têm ids diferentes
+    assert make_run_id(cell) != make_run_id(cell)  # e sem `now` também (relógio com resolução de microssegundo)
     free = Cell(task_id="x", modality="text", rep=0, provider="google", model_id="m",
                 prompt_source=tasks and make_standard_source(tasks[0], "no_spec").model_copy(
                     update={"prompt_id": "free:coleta_1/p001/2"}))

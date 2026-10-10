@@ -354,6 +354,9 @@ def test_model_mismatch_first_time_is_redone(make_cfg, make_pipeline):
     statuses = [e["status"] for e in pipeline.store.manifest()]
     assert statuses == ["model_mismatch", "done"]  # a tentativa divergente fica registrada
     assert pipeline.store.completed_keys() == {cells[0].key}
+    run_ids = [e["run_id"] for e in pipeline.store.manifest()]
+    assert len(set(run_ids)) == 2  # duas tentativas imediatas, dois run_id, dois record.json (a divergente não é sobrescrita)
+    assert all((pipeline.store.runs_dir / rid / "record.json").is_file() for rid in run_ids)
 
 
 def test_model_mismatch_twice_aborts_the_run(make_cfg, make_pipeline):
