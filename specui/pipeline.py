@@ -398,6 +398,7 @@ class Pipeline:
                 break
             if providers and providers <= paused:
                 logger.warning("todos os provedores pausados por cota; encerrando")
+                summary.not_run += sum(1 for c in cells[i:] if c.key not in done)  # o que ficou por rodar, no resumo
                 break
         return summary
 

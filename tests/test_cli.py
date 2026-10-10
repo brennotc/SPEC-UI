@@ -58,13 +58,24 @@ def test_invalid_config_exits_with_code_2(tmp_path):
 # ----------------------------------------------------------------------------- oráculo, análise, export
 
 
-def test_oracle_lint_and_matrix_on_the_real_suites(repo_root):
-    config = str(repo_root / "configs" / "default.yaml")
-    assert runner.invoke(app, ["oracle-lint", "--config", config]).exit_code == 0
-    result = runner.invoke(app, ["oracle-matrix", "--config", config, "--task", "easy_pomodoro"])
+def test_oracle_lint_and_matrix_on_the_real_suites(repo_root, tmp_path):
+    """Roda sobre uma CÓPIA de oracles/: `oracle-matrix` grava traceability.md e o teste não pode escrever na árvore do repositório."""
+    import shutil
+
+    copy = tmp_path / "oracles"
+    shutil.copytree(repo_root / "oracles", copy, ignore=shutil.ignore_patterns("__pycache__"))
+    (tmp_path / "pyproject.toml").write_text("", encoding="utf-8")
+    config = tmp_path / "copy.yaml"
+    config.write_text(os.linesep.join([f"extends: {(repo_root / 'configs' / 'default.yaml').as_posix()}",
+                                       f"oracles_dir: {copy.as_posix()}"]) + os.linesep, encoding="utf-8")
+    assert runner.invoke(app, ["oracle-lint", "--config", str(config)]).exit_code == 0
+    result = runner.invoke(app, ["oracle-matrix", "--config", str(config), "--task", "easy_pomodoro"])
     assert result.exit_code == 0 and "easy_pomodoro" in result.output
-    text = (repo_root / "oracles" / "easy_pomodoro" / "traceability.md").read_text(encoding="utf-8")
+    text = (copy / "easy_pomodoro" / "traceability.md").read_text(encoding="utf-8")
     assert "| E-01 |" in text and "E-A-10 (pendente)" in text
+    # o gerado a partir da cópia é idêntico ao commitado: o traceability.md versionado está em dia
+    committed = (repo_root / "oracles" / "easy_pomodoro" / "traceability.md").read_text(encoding="utf-8")
+    assert text.split() == committed.split()  # sem diferenças de conteúdo (a quebra de linha do checkout não conta)
 
 
 def test_analyze_refuses_without_main_runs(mock_config):

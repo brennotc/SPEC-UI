@@ -283,6 +283,8 @@ class ScaffoldHarness:
             raise ValueError(f"recusando apagar fora do workspace: {run_dir}")
         remove_dir_link(run_dir / "node_modules")
         shutil.rmtree(run_dir, ignore_errors=True)
+        for suffix in ("stdout", "stderr"):  # os logs do build já foram copiados por `collect`: um par por célula acumulava
+            (self.workspace_dir / "_logs" / f"{run_dir.name}.{suffix}.txt").unlink(missing_ok=True)
 
     def verify_pristine(self) -> BuildResult:
         """Constrói o scaffold vazio (usado por `specui scaffold-check`)."""

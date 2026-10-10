@@ -341,6 +341,7 @@ def test_all_providers_exhausted_stops_the_run(make_cfg, make_pipeline):
     pipeline, cells, *_ = make_pipeline(cfg=cfg, clients={key: client})
     summary = pipeline.run(cells[:5])
     assert summary.executed == 0 and client.calls == 1 and summary.paused_providers == ["mock"]
+    assert summary.not_run == 5 and summary.total == 5  # a que bateu na cota + as 4 que nem foram tentadas
 
 
 def test_model_mismatch_first_time_is_redone(make_cfg, make_pipeline):

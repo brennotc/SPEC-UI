@@ -198,6 +198,7 @@ class GeminiClient:
 
     def count_tokens(self, system: str, user_text: str) -> int | None:
         try:
+            self.limiter.wait()  # chamada extra à API por célula: passa pelo mesmo limitador da geração
             client = self._client()
             result = client.models.count_tokens(
                 model=self.generator.model_id, contents=f"{system}\n\n{user_text}"
