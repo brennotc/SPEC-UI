@@ -10,7 +10,8 @@ agente LLM ou de pessoa: só métricas de três artigos revisados por pares.
 | **Figma2Code** (ICLR 2026) <https://arxiv.org/pdf/2604.13648> | VES (cosseno DINOv2 render × design), MAE e qualidade de código: RUR, APR, FU, BC, STR, AVU, ISR, CCR |
 | **WebGen-Bench** (NeurIPS 2025) <https://arxiv.org/pdf/2505.03733> | Nota funcional por casos de teste (Task → Expected Result), YES / PARTIAL / NO, `Accuracy = (Y + 0,5·P) / N`, executada por scripts Playwright **determinísticos** (não por agente) |
 
-Os PDFs estão em [docs/papers/](docs/papers/). O contexto da decisão de abandonar o juiz LLM está em
+Os três artigos estão referenciados pelo arXiv (links acima); os PDFs **não** estão no repositório. Os dois artigos que o desenho
+anterior usava (DesignBench e UI-Bench) ficam em [docs/papers/descartados/](docs/papers/descartados/) só como registro. O contexto da decisão de abandonar o juiz LLM está em
 [docs/contexto-benchmarks-spec-ui.md](docs/contexto-benchmarks-spec-ui.md).
 
 ---
@@ -268,4 +269,4 @@ fixos e verificados a cada geração; seeds `base_seed + rep`; temperatura do pa
 - Si et al., *Design2Code*, NAACL 2025. <https://arxiv.org/pdf/2403.03163>
 - *Figma2Code*, ICLR 2026. <https://arxiv.org/pdf/2604.13648>
 - Lu et al., *WebGen-Bench*, NeurIPS 2025. <https://arxiv.org/pdf/2505.03733>
-- PDFs: [docs/papers/](docs/papers/) · contexto: [docs/contexto-benchmarks-spec-ui.md](docs/contexto-benchmarks-spec-ui.md)
+- Artigos descartados (registro): [docs/papers/descartados/](docs/papers/descartados/) · contexto: [docs/contexto-benchmarks-spec-ui.md](docs/contexto-benchmarks-spec-ui.md)
