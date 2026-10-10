@@ -98,7 +98,8 @@ def test_runner_outcomes_flags_and_environment(served):
     outcomes = {o.case_id: o for o in run_suite(suite, session, url, (1440, 900))}
 
     first = outcomes["R-A-01"]  # act (passo) + eventually (pontua)
-    assert first.outcome == "YES" and (first.n_pass, first.n_total, first.n_steps) == (1, 1, 1)
+    detail = f"failed={first.failed!r} error={first.error!r} blocked={first.blocked}"  # o motivo do NO (timeout, asserção nomeada...)
+    assert first.outcome == "YES" and (first.n_pass, first.n_total, first.n_steps) == (1, 1, 1), detail
     p = outcomes["R-A-02"]
     assert (p.outcome, p.n_pass, p.n_total) == ("PARTIAL", 1, 2) and p.failed == ["não existe :: faltou o Tchau"]
     n = outcomes["R-A-03"]
