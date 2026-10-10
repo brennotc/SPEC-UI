@@ -16,6 +16,7 @@ from typing import Any, Self
 from urllib.parse import urlparse
 
 from playwright.sync_api import Browser, BrowserContext, Page, Playwright, sync_playwright
+from playwright.sync_api import TimeoutError as PlaywrightTimeout
 from pydantic import BaseModel, Field
 
 from specui.clock import FIXED_NOW
@@ -170,7 +171,13 @@ class BrowserSession:
             page.on("pageerror", lambda err: art.page_errors.append(str(err)))
             page.on("console", lambda msg: art.console_errors.append(msg.text) if msg.type == "error" else None)
 
-            error = load_app(page, url, self.render_settle_ms)
+            try:
+                error = load_app(page, url, self.render_settle_ms)
+            except PlaywrightTimeout:
+                # o `load` não veio em GOTO_TIMEOUT_MS (ex.: laço infinito no construtor): falha do APP, não da infraestrutura.
+                # Sem render não há screenshot nem extração; o pipeline grava `nonexecutable`.
+                art.errors.append(f"o app não terminou de carregar em {GOTO_TIMEOUT_MS // 1000} s (TimeoutError)")
+                return art
             if error is None:
                 art.render_ok = True
             else:
