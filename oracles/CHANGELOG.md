@@ -77,3 +77,9 @@ Sob o protocolo de passos (acima), cada caso abaixo passa a ter o efeito princip
   10/03/2026 e 10:01; agora derivam de `specui/clock.py` (a mesma fonte do runner, do render e da configuração). Valores
   idênticos; nenhuma mudança de comportamento nas suítes. `RunConfig` recusa qualquer `clock_epoch_iso` diferente do relógio
   fixo, porque a suíte medium cria tarefas para "hoje" a partir dele.
+
+### PD-H6: isenção do matiz do corpo de "Aprovado" (revisão I2)
+- **ambiguity / decisão de protocolo** (`hard_kanban/pending.yaml`): H-A-03 já pulava a checagem de matiz do corpo de "Aprovado",
+  porque o `#C5CC9E` da spec cai na faixa do amarelo; era conhecimento da spec dentro de um teste "derivado só do prompt" sem
+  registro. Agora é PD-H6 (regra 3): no nível A só a luminância nessa coluna; o matiz continua nas outras três. Vale igual para
+  no_spec e with_spec. Sem mudança de comportamento.

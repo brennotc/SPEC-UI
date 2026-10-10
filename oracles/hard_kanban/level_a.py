@@ -91,7 +91,7 @@ def column_colors(page: Page, t: Checks) -> None:
         header = rect[1] if rect else None
         t.ok(f"'{title}': o corpo é mais claro que o cabeçalho",
              bool(body and header and relative_luminance(body) > relative_luminance(header) + 0.05), f"{body} vs {header}")
-        if title != "Aprovado":  # o corpo do Aprovado (#C5CC9E) cai na faixa do amarelo: só se compara a luminância
+        if title != "Aprovado":  # PD-H6: o corpo do Aprovado (#C5CC9E, da spec) cai na faixa do amarelo: só a luminância
             t.ok(f"'{title}': corpo da mesma família de cor", hue_matches(body, hue), f"{body}")
 
 

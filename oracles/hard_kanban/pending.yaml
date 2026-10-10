@@ -64,3 +64,11 @@ pending:
     decision: "Só o Expected Result pontua (WebGen-Bench). Ações (act) e pré-condições (require) que dão certo são passos e não pontuam; o EFEITO PRINCIPAL do caso é pré-condição (require) dos invariantes: se ele não acontece o caso é NO, não PARTIAL. Invariantes que passam com o app inerte (formato, ausência de erro, 'o card só existe uma vez') continuam como ok, mas só valem depois do efeito. Casos com mais de um requisito independente (E-A-01, M-A-05, H-A-03) seguem podendo dar PARTIAL."
     decided_on: "2026-10-10"
     blocks: [H-A-04, H-A-06, H-A-11, H-A-14]
+  - id: PD-H6
+    question: "O corpo de 'Aprovado' (#C5CC9E na spec, matiz ~70°) cai na faixa do amarelo, não na do verde. O nível A ('derivado só do prompt') compara o matiz do corpo com a cor pedida?"
+    rule: 3
+    options: ["só luminância no Aprovado", "matiz nas quatro colunas", "luminância nas quatro colunas"]
+    status: decided
+    decision: "O prompt pede 'cor mais fraca' da respectiva cor (verde para Aprovado); o hex da spec (#C5CC9E) é amarelado e é exigência da spec (nível B, H-B-02). No nível A, o corpo de 'Aprovado' é comparado SÓ pela luminância (mais claro que o cabeçalho); o matiz do corpo é comparado nas outras três colunas, onde o hex da spec não contradiz o nome da cor. A isenção vale igual para no_spec e with_spec (decisão do pesquisador, revisão D6)."
+    decided_on: "2026-10-10"
+    blocks: [H-A-03]
