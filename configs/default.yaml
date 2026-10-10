@@ -1,4 +1,5 @@
-# Experimento principal do SPEC-UI. Tudo aqui e copiado para cada record.json.
+# Experimento principal do SPEC-UI. O hash desta configuracao (sem os diretorios da maquina) e os parametros do gerador
+# (modelo, temperatura, thinking, seed) vao para cada record.json.
 run_kind: main
 repetitions: 5            # repeticoes independentes por celula
 free_repetitions: 3       # repeticoes para prompts livres de participantes

@@ -156,6 +156,9 @@ def smoke(config: ConfigOpt = DEFAULT_CONFIG) -> None:
     cfg = _load(config, overrides).model_copy(update={"generators": [_mock_generator("ok")]})
     summary = _execute(cfg, resume=False)
 
+    from specui.tasks import load_tasks
+
+    frame_size = load_tasks(cfg.path("benchmarks_dir"), ["easy"])[0].image_size  # o frame da tarefa, não um 1440x900 fixo
     store = RunStore(cfg.path("results_dir"), "smoke")
     rec = store.load_records()[-1] if store.load_records() else None
     checks: list[tuple[str, bool]] = []
@@ -164,7 +167,7 @@ def smoke(config: ConfigOpt = DEFAULT_CONFIG) -> None:
         checks = [
             ("status == done", rec.status == "done"),
             ("executável", rec.exec.executable is True),
-            ("screenshot no tamanho do frame do Figma", shot.is_file() and png_size(shot) == (1440, 900)),
+            ("screenshot no tamanho do frame do Figma", shot.is_file() and png_size(shot) == frame_size),
             ("métricas técnicas presentes", rec.technical is not None),
             ("métricas do insumo presentes", rec.input_spec is not None),
             ("record.json gravado", (store.root / rec.paths["run_dir"] / "record.json").is_file()),
@@ -204,7 +207,7 @@ def scaffold_check(config: ConfigOpt = DEFAULT_CONFIG) -> None:
         path = shutil.which(tool)
         version = subprocess.run([path, "--version"], capture_output=True, text=True, check=False).stdout.strip() if path else "AUSENTE"
         console.print(f"{tool}: {version}")
-    harness = ScaffoldHarness(cfg.path("scaffold_dir"), cfg.path("workspace_dir"), cfg.build_timeout_s)
+    harness = ScaffoldHarness(cfg.path("scaffold_dir"), cfg.path("workspace_dir"), cfg.build_timeout_s, cfg.build_configuration)
     info = harness.info()
     console.print(f"scaffold {info.version} | Angular {info.angular_version} | lock {info.lock_sha256[:12]} | árvore {str(info.tree_sha256)[:12]}")
     for name, version in info.packages.items():

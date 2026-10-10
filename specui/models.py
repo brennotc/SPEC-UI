@@ -137,7 +137,7 @@ class RunConfig(BaseModel):
     run_kind: RunKind = "main"
     repetitions: int = 5
     free_repetitions: int = 3
-    tasks: list[Difficulty] = Field(default_factory=lambda: list(DIFFICULTIES))
+    tasks: list[str] = Field(default_factory=lambda: list(DIFFICULTIES))  # dificuldades (easy, medium, hard) e/ou ids (easy_pomodoro)
     modalities: list[Modality] = Field(default_factory=lambda: ["text", "multimodal"])
     prompt_sources: list[str] = Field(default_factory=lambda: ["no_spec", "with_spec"])
     free_modalities: Literal["intended", "both"] = "intended"
@@ -183,6 +183,19 @@ class RunConfig(BaseModel):
     def _positive(cls, v: int) -> int:
         if v < 1:
             raise ValueError("deve ser >= 1")
+        return v
+
+    @field_validator("tasks")
+    @classmethod
+    def _tasks_are_difficulties_or_ids(cls, v: list[str]) -> list[str]:
+        """Aceita dificuldade ou id de tarefa (o mesmo que `load_tasks` aceita); a existência do id é conferida ao carregar."""
+        if not v:
+            raise ValueError("tasks vazio")
+        for item in v:
+            if item not in DIFFICULTIES and not re.fullmatch(r"[a-z][a-z0-9_]*", item):
+                raise ValueError(f"tarefa inválida: '{item}' (use easy|medium|hard ou o id de uma tarefa, ex.: easy_pomodoro)")
+        if len(set(v)) != len(v):
+            raise ValueError("tasks com itens repetidos")
         return v
 
     @field_validator("prompt_sources")

@@ -135,3 +135,18 @@ def test_the_fixed_clock_has_one_source_and_the_config_cannot_change_it(repo_roo
     assert load_config(repo_root / "configs" / "default.yaml").clock_epoch_iso == FIXED_NOW
     with pytest.raises(ValueError, match="parte do instrumento"):
         load_config(repo_root / "configs" / "default.yaml", overrides={"clock_epoch_iso": "2026-03-11T10:00:00"})
+
+
+def test_tasks_accept_difficulties_and_ids_and_refuse_nonsense(repo_root):
+    ok = load_config(repo_root / "configs" / "default.yaml", overrides={"tasks": ["easy_pomodoro", "hard"]})
+    assert ok.tasks == ["easy_pomodoro", "hard"]
+    for bad in ([], ["Easy"], ["easy", "easy"], ["../etc"]):
+        with pytest.raises(ValueError):
+            load_config(repo_root / "configs" / "default.yaml", overrides={"tasks": bad})
+
+
+def test_task_ids_reach_load_tasks(repo_root):
+    from specui.tasks import load_tasks
+
+    cfg = load_config(repo_root / "configs" / "default.yaml", overrides={"tasks": ["hard_kanban"]})
+    assert [t.id for t in load_tasks(repo_root / "benchmarks", list(cfg.tasks))] == ["hard_kanban"]
