@@ -37,6 +37,7 @@ from specui.llm import (
     make_client,
     model_matches,
 )
+from specui.metrics import embeddings as emb
 from specui.metrics.input_spec import compute_input_spec
 from specui.metrics.reference import ReferenceUnavailableError, load_reference_blocks
 from specui.metrics.technical import compute_cost
@@ -304,6 +305,7 @@ class Pipeline:
             return
         self._check_oracle_frozen()
         self._check_oracle_files()
+        self._check_models_cached()
         if not any(s.__name__ == "stage_design2code" for s in self.stages):
             return
         missing = []
@@ -317,6 +319,14 @@ class Pipeline:
                 "referência do Figma indisponível (as métricas visuais não poderiam ser calculadas):\n  "
                 + "\n  ".join(missing)
             )
+
+    def _check_models_cached(self) -> None:
+        """DINOv2 e CLIP só do cache local (o experimento não acessa o Hub): ausentes, falha ANTES de gastar API."""
+        if not self.cfg.enable_embeddings or not any(s.__name__ == "stage_embeddings" for s in self.stages):
+            return
+        if not emb.embeddings_available()[0]:  # sem torch/transformers as métricas ficam None com o motivo (como antes)
+            return
+        emb.ensure_cached(self.cfg.model_cache_dir)
 
     def _check_oracle_files(self) -> None:
         """`requirements.yaml`/`pending.yaml` de cada tarefa precisam carregar ANTES de gastar API: regex inválida em

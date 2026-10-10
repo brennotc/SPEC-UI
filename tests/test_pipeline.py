@@ -514,6 +514,23 @@ def test_preflight_refuses_invalid_oracle_files_before_any_api_call(make_cfg, ma
     pipeline.preflight()  # corrigidos: passa
 
 
+def test_preflight_refuses_missing_embedding_models_before_any_api_call(make_cfg, make_pipeline, tmp_path, monkeypatch):
+    from specui.metrics import embeddings as emb
+    from specui.stages import stage_embeddings
+
+    monkeypatch.setattr(emb, "embeddings_available", lambda: (True, None))
+    real = [Generator(provider="google", model_id="gemini-3.8-flash", request_delay_s=0)]
+    cfg = make_cfg(generators=real, run_kind="pilot", enable_embeddings=True, model_cache_dir=str(tmp_path / "cache"))
+    pipeline, *_ = make_pipeline(cfg=cfg, clients={real[0].key: MockClient(real[0])}, stages=[stage_embeddings])
+    monkeypatch.setattr(pipeline, "_check_oracle_files", lambda: None)
+    with pytest.raises(ConfigurationError, match="facebook/dinov2-base") as err:
+        pipeline.preflight()
+    assert str(tmp_path / "cache") in str(err.value)
+    monkeypatch.setattr(emb, "ensure_cached", lambda cache: {})  # modelos no cache: passa (a referência do Figma é outro item)
+    monkeypatch.setattr("specui.pipeline.load_reference_blocks", lambda *a, **k: None)
+    pipeline.preflight()
+
+
 def test_requirements_loader_no_longer_swallows_invalid_files(make_cfg, tmp_path):
     from specui.pipeline import _requirements_loader
 

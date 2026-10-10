@@ -109,6 +109,13 @@ specui check-model                                       # confirma os ids dos d
 `requirements.lock` é o `pip freeze` do ambiente do piloto 1 (Playwright 1.62.0 → Chromium 151.0.7922.34, torch 2.14.1, transformers 5.19.0);
 `playwright` é a única dependência pinada em `requirements.txt`, porque a versão define o navegador. Windows: `git config core.longpaths true`. O `workspace_dir` tem padrão por plataforma (`C:/specui-work` no Windows, curto de propósito por causa do limite de caminho; `~/.cache/specui-work` nas demais) e pode ser trocado na configuração.
 
+**Modelos de embedding (DINOv2 `facebook/dinov2-base` e CLIP `openai/clip-vit-base-patch32`) precisam estar no cache local antes do
+run**, em `model_cache_dir` (padrão `~/.cache/specui-models`). O experimento **não acessa o Hub**: carrega só do cache
+(`local_files_only=True`, `HF_HUB_OFFLINE=1`), e a ausência de um modelo é um erro de configuração que o `preflight` aponta antes de qualquer chamada
+paga. Para baixar uma vez, com rede:
+`python -c "import os; os.environ['HF_HUB_OFFLINE']='0'; from huggingface_hub import snapshot_download; [snapshot_download(m, cache_dir=r'C:/Users/<você>/.cache/specui-models') for m in ('facebook/dinov2-base', 'openai/clip-vit-base-patch32')]"`.
+Cada record grava `<modelo>@<sha do snapshot>` em `embeddings.dinov2_model` e `embeddings.clip_model`.
+
 A instalação é **editável** (`pip install -e .`): `oracles/`, `configs/`, `benchmarks/` e `scaffold/` não são empacotados, são lidos do repositório. Python 3.12 é exigido (`requires-python` em `pyproject.toml`; o harness usa `os.path.isjunction`).
 
 ## 6. Tarefas, requisitos e rastreabilidade

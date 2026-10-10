@@ -4,8 +4,9 @@
 - CLIP ViT-B/32 (Design2Code): cosseno entre embeddings CLIP, após remover o texto por inpainting.
 
 torch/transformers só são importados aqui, dentro das funções, e os modelos são carregados uma
-vez por processo (cache em disco em `cache_dir`). Sem os pacotes, `embeddings_available()` diz
-por quê e as métricas ficam None (o pipeline segue).
+vez por processo, SÓ do cache em disco em `cache_dir` (`local_files_only=True` e `HF_HUB_OFFLINE=1`: o experimento nunca acessa
+o Hub). Modelo ausente do cache é `ConfigurationError` com o nome e a pasta esperada; `model_snapshot` devolve o sha do
+snapshot em uso (vai para o record). Sem os pacotes, `embeddings_available()` diz por quê e as métricas ficam None.
 
 As imagens são redimensionadas INTEIRAS para 224x224 (sem corte central): o recorte padrão dos
 processadores descartaria as bordas laterais do frame 1440x900.
@@ -18,6 +19,10 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
+from specui.llm.base import ConfigurationError
+
+# Nada neste processo toca a rede do Hub (setdefault: quem precisar baixar, de propósito, define HF_HUB_OFFLINE=0 antes de importar).
+os.environ.setdefault("HF_HUB_OFFLINE", "1")
 # No Windows sem modo desenvolvedor o cache não usa symlinks (funciona, só ocupa mais disco).
 os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
 
@@ -40,21 +45,62 @@ def _cache(cache_dir: str | Path | None) -> str | None:
     return str(Path(cache_dir).expanduser()) if cache_dir else None
 
 
+def _cache_root(cache_dir: str | Path | None) -> Path:
+    if cache_dir:
+        return Path(cache_dir).expanduser()
+    return Path(os.environ.get("HF_HUB_CACHE") or Path.home() / ".cache" / "huggingface" / "hub")
+
+
+def model_snapshot(model: str, cache_dir: str | Path | None = None) -> str:
+    """sha do snapshot de `model` no cache local (o que `from_pretrained(..., local_files_only=True)` carrega).
+
+    Sem o modelo no cache: `ConfigurationError` com o nome e a pasta esperada. O sha vem de `refs/main`; sem ele, do único
+    snapshot existente."""
+    root = _cache_root(cache_dir)
+    folder = root / f"models--{model.replace('/', '--')}"
+    hint = (f"modelo '{model}' ausente do cache local ({folder}); o experimento não acessa o Hub. Baixe uma vez, com rede: "
+            f"python -c \"import os; os.environ['HF_HUB_OFFLINE']='0'; from huggingface_hub import snapshot_download; "
+            f"snapshot_download('{model}', cache_dir=r'{root}')\"")
+    snapshots = folder / "snapshots"
+    if not snapshots.is_dir():
+        raise ConfigurationError(hint)
+    ref = folder / "refs" / "main"
+    sha = ref.read_text(encoding="utf-8").strip() if ref.is_file() else None
+    if sha is None:
+        found = [d.name for d in snapshots.iterdir() if d.is_dir()]
+        sha = found[0] if len(found) == 1 else None
+    if not sha or not (snapshots / sha).is_dir() or not any((snapshots / sha).iterdir()):
+        raise ConfigurationError(hint)
+    return sha
+
+
+def ensure_cached(cache_dir: str | Path | None = None) -> dict[str, str]:
+    """Os dois modelos no cache (antes de gastar API): {nome: sha}. `ConfigurationError` no primeiro que faltar."""
+    return {name: model_snapshot(name, cache_dir) for name in (DINOV2_MODEL, CLIP_MODEL)}
+
+
+def model_version(model: str, cache_dir: str | Path | None = None) -> str:
+    """`<nome>@<sha do snapshot>`, como gravado no record."""
+    return f"{model}@{model_snapshot(model, cache_dir)}"
+
+
 @lru_cache(maxsize=2)
 def _dinov2(cache_dir: str | None):
+    model_snapshot(DINOV2_MODEL, cache_dir)  # ConfigurationError legível em vez do traceback do Hub
     from transformers import AutoImageProcessor, AutoModel
 
-    processor = AutoImageProcessor.from_pretrained(DINOV2_MODEL, cache_dir=cache_dir)
-    model = AutoModel.from_pretrained(DINOV2_MODEL, cache_dir=cache_dir).eval()
+    processor = AutoImageProcessor.from_pretrained(DINOV2_MODEL, cache_dir=cache_dir, local_files_only=True)
+    model = AutoModel.from_pretrained(DINOV2_MODEL, cache_dir=cache_dir, local_files_only=True).eval()
     return processor, model
 
 
 @lru_cache(maxsize=2)
 def _clip(cache_dir: str | None):
+    model_snapshot(CLIP_MODEL, cache_dir)  # ConfigurationError legível em vez do traceback do Hub
     from transformers import CLIPModel, CLIPProcessor
 
-    processor = CLIPProcessor.from_pretrained(CLIP_MODEL, cache_dir=cache_dir)
-    model = CLIPModel.from_pretrained(CLIP_MODEL, cache_dir=cache_dir).eval()
+    processor = CLIPProcessor.from_pretrained(CLIP_MODEL, cache_dir=cache_dir, local_files_only=True)
+    model = CLIPModel.from_pretrained(CLIP_MODEL, cache_dir=cache_dir, local_files_only=True).eval()
     return processor, model
 
 

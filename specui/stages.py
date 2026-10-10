@@ -130,7 +130,9 @@ def stage_embeddings(ctx: StageContext) -> None:
         return
     cache = ctx.cfg.model_cache_dir
     shot, design = ctx.out_dir / "screenshot.png", ctx.task.image_path
-    _embeddings_record(ctx).ves_dinov2 = emb.ves_dinov2(shot, design, cache)
+    record = _embeddings_record(ctx)
+    record.ves_dinov2 = emb.ves_dinov2(shot, design, cache)
+    record.dinov2_model = emb.model_version(emb.DINOV2_MODEL, cache)
 
     if ctx.record.design2code is None:  # sem blocos de referência não há o que apagar
         return
@@ -141,6 +143,7 @@ def stage_embeddings(ctx: StageContext) -> None:
     clean_design = inpaint_text(to_u8(design_img), with_boxes(blocks_from_ref(refs)))
     clean_render = inpaint_text(to_u8(load_rgb(shot, size=size)), with_boxes(blocks_from_dom(ctx.render.dom_blocks)))
     ctx.record.design2code.clip_inpainted = emb.clip_cosine(clean_render, clean_design, cache)
+    record.clip_model = emb.model_version(emb.CLIP_MODEL, cache)
 
 
 def stage_code_quality(ctx: StageContext) -> None:

@@ -304,8 +304,8 @@ class EmbeddingMetrics(BaseModel):
     ves_dinov2: float | None = None
     mae: float | None = None
     ssim: float | None = None  # secundária
-    dinov2_model: str = "facebook/dinov2-base"
-    clip_model: str = "openai/clip-vit-base-patch32"
+    dinov2_model: str | None = None  # "<nome>@<sha do snapshot em cache>", gravado quando o VES é calculado
+    clip_model: str | None = None  # idem, quando o CLIP é calculado
 
 
 class CodeQualityMetrics(BaseModel):
