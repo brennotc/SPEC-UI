@@ -57,3 +57,9 @@ Sob o protocolo de passos (acima), cada caso abaixo passa a ter o efeito princip
   `require` e as duas leituras do prompt (30:00 imediato, ou 29:59 após play) viram uma única asserção; `E-A-09` "a contagem
   chegou a decrescer" vira `require` (antes dos invariantes "sempre MM:SS" e "nenhum erro de página", que passam com o timer
   parado). MUT-E1/E2/E4 sobre E-A-05/08/09: WEAK → KILLED.
+- **medium_tarefas**: `M-A-04` "o nome da tarefa aparece em uma linha com checkbox" vira `require` (badge e título "Hoje" ficam como
+  invariantes); `M-A-09` "existe um contêiner com rolagem vertical própria" vira `require` (página sem rolagem fica como
+  invariante); `M-A-10` "a tarefa RELAXA fica oculta" vira `require` ("a URGENTE continua visível" é o invariante); `M-A-11`
+  "ao menos uma tarefa de outro dia fica oculta" vira `require` e passa a vir antes de "a filtrada continua visível" e "sem
+  filtro as três voltam". Sob um filtro inerte esses casos davam 5/6 e 8/9 (PARTIAL); agora NO. MUT-M1/M2/M3/M5 (M-A-04/09):
+  WEAK → KILLED; em M-A-10/11 o KILLED atual vinha da criação de tarefas falhar, e o MUT-M8 (próximo item) passa a exercitar o filtro.

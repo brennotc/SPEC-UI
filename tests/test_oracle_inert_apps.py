@@ -17,6 +17,7 @@ FIXTURES = Path(__file__).resolve().parent / "fixtures" / "pages"
 # (tarefa, página estática inerte, casos que precisam dar NO nela)
 INERT = [
     ("easy_pomodoro", "widgets_timer.html", ["E-A-05", "E-A-08", "E-A-09"]),
+    ("medium_tarefas", "widgets_form.html", ["M-A-04", "M-A-09", "M-A-10", "M-A-11"]),
 ]
 
 

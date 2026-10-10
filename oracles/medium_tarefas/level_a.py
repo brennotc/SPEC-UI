@@ -96,8 +96,8 @@ def add_task_case(page: Page, t: Checks) -> None:
     t.act("clicar no +", lambda: form.add.click(timeout=2000))
     page.wait_for_timeout(250)
     row = row_of(page, "Testar prompt Spec-Driven")
-    t.ok("o nome da tarefa aparece em uma linha com checkbox", row is not None)
-    t.ok("a badge URGENTE aparece na linha", row is not None and badge_in(row, "URGENTE") is not None)
+    t.require("o nome da tarefa aparece em uma linha com checkbox", row is not None)  # efeito principal
+    t.ok("a badge URGENTE aparece na linha", badge_in(row, "URGENTE") is not None)
     t.ok("o título do grupo 'Hoje' aparece", heading_y(page, "Hoje", exact=True) is not None)
 
 
@@ -178,9 +178,9 @@ def delete_task(page: Page, t: Checks) -> None:
       expected="Só a lista rola: a página não rola, o header e o formulário continuam visíveis.")
 def only_the_list_scrolls(page: Page, t: Checks) -> None:
     need_tasks(page, t, [(TODAY, "MÉDIO", f"Item {n:02d}") for n in range(1, 15)])
+    t.require("existe um contêiner com rolagem vertical própria", page.evaluate(_SCROLLABLE_JS))  # efeito principal
     page_scrolls = page.evaluate("() => document.scrollingElement.scrollHeight > window.innerHeight + 2")
     t.ok("a página inteira não rola", not page_scrolls)
-    t.ok("existe um contêiner com rolagem vertical própria", page.evaluate(_SCROLLABLE_JS))
     last = first_visible(page.get_by_text("Item 14", exact=True))
     if last is not None:
         last.scroll_into_view_if_needed()
@@ -208,8 +208,8 @@ def priority_filter(page: Page, t: Checks) -> None:
     t.act("escolher URGENTE no filtro", lambda: _must(select_priority(form.filter_priority, "URGENTE")))
     commit(form.filter_priority)
     page.wait_for_timeout(250)
+    t.require("a tarefa RELAXA fica oculta", row_of(page, "Filtro Relaxa") is None, "o filtro não filtrou")  # efeito principal
     t.ok("a tarefa URGENTE continua visível", row_of(page, "Filtro Urgente") is not None)
-    t.ok("a tarefa RELAXA fica oculta", row_of(page, "Filtro Relaxa") is None)
 
 
 @case("M-A-11", requirements=["M-12"], level="A",
@@ -222,9 +222,9 @@ def date_filter(page: Page, t: Checks) -> None:
     t.act("digitar a data de amanhã no filtro", lambda: _must(fill_date(form.filter_date, TOMORROW)))
     commit(form.filter_date)
     page.wait_for_timeout(300)
-    t.ok("a tarefa da data filtrada continua visível", row_of(page, "Dia Amanha") is not None)
     hidden = [d for d in ("Dia Hoje", "Dia Depois") if row_of(page, d) is None]
-    t.ok("ao menos uma tarefa de outro dia fica oculta", bool(hidden), "nada foi filtrado")
+    t.require("ao menos uma tarefa de outro dia fica oculta", bool(hidden), "nada foi filtrado")  # efeito principal
+    t.ok("a tarefa da data filtrada continua visível", row_of(page, "Dia Amanha") is not None)
     t.act("apagar a data do filtro", lambda: _must(clear_date(form.filter_date)))
     commit(form.filter_date)
     page.wait_for_timeout(300)
