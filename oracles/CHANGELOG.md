@@ -105,3 +105,10 @@ Sem chamada a API; o oráculo que rodou é o hash `d7c7b3be…` (antes `94b727c0
   foram de WEAK para KILLED nos 4 runs. Os WEAK que restam são os previstos como PARTIAL legítimo (MUT-M6×M-A-05 ×4, MUT-E6×E-A-01
   ×3, MUT-H4×H-A-03 ×3). Diferença para a previsão (11 WEAK / 1 NOT_APPLIED): em MUT-E6×E-A-01 o run easy no_spec texto teve
   baseline NO na rodada de mutação (NOT_APPLIED) embora o `record.json` e 33 execuções isoladas deem YES: ver `docs/revisoes/`.
+- **Correção da diferença acima (mutação refeita depois do ajuste do runner)**: com o runner esperando a mesma sequência do render
+  inicial e o baseline detalhado em `sensitivity_baseline.csv`, a mutação deu **136 KILLED / 11 WEAK / 1 NOT_APPLIED / 0 SURVIVED**
+  (148 linhas), exatamente a previsão. O único NOT_APPLIED é MUT-H4×H-A-03 no run hard no_spec texto, cujo baseline é PARTIAL
+  (`'Feito': corpo da mesma família de cor :: (250, 245, 255)`, `model_defect` já classificado). Os 11 WEAK são os PARTIAL legítimos:
+  MUT-E6×E-A-01 ×4, MUT-M6×M-A-05 ×4, MUT-H4×H-A-03 ×3. O baseline NO de E-A-01 da rodada anterior não foi reproduzido em 50
+  rodadas com Chromium novo antes da correção nem em 20 depois (`docs/pilot-1/corrida-E-A-01-*.txt`); a confirmação da previsão
+  (11 WEAK / 1 NOT_APPLIED) só veio depois do ajuste do runner.
