@@ -1,9 +1,9 @@
 # SPEC-UI: uma especificação formal ajuda um designer a obter melhor código de front-end?
 
-## Estado em 2026-10-10 (código em `cf8545b`, o último commit que altera código; os commits seguintes só alteram documentação)
+## Estado em 2026-10-10 (código em `90b0a67`, o último commit que altera código; os commits seguintes só alteram documentação)
 
 **Feito.** Piloto 1: 12 células (3 tarefas × `no_spec`/`with_spec` × texto/multimodal) do `gemini-3.8-flash`, 1 repetição, em
-[docs/pilot-1/](docs/pilot-1/README.md). Oráculo `oracle-v1` congelado (tag em `de50aa2`, 74 casos). Mutação do oráculo sobre o piloto:
+[docs/pilot-1/](docs/pilot-1/README.md). Oráculo `oracle-v1` congelado (tag `oracle-v1`, commit `d3a312c`, 74 casos). Mutação do oráculo sobre o piloto:
 136 KILLED / 11 WEAK / 1 NOT_APPLIED / 0 SURVIVED. 434 testes rápidos e 53 lentos passam. O `preflight` do `run` principal passa.
 
 **Não feito.** A execução principal (60 execuções: 12 células × 5 repetições). `specui evaluate --rebuild` (um `metric_error` de infraestrutura antes do render não tem
@@ -12,15 +12,14 @@ modelo (H4 não é testável com um gerador).
 
 **Decisões abertas que dependem da orientadora.**
 1. O teto do nível A é aceitável? `accuracy_a` é 1,000 em 9 das 12 células e 0,917–0,964 nas outras 3; o Δ `with_spec − no_spec` por
-   tarefa × modalidade vai de 0 a +0,083, e o contraste principal (a média dos Δ) seria +0,027 se o padrão do piloto se repetisse. Causas no oráculo em [seção 16](#16-ameaças-à-validade); números em
-   [docs/revisoes/2026-10-10-como-o-spec-ui-mede-7bf6a49.md, seção 1.5](docs/revisoes/2026-10-10-como-o-spec-ui-mede-7bf6a49.md). Corrigir exige `oracle-v2`
+   tarefa × modalidade vai de 0 a +0,083, e o contraste principal (a média dos Δ) seria +0,027 se o padrão do piloto se repetisse. Causas no oráculo em [seção 16](#16-ameaças-à-validade); números por célula em
+   [docs/pilot-1/README.md](docs/pilot-1/README.md). Corrigir exige `oracle-v2`
    e repetir piloto e mutação.
 2. Design2Code sem nenhum par casado vale 0,0 ou `None`? Hoje 0,0 (seção 10).
 3. Implementar `--rebuild` antes do `run` principal ou aceitar o custo de uma chamada de API por `metric_error` de infraestrutura.
 4. Segundo modelo Gemini e `analysis.equivalence_margin` antes do `run` (para H4).
 
-**Ordem de leitura.** Este README → [docs/revisoes/2026-10-10-execucao.md](docs/revisoes/2026-10-10-execucao.md) →
-[docs/pilot-1/README.md](docs/pilot-1/README.md) → `docs/revisoes/*como-o-spec-ui-mede*` (leituras do código; a mais recente é a de `7bf6a49`) → código.
+**Ordem de leitura.** Este README → [docs/pilot-1/README.md](docs/pilot-1/README.md) (evidência do piloto) → `oracles/CHANGELOG.md` → código.
 
 Framework de avaliação **100 % automática** de front-end gerado por LLMs a partir de (a) um pedido em texto simples e
 (b) o mesmo pedido como especificação formal, com ou sem a imagem do design do Figma. Nenhuma nota vem de juiz LLM, de
@@ -32,8 +31,7 @@ agente LLM ou de pessoa: só métricas de três artigos revisados por pares.
 | **Figma2Code** (ICLR 2026) <https://arxiv.org/pdf/2604.13648> | VES (cosseno DINOv2 render × design), MAE e qualidade de código: RUR, APR, FU, BC, STR, AVU, ISR, CCR |
 | **WebGen-Bench** (NeurIPS 2025) <https://arxiv.org/pdf/2505.03733> | Nota funcional por casos de teste (Task → Expected Result), YES / PARTIAL / NO, `Accuracy = (Y + 0,5·P) / N`, executada por scripts Playwright **determinísticos** (não por agente) |
 
-Os três artigos são citados pelo arXiv (links acima e seção 17); os PDFs **não** estão no repositório. O contexto da decisão de
-abandonar o juiz LLM está em [docs/contexto-benchmarks-spec-ui.md](docs/contexto-benchmarks-spec-ui.md).
+Os três artigos são citados pelo arXiv (links acima e seção 17); os PDFs **não** estão no repositório.
 
 ---
 
@@ -138,7 +136,7 @@ run**, em `model_cache_dir` (padrão `~/.cache/specui-models`). O experimento **
 (`local_files_only=True`, `HF_HUB_OFFLINE=1`), e a ausência de um modelo é um erro de configuração que o `preflight` aponta antes de qualquer chamada
 paga. Para baixar uma vez, com rede:
 `python -c "import os; os.environ['HF_HUB_OFFLINE']='0'; from huggingface_hub import snapshot_download; [snapshot_download(m, cache_dir=r'C:/Users/<você>/.cache/specui-models') for m in ('facebook/dinov2-base', 'openai/clip-vit-base-patch32')]"`.
-Cada record grava `<modelo>@<sha do snapshot>` em `embeddings.dinov2_model` e `embeddings.clip_model` **a partir do commit `ab3c969`**;
+Cada record grava `<modelo>@<sha do snapshot>` em `embeddings.dinov2_model` e `embeddings.clip_model` **a partir do commit `27cef6c`**;
 os records do piloto 1 (`docs/pilot-1/`) foram gravados antes, em `b820545+dirty`, e têm só o nome do modelo.
 
 A instalação é **editável** (`pip install -e .`): `oracles/`, `configs/`, `benchmarks/` e `scaffold/` não são empacotados, são lidos do repositório. Python 3.12 é exigido (`requires-python` em `pyproject.toml`; o harness usa `os.path.isjunction`).
@@ -176,7 +174,7 @@ e as falhas de infraestrutura `api_error` (a célula é refeita), `metric_error`
 `model_mismatch` (modelo devolvido ≠ solicitado: a célula é refeita; **se repetir, o run é interrompido** com
 `ModelMismatchError`, checkpoint intacto). Não existe fallback de modelo nem de provedor.
 
-Todo record com resposta do provedor grava `finish_reason` (o motivo de parada devolvido pelo provedor) **a partir do commit `67e69d5`** (um `api_error`, sem resposta, fica `null`); nos records do piloto 1 ele é `null`. `RECITATION`, `SAFETY`, `PROHIBITED_CONTENT`, `BLOCKLIST`, `SPII` e `IMAGE_SAFETY` (e o bloqueio do prompt) são motivos de
+Todo record com resposta do provedor grava `finish_reason` (o motivo de parada devolvido pelo provedor) **a partir do commit `fac1b50`** (um `api_error`, sem resposta, fica `null`); nos records do piloto 1 ele é `null`. `RECITATION`, `SAFETY`, `PROHIBITED_CONTENT`, `BLOCKLIST`, `SPII` e `IMAGE_SAFETY` (e o bloqueio do prompt) são motivos de
 recusa e valem `refusal`; `MAX_TOKENS` vale `truncated`. Exceção de **infraestrutura** no build ou no render
 (disco, navegador fechado, `OSError`) vira `metric_error` **gravado** (a resposta paga já está em `response.raw.txt`) e a execução segue
 para a próxima célula. Já o app que não carrega em 30 s é falha do app: `render_ok = false` e status `nonexecutable`. Se a extração do DOM falhar
@@ -367,4 +365,3 @@ A proveniência do oráculo (tag, hash da árvore e do conteúdo, `pending.yaml`
   *WebGen-Bench: Evaluating LLMs on Generating Interactive and Functional Websites from Scratch*. NeurIPS 2025 (a página do arXiv não
   registra o venue). arXiv:2505.03733 <https://arxiv.org/abs/2505.03733>
 
-Contexto da decisão de abandonar o juiz LLM: [docs/contexto-benchmarks-spec-ui.md](docs/contexto-benchmarks-spec-ui.md).

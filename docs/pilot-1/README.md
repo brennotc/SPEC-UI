@@ -46,7 +46,7 @@ Antes: {'WEAK': 63, 'KILLED': 76, 'NOT_APPLIED': 1} (140 linhas). Depois: {'KILL
 a uma mutação-alvo. Os WEAK que restam são PARTIAL legítimos de casos com mais de um requisito independente (MUT-E6×E-A-01,
 MUT-M6×M-A-05, MUT-H4×H-A-03). O único NOT_APPLIED é MUT-H4×H-A-03 no run hard no_spec texto, cujo baseline é PARTIAL (`model_defect`).
 
-Decisões e correções do oráculo: `oracles/CHANGELOG.md`. Plano e execução: `docs/revisoes/`.
+Decisões e correções do oráculo: `oracles/CHANGELOG.md`.
 
 ## Campos dos records que não refletem o código atual
 
@@ -58,8 +58,8 @@ reavaliados depois com `specui evaluate --groups functional` (reavaliação só 
 - `config_sha256` (`6822b0bd…`) foi calculado pela função antiga, que incluía os caminhos da máquina; não bate com o hash que o código atual
   calcula para a mesma configuração (`config_sha256` atual exclui `repo_root`, `workspace_dir`, `model_cache_dir`, `results_dir`,
   `benchmarks_dir`, `references_dir`, `oracles_dir` e `scaffold_dir`).
-- `finish_reason` é `null` (o campo existe a partir do commit `67e69d5`).
-- `embeddings.dinov2_model` e `embeddings.clip_model` têm só o nome do modelo, sem `@<sha do snapshot>` (a partir de `ab3c969`).
+- `finish_reason` é `null` (o campo existe a partir do commit `fac1b50`).
+- `embeddings.dinov2_model` e `embeddings.clip_model` têm só o nome do modelo, sem `@<sha do snapshot>` (a partir de `27cef6c`).
 - `accuracy_b`/`n_total` dos records em `antes/` usam o oráculo `94b727c0…` (anterior ao protocolo de passos).
 - Em `results/pilot/runs/` (fora do git) havia 4 pastas sem `record.json` (execuções interrompidas, só com `prompt.system.txt` e
   `prompt.user.txt`); foram apagadas em 2026-10-10. Os `manifest.jsonl` (aqui e em `results/pilot/`) continuam listando as tentativas que
