@@ -423,3 +423,55 @@ def test_records_carry_oracle_provenance_and_browser_versions(make_pipeline, mak
     assert (rec.oracle_suite_tag, rec.oracle_tree_hash, rec.oracle_content_sha256) == ("oracle-v1", "tree", "content")
     assert (rec.oracle_dirty, rec.pending_sha256, rec.mention_patterns_sha256) == (False, "pend", "mention")
     assert (rec.playwright_version, rec.browser_version) == ("1.0-test", "chromium-test")
+
+
+# ----------------------------------------------------------------------- falha de infraestrutura no build/render (B1)
+
+
+class BrokenHarness(FakeHarness):
+    """Falha uma vez ao preparar a pasta de build (disco, junction) e depois funciona."""
+
+    def __init__(self, root, error: Exception, times: int = 1) -> None:
+        super().__init__(root)
+        self.error, self.times = error, times
+
+    def prepare_run_dir(self, run_id):
+        if self.times > 0:
+            self.times -= 1
+            raise self.error
+        return super().prepare_run_dir(run_id)
+
+
+class CrashingSession(FakeSession):
+    def capture_initial_render(self, url, viewport, out_dir):
+        raise RuntimeError("TargetClosedError: o Chromium fechou")
+
+
+def test_infrastructure_failure_in_build_becomes_a_saved_metric_error(make_cfg, make_pipeline, tmp_path):
+    cfg = make_cfg()
+    key = cfg.generators[0].key
+    client = ScriptedClient([good_response()] * 4)
+    harness = BrokenHarness(tmp_path / "ws", OSError("disco cheio"))
+    pipeline, cells, *_ = make_pipeline(cfg=cfg, clients={key: client}, harness=harness)
+    summary = pipeline.run(cells[:2])  # a 1ª célula perde o build; o run SEGUE para a 2ª
+    assert summary.by_status == {"metric_error": 1, "done": 1}
+    first = pipeline.store.load_records()[0]
+    assert first.status == "metric_error" and any("infra: OSError: disco cheio" in e for e in first.errors)
+    assert (pipeline.store.runs_dir / first.run_id / "response.raw.txt").is_file()  # a resposta paga está no disco
+    assert len(pipeline.store.manifest()) == 2 and client.calls == 2
+    pipeline.run(cells[:2])  # retomada: metric_error conta como concluída, não gasta API de novo
+    assert client.calls == 2
+
+
+def test_chromium_crash_in_render_is_a_metric_error_too(make_cfg, make_pipeline):
+    cfg = make_cfg()
+    pipeline, cells, *_ = make_pipeline(cfg=cfg, session=CrashingSession())
+    rec = pipeline.run_cell(cells[0])
+    assert rec.status == "metric_error" and any("infra: RuntimeError: TargetClosedError" in e for e in rec.errors)
+    assert pipeline.store.manifest()[-1]["status"] == "metric_error"
+
+
+def test_configuration_errors_from_the_harness_still_stop_the_run(make_cfg, make_pipeline, tmp_path):
+    pipeline, cells, *_ = make_pipeline(harness=BrokenHarness(tmp_path / "ws", ConfigurationError("npm não encontrado")))
+    with pytest.raises(ConfigurationError, match="npm"):
+        pipeline.run_cell(cells[0])  # o pesquisador precisa corrigir o ambiente: não vira metric_error

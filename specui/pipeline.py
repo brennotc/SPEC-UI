@@ -240,8 +240,18 @@ class Pipeline:
             rec.status = "contract_failure"
             return self._save(rec)
 
-        # 5. build + render + métricas
-        self._build_render_measure(cell, task, pkg, bundle, rec, out_dir)
+        # 5. build + render + métricas. Uma falha de INFRAESTRUTURA aqui (disco, porta, Chromium que caiu) não pode perder a
+        # chamada paga: vira `metric_error` com a exceção em `errors`, o record é gravado e a retomada não refaz a API
+        # (`evaluate --rebuild` refaz só o build/render a partir de response.raw.txt). Falha DO APP (build quebrado, timeout
+        # de carregamento) já é `nonexecutable`; erro de configuração e cota continuam subindo.
+        try:
+            self._build_render_measure(cell, task, pkg, bundle, rec, out_dir)
+        except (ConfigurationError, QuotaExceededError):
+            raise
+        except Exception as exc:
+            logger.exception("falha de infraestrutura em %s", cell.key)
+            rec.status = "metric_error"
+            rec.errors.append(f"infra: {type(exc).__name__}: {exc}")
         return self._save(rec)
 
     def _build_render_measure(
