@@ -487,3 +487,37 @@ def test_finish_reason_is_recorded_for_every_generation(make_cfg, make_pipeline)
     records = [pipeline.run_cell(c) for c in cells[:4]]
     assert [(r.status, r.finish_reason) for r in records] == [
         ("done", "STOP"), ("refusal", "RECITATION"), ("format_failure", "OTHER"), ("truncated", "MAX_TOKENS")]
+
+
+def test_preflight_refuses_invalid_oracle_files_before_any_api_call(make_cfg, make_pipeline, tmp_path):
+    oracles = tmp_path / "oracles"
+    for task in ("easy_pomodoro", "medium_tarefas", "hard_kanban"):
+        (oracles / task).mkdir(parents=True)
+        (oracles / task / "requirements.yaml").write_text(
+            "requirements:\n  - {id: X-1, text: t, category: a, info_source: image}\n", encoding="utf-8")
+    (oracles / "medium_tarefas" / "requirements.yaml").write_text(
+        "requirements:\n  - {id: X-1, text: t, category: a, info_source: image, mention_patterns: ['(']}\n", encoding="utf-8")  # regex inválida
+    (oracles / "hard_kanban" / "pending.yaml").write_text("pending: [quebrado\n", encoding="utf-8")  # YAML inválido
+    real = [Generator(provider="google", model_id="gemini-3.8-flash", request_delay_s=0)]
+    cfg = make_cfg(generators=real, oracles_dir=str(oracles), run_kind="pilot")
+    pipeline, *_ = make_pipeline(cfg=cfg, clients={real[0].key: MockClient(real[0])}, stages=[stage_technical])
+    with pytest.raises(ConfigurationError, match="arquivos do oráculo inválidos") as err:
+        pipeline.preflight()
+    text = str(err.value)
+    assert "medium_tarefas: requirements.yaml" in text and "mention_pattern" in text and "hard_kanban: pending.yaml" in text
+    assert "easy_pomodoro" not in text  # o arquivo válido não é acusado
+    (oracles / "medium_tarefas" / "requirements.yaml").write_text("requirements:\n  - {id: X-1, text: t, category: a, info_source: image}\n", encoding="utf-8")
+    (oracles / "hard_kanban" / "pending.yaml").write_text("pending: []\n", encoding="utf-8")
+    pipeline.preflight()  # corrigidos: passa
+
+
+def test_requirements_loader_no_longer_swallows_invalid_files(make_cfg, tmp_path):
+    from specui.pipeline import _requirements_loader
+
+    oracles = tmp_path / "oracles"
+    (oracles / "easy_pomodoro").mkdir(parents=True)
+    (oracles / "easy_pomodoro" / "requirements.yaml").write_text(
+        "requirements:\n  - {id: X, text: t, category: a, info_source: image, mention_patterns: ['(']}\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="mention_pattern"):
+        _requirements_loader(make_cfg(oracles_dir=str(oracles)))("easy_pomodoro")
+    assert _requirements_loader(make_cfg(oracles_dir=str(tmp_path / "nao-existe")))("easy_pomodoro") == []  # sem pasta: vazio

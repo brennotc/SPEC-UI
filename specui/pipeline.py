@@ -18,6 +18,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+import yaml
 from pydantic import BaseModel, Field
 
 from specui.codegen import GeneratedBundle, parse_bundle
@@ -52,7 +53,7 @@ from specui.models import (
     Task,
 )
 from specui.oracle.provenance import OracleProvenance, freeze_problems, read_provenance
-from specui.oracle.requirements import load_requirements
+from specui.oracle.requirements import load_pending, load_requirements
 from specui.prompting import build_messages
 from specui.prompts import resolve_prompt_sources
 from specui.stages import MetricStage, StageContext, default_stages, run_stages, stage_technical
@@ -302,6 +303,7 @@ class Pipeline:
         if all(g.provider == "mock" for g in self.cfg.generators):
             return
         self._check_oracle_frozen()
+        self._check_oracle_files()
         if not any(s.__name__ == "stage_design2code" for s in self.stages):
             return
         missing = []
@@ -315,6 +317,23 @@ class Pipeline:
                 "referência do Figma indisponível (as métricas visuais não poderiam ser calculadas):\n  "
                 + "\n  ".join(missing)
             )
+
+    def _check_oracle_files(self) -> None:
+        """`requirements.yaml`/`pending.yaml` de cada tarefa precisam carregar ANTES de gastar API: regex inválida em
+        `mention_patterns` ou YAML quebrado deixaria a cobertura de requisitos em branco sem aviso (e a nota funcional
+        levantaria no mesmo arquivo)."""
+        oracles_dir = self.cfg.path("oracles_dir")
+        if not oracles_dir.is_dir():
+            return
+        problems = []
+        for task in self.tasks.values():
+            for loader in (load_requirements, load_pending):
+                try:
+                    loader(oracles_dir, task.id)
+                except (OSError, ValueError, yaml.YAMLError) as exc:
+                    problems.append(f"{task.id}: {loader.__name__.removeprefix('load_')}.yaml: {exc}")
+        if problems:
+            raise ConfigurationError("arquivos do oráculo inválidos:\n  " + "\n  ".join(problems))
 
     def _check_oracle_frozen(self) -> None:
         """Execução PRINCIPAL só com o oráculo congelado (tag `oracle-*` na árvore atual, sem mudanças pendentes)."""
@@ -412,15 +431,14 @@ def _relativize_paths(rec: RunRecord, root: Path) -> None:
 
 
 def _requirements_loader(cfg: RunConfig) -> Callable[[str], list[Any]]:
-    """Requisitos da tarefa (alimentam `mention_patterns` em `InputSpecMetrics`); vazio se não houver oracles/."""
+    """Requisitos da tarefa (alimentam `mention_patterns` em `InputSpecMetrics`). Sem a pasta oracles/ (testes, `smoke` em
+    repositório fictício) a cobertura fica vazia; com a pasta, um arquivo inválido NÃO é engolido (o `preflight` já o recusou)."""
     cache: dict[str, list[Any]] = {}
 
     def load(task_id: str) -> list[Any]:
         if task_id not in cache:
-            try:
-                cache[task_id] = load_requirements(cfg.path("oracles_dir"), task_id)
-            except (OSError, ValueError):
-                cache[task_id] = []
+            oracles_dir = cfg.path("oracles_dir")
+            cache[task_id] = load_requirements(oracles_dir, task_id) if oracles_dir.is_dir() else []
         return cache[task_id]
 
     return load
