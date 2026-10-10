@@ -10,9 +10,8 @@ agente LLM ou de pessoa: só métricas de três artigos revisados por pares.
 | **Figma2Code** (ICLR 2026) <https://arxiv.org/pdf/2604.13648> | VES (cosseno DINOv2 render × design), MAE e qualidade de código: RUR, APR, FU, BC, STR, AVU, ISR, CCR |
 | **WebGen-Bench** (NeurIPS 2025) <https://arxiv.org/pdf/2505.03733> | Nota funcional por casos de teste (Task → Expected Result), YES / PARTIAL / NO, `Accuracy = (Y + 0,5·P) / N`, executada por scripts Playwright **determinísticos** (não por agente) |
 
-Os três artigos estão referenciados pelo arXiv (links acima); os PDFs **não** estão no repositório. Os dois artigos que o desenho
-anterior usava (DesignBench e UI-Bench) ficam em [docs/papers/descartados/](docs/papers/descartados/) só como registro. O contexto da decisão de abandonar o juiz LLM está em
-[docs/contexto-benchmarks-spec-ui.md](docs/contexto-benchmarks-spec-ui.md).
+Os três artigos são citados pelo arXiv (links acima e seção 17); os PDFs **não** estão no repositório. O contexto da decisão de
+abandonar o juiz LLM está em [docs/contexto-benchmarks-spec-ui.md](docs/contexto-benchmarks-spec-ui.md).
 
 ---
 
@@ -71,7 +70,8 @@ vira variável contínua, medida no texto (cobertura de requisitos, densidade de
   **scripts Playwright escritos antes do experimento**.
 - **Nota humana:** só entra como *classificação de falhas do piloto* (quem edita o oráculo), nunca como nota dos resultados.
 - **Rubricas ponderadas (40/30/30 do código antigo):** sem respaldo; removidas.
-- **UI-Bench / DesignBench como datasets:** eram cópias byte-idênticas das mesmas 3 tarefas; removidos. Só as métricas dos artigos ficam.
+- **UI-Bench / DesignBench como datasets:** o desenho anterior os usava; foram substituídos por tarefas próprias em `benchmarks/tasks/`.
+  As pastas dos dois continham as mesmas 3 tarefas (os arquivos diferiam em 3 linhas de frontmatter; os PNGs eram idênticos). Só as métricas dos três artigos ficam.
 
 ## 4. Organização do repositório
 
@@ -313,7 +313,12 @@ A proveniência do oráculo (tag, hash da árvore e do conteúdo, `pending.yaml`
 
 ## 17. Referências
 
-- Si et al., *Design2Code*, NAACL 2025. <https://arxiv.org/pdf/2403.03163>
-- *Figma2Code*, ICLR 2026. <https://arxiv.org/pdf/2604.13648>
-- Lu et al., *WebGen-Bench*, NeurIPS 2025. <https://arxiv.org/pdf/2505.03733>
-- Artigos descartados (registro): [docs/papers/descartados/](docs/papers/descartados/) · contexto: [docs/contexto-benchmarks-spec-ui.md](docs/contexto-benchmarks-spec-ui.md)
+- Chenglei Si, Yanzhe Zhang, Ryan Li, Zhengyuan Yang, Ruibo Liu, Diyi Yang. *Design2Code: Benchmarking Multimodal Code Generation for
+  Automated Front-End Engineering*. NAACL 2025. arXiv:2403.03163 <https://arxiv.org/abs/2403.03163>
+- Yi Gui, Jiawan Zhang, Yina Wang, Tianran Ma, Yao Wan, Shilin He, Dongping Chen, Zhou Zhao, Wenbin Jiang, Xuanhua Shi, Hai Jin,
+  Philip S. Yu. *Figma2Code: Automating Multimodal Design to Code in the Wild*. ICLR 2026. arXiv:2604.13648 <https://arxiv.org/abs/2604.13648>
+- Zimu Lu, Yunqiao Yang, Houxing Ren, Haotian Hou, Han Xiao, Ke Wang, Weikang Shi, Aojun Zhou, Mingjie Zhan, Hongsheng Li.
+  *WebGen-Bench: Evaluating LLMs on Generating Interactive and Functional Websites from Scratch*. NeurIPS 2025 (a página do arXiv não
+  registra o venue). arXiv:2505.03733 <https://arxiv.org/abs/2505.03733>
+
+Contexto da decisão de abandonar o juiz LLM: [docs/contexto-benchmarks-spec-ui.md](docs/contexto-benchmarks-spec-ui.md).
