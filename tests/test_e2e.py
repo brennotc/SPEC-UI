@@ -7,7 +7,7 @@ import shutil
 import pytest
 
 from specui.config import load_config
-from specui.models import Generator
+from specui.models import Generator, default_workspace_dir
 from specui.pipeline import run_experiment
 from specui.storage import RunStore
 from specui.tasks import png_size
@@ -19,7 +19,7 @@ if not shutil.which("node"):  # pragma: no cover
 
 
 def _cfg(repo_root, tmp_path, variant: str):
-    ws = os.environ.get("SPECUI_TEST_WORKSPACE", "C:/specui-work-test")
+    ws = os.environ.get("SPECUI_TEST_WORKSPACE", default_workspace_dir() + "-test")
     cfg = load_config(
         repo_root / "configs" / "default.yaml",
         overrides={"results_dir": str(tmp_path / "results"), "workspace_dir": ws, "repetitions": 1,

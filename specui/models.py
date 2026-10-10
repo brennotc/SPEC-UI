@@ -4,6 +4,7 @@ Convenção: toda métrica não calculada fica `None` (com o motivo em `errors` 
 nunca 0. A imputação ITT (nota 0 para execuções que falharam) é feita na análise.
 """
 
+import os
 import re
 from pathlib import Path
 from typing import Any, Literal
@@ -110,6 +111,12 @@ class Generator(BaseModel):
         return f"{self.provider}:{self.model_id}"
 
 
+def default_workspace_dir() -> str:
+    """Pasta de build do harness. No Windows, um caminho CURTO (o limite MAX_PATH quebra o node_modules em caminhos longos);
+    nos demais sistemas, o cache do usuário. Sobrescreva com `workspace_dir` no YAML."""
+    return "C:/specui-work" if os.name == "nt" else "~/.cache/specui-work"
+
+
 class AnalysisConfig(BaseModel):
     # Margem do TOST entre modelos. Sem default: None => o teste de equivalência não roda.
     equivalence_margin: float | None = None
@@ -143,7 +150,7 @@ class RunConfig(BaseModel):
     oracles_dir: str = "oracles"
     scaffold_dir: str = "scaffold/angular-base"
     results_dir: str = "results"
-    workspace_dir: str = "C:/specui-work"
+    workspace_dir: str = Field(default_factory=lambda: default_workspace_dir())
     model_cache_dir: str = "~/.cache/specui-models"
 
     # Harness

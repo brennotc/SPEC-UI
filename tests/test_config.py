@@ -84,3 +84,18 @@ def test_python_requirement_matches_what_the_code_uses(repo_root):
 
     declared = tomllib.loads((repo_root / "pyproject.toml").read_text(encoding="utf-8"))["project"]["requires-python"]
     assert declared == ">=3.12" and hasattr(os.path, "isjunction")
+
+
+def test_workspace_dir_default_depends_on_the_platform(monkeypatch):
+    from specui import models
+
+    monkeypatch.setattr(models.os, "name", "nt")
+    assert models.default_workspace_dir() == "C:/specui-work"
+    monkeypatch.setattr(models.os, "name", "posix")
+    assert models.default_workspace_dir() == "~/.cache/specui-work"  # nunca "C:/..." (seria relativo e cairia dentro do repo)
+    assert not models.RunConfig.model_fields["workspace_dir"].is_required()
+
+
+def test_default_yaml_does_not_pin_a_windows_workspace(repo_root):
+    lines = (repo_root / "configs" / "default.yaml").read_text(encoding="utf-8").splitlines()
+    assert not [line for line in lines if line.startswith("workspace_dir:")]  # comentários não contam

@@ -1,7 +1,7 @@
 """Build real do Angular com o scaffold (lento: usa Node). Rode com: pytest -m slow
 
 O primeiro teste instala o node_modules compartilhado (npm ci, ~1 min); os demais reaproveitam.
-Workspace de teste: SPECUI_TEST_WORKSPACE (padrão C:/specui-work-test).
+Workspace de teste: SPECUI_TEST_WORKSPACE (padrão: default_workspace_dir() + '-test').
 """
 
 import os
@@ -15,7 +15,7 @@ import pytest
 from specui.codegen import parse_bundle
 from specui.harness import ScaffoldHarness, StaticServer
 from specui.llm import MockClient
-from specui.models import Generator, PromptPackage
+from specui.models import Generator, PromptPackage, default_workspace_dir
 
 pytestmark = pytest.mark.slow
 
@@ -26,7 +26,7 @@ if not shutil.which("node") or not shutil.which("npm"):  # pragma: no cover
 
 @pytest.fixture(scope="module")
 def harness(repo_root) -> ScaffoldHarness:
-    ws = Path(os.environ.get("SPECUI_TEST_WORKSPACE", "C:/specui-work-test"))
+    ws = Path(os.environ.get("SPECUI_TEST_WORKSPACE", default_workspace_dir() + "-test"))
     h = ScaffoldHarness(repo_root / "scaffold" / "angular-base", ws, build_timeout_s=240)
     h.ensure_workspace()
     return h
@@ -118,7 +118,7 @@ def test_tailwind_icons_and_local_font_build(harness, tmp_path):
 
 
 def test_timeout_kills_the_whole_process_tree(repo_root):
-    ws = Path(os.environ.get("SPECUI_TEST_WORKSPACE", "C:/specui-work-test"))
+    ws = Path(os.environ.get("SPECUI_TEST_WORKSPACE", default_workspace_dir() + "-test"))
     quick = ScaffoldHarness(repo_root / "scaffold" / "angular-base", ws, build_timeout_s=1)
     run_dir = quick.prepare_run_dir("t-timeout")
     try:

@@ -13,6 +13,7 @@ import pytest
 from specui.codegen import parse_bundle
 from specui.harness import BrowserSession, ScaffoldHarness, StaticServer
 from specui.metrics.code_quality import compute_code_quality
+from specui.models import default_workspace_dir
 
 pytestmark = pytest.mark.slow
 
@@ -32,7 +33,7 @@ PAGE = (
 
 
 def test_real_tailwind_page_matches_hand_computed_values(repo_root, tmp_path):
-    ws = Path(os.environ.get("SPECUI_TEST_WORKSPACE", "C:/specui-work-test"))
+    ws = Path(os.environ.get("SPECUI_TEST_WORKSPACE", default_workspace_dir() + "-test"))
     harness = ScaffoldHarness(repo_root / "scaffold" / "angular-base", ws, 240)
     run_dir = harness.prepare_run_dir("t-cq")
     try:

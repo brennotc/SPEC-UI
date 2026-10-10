@@ -28,13 +28,13 @@ analysis:
 
 base_seed: 20260101
 
-# Diretorios (relativos a raiz do repositorio, exceto workspace_dir)
+# Diretorios (relativos a raiz do repositorio, exceto workspace_dir e model_cache_dir)
 benchmarks_dir: benchmarks
 references_dir: references/figma
 oracles_dir: oracles
 scaffold_dir: scaffold/angular-base
 results_dir: results
-workspace_dir: "C:/specui-work"   # caminho curto: MAX_PATH do Windows com node_modules
+# workspace_dir: omitido = padrao da plataforma (C:/specui-work no Windows, ~/.cache/specui-work nos demais; caminho curto por causa do MAX_PATH)
 model_cache_dir: "~/.cache/specui-models"
 
 # Harness
