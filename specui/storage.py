@@ -221,6 +221,12 @@ def _as_float(series: pd.Series) -> pd.Series | None:
     return None
 
 
+# Colunas numéricas que NÃO são métricas: parâmetros enviados ao modelo, flag de proveniência e os numeradores/denominadores
+# do Figma2Code (`cq_counts_*`, para auditoria no record.json, não para o metrics_long.csv).
+NON_METRIC_COLUMNS = frozenset({"temperature", "seed", "oracle_dirty"})
+NON_METRIC_PREFIXES = ("cq_counts_",)
+
+
 def to_long(df: pd.DataFrame) -> pd.DataFrame:
     """Formato longo (run_id, ..., metric, value) só com colunas numéricas/booleanas (0/1).
     Valores ausentes ficam de fora: métrica não calculada nunca vira 0."""
@@ -229,6 +235,8 @@ def to_long(df: pd.DataFrame) -> pd.DataFrame:
     metrics: dict[str, pd.Series] = {}
     for col in df.columns:
         if col in id_cols or col.endswith("_n") and col[:-2] in df:
+            continue
+        if col in NON_METRIC_COLUMNS or col.startswith(NON_METRIC_PREFIXES):  # parâmetros e contagens, não métricas
             continue
         converted = _as_float(df[col])
         if converted is not None:

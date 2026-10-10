@@ -131,3 +131,19 @@ def test_aggregate_roundtrip(tmp_path, tasks):
 def test_smoke_runs_have_their_own_folder(tmp_path):
     smoke, pilot, main = RunStore(tmp_path, "smoke"), RunStore(tmp_path, "pilot"), RunStore(tmp_path, "main")
     assert smoke.root == tmp_path / "smoke" and pilot.root == tmp_path / "pilot" and main.root == tmp_path
+
+
+def test_metrics_long_has_metrics_only(tmp_path):
+    import pandas as pd
+
+    from specui.storage import to_long
+
+    df = pd.DataFrame([{
+        "run_id": "r1", "task_id": "t", "prompt_kind": "no_spec", "modality": "text", "provider": "google",
+        "model_id_requested": "m", "rep": 0, "status": "done",
+        "fn_accuracy_a": 0.5, "emb_ves_dinov2": 0.9, "cq_apr": 0.1,
+        "cq_counts_positioned_total": 12, "cq_counts_classes_total": 40,  # numeradores/denominadores: auditoria, não métrica
+        "temperature": None, "seed": 7, "oracle_dirty": False,  # parâmetros e proveniência
+    }])
+    metrics = set(to_long(df)["metric"])
+    assert metrics == {"fn_accuracy_a", "emb_ves_dinov2", "cq_apr"}
