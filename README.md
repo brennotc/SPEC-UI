@@ -1,18 +1,18 @@
 # SPEC-UI: uma especificação formal ajuda um designer a obter melhor código de front-end?
 
-## Estado em 2026-10-10 (código em `7bf6a49`; a documentação foi revisada nos commits seguintes)
+## Estado em 2026-10-10 (código em `cf8545b`, o último commit que altera código; os commits seguintes só alteram documentação)
 
 **Feito.** Piloto 1: 12 células (3 tarefas × `no_spec`/`with_spec` × texto/multimodal) do `gemini-3.8-flash`, 1 repetição, em
 [docs/pilot-1/](docs/pilot-1/README.md). Oráculo `oracle-v1` congelado (tag em `de50aa2`, 74 casos). Mutação do oráculo sobre o piloto:
 136 KILLED / 11 WEAK / 1 NOT_APPLIED / 0 SURVIVED. 434 testes rápidos e 53 lentos passam. O `preflight` do `run` principal passa.
 
-**Não feito.** A execução principal (60 células). `specui evaluate --rebuild` (um `metric_error` de infraestrutura antes do render não tem
+**Não feito.** A execução principal (60 execuções: 12 células × 5 repetições). `specui evaluate --rebuild` (um `metric_error` de infraestrutura antes do render não tem
 recuperação sem nova chamada de API). Análise de H3 e uso de `accuracy_b`/métricas visuais/de código no relatório (seção 12). Um segundo
 modelo (H4 não é testável com um gerador).
 
 **Decisões abertas que dependem da orientadora.**
-1. O teto do nível A é aceitável? `accuracy_a` é 1,000 em 9 das 12 células e 0,917–0,964 nas outras 3; o contraste da métrica primária só
-   pode valer 0 a +0,08. Causas no oráculo em [seção 16](#16-ameaças-à-validade); números em
+1. O teto do nível A é aceitável? `accuracy_a` é 1,000 em 9 das 12 células e 0,917–0,964 nas outras 3; o Δ `with_spec − no_spec` por
+   tarefa × modalidade vai de 0 a +0,083, e o contraste principal (a média dos Δ) seria +0,027 se o padrão do piloto se repetisse. Causas no oráculo em [seção 16](#16-ameaças-à-validade); números em
    [docs/revisoes/2026-10-10-como-o-spec-ui-mede-7bf6a49.md, seção 1.5](docs/revisoes/2026-10-10-como-o-spec-ui-mede-7bf6a49.md). Corrigir exige `oracle-v2`
    e repetir piloto e mutação.
 2. Design2Code sem nenhum par casado vale 0,0 ou `None`? Hoje 0,0 (seção 10).
@@ -75,7 +75,7 @@ ng-icons), com um envelope (system prompt) idêntico em todas as células. Por i
 | `medium_tarefas` | medium | [benchmarks/tasks/medium/](benchmarks/tasks/medium/) |
 | `hard_kanban` | hard | [benchmarks/tasks/hard/](benchmarks/tasks/hard/) |
 
-**Prompts livres** (`free`, extensão prevista): prompts escritos por participantes para a mesma imagem. O grau de especificação
+**Prompts livres** (`free`, implementados no código; ainda sem coleta, pois `benchmarks/free_prompts/` não existe): prompts escritos por participantes para a mesma imagem. O grau de especificação
 vira variável contínua, medida no texto (cobertura de requisitos, densidade de restrições).
 
 **Limitações assumidas.**
@@ -94,14 +94,15 @@ vira variável contínua, medida no texto (cobertura de requisitos, densidade de
 - **Nota humana:** só entra como *classificação de falhas do piloto* (quem edita o oráculo), nunca como nota dos resultados.
 - **Rubricas ponderadas (40/30/30 do código antigo):** sem respaldo; removidas.
 - **UI-Bench / DesignBench como datasets:** o desenho anterior os usava; foram substituídos por tarefas próprias em `benchmarks/tasks/`.
-  As pastas dos dois continham as mesmas 3 tarefas (os arquivos diferiam em 3 linhas de frontmatter; os PNGs eram idênticos). Só as métricas dos três artigos ficam.
+  As pastas dos dois continham as mesmas 3 tarefas (os arquivos diferiam em 3 linhas de frontmatter: `id`, `benchmark_name` e `multimodal`);
+  só a pasta do DesignBench tinha PNG, e é ele que virou o PNG das tarefas. Só as métricas dos três artigos ficam.
 
 ## 4. Organização do repositório
 
 ```
 benchmarks/tasks/<nível>/<id>.md|.png   tarefas (frontmatter: id, complexity) e o design do Figma
 benchmarks/tasks/figma_frames.yaml      tarefa → node_id do Figma → png
-benchmarks/free_prompts/<coleta>/       collection.yaml + prompts.jsonl (anônimo)
+benchmarks/free_prompts/<coleta>/       collection.yaml + prompts.jsonl (anônimo); criada por `specui prompts import`, ainda não existe
 configs/default.yaml  pilot.yaml        experimento principal e piloto
 scaffold/angular-base/                  Angular 20 + Tailwind 4 + ng-icons; package-lock.json versionado
 oracles/                                suítes Playwright (instrumento de medida) + requirements.yaml + pending.yaml
@@ -159,7 +160,7 @@ ng-icons com os pacotes instalados); pedido de suíte Cypress removido; três de
 `python scripts/fetch_figma.py --dry-run` imprime a URL; sem `--dry-run` faz **uma** requisição (`GET /v1/files/:key/nodes`) e
 grava `references/figma/nodes.raw.json` (o plano Starter permite poucas chamadas por mês); recusa sobrescrever sem `--force` e
 recusa node ids `TODO`. `specui figma-derive` gera `blocks.json` offline (nós TEXT: `characters`, caixa, cor, tamanho) e valida a
-escala (frame 1440×900 == PNG). Preencha os `node_id` em [benchmarks/tasks/figma_frames.yaml](benchmarks/tasks/figma_frames.yaml).
+escala (frame 1440×900 == PNG). Os `node_id` já estão em [benchmarks/tasks/figma_frames.yaml](benchmarks/tasks/figma_frames.yaml) (9:46, 9:47, 9:48); só mude se o frame do Figma mudar.
 
 ## 8. Envelope e scaffold
 
@@ -175,7 +176,7 @@ e as falhas de infraestrutura `api_error` (a célula é refeita), `metric_error`
 `model_mismatch` (modelo devolvido ≠ solicitado: a célula é refeita; **se repetir, o run é interrompido** com
 `ModelMismatchError`, checkpoint intacto). Não existe fallback de modelo nem de provedor.
 
-Todo record grava `finish_reason` (o motivo de parada devolvido pelo provedor) **a partir do commit `67e69d5`**; nos records do piloto 1 ele é `null`. `RECITATION`, `SAFETY`, `PROHIBITED_CONTENT`, `BLOCKLIST`, `SPII` e `IMAGE_SAFETY` (e o bloqueio do prompt) são motivos de
+Todo record com resposta do provedor grava `finish_reason` (o motivo de parada devolvido pelo provedor) **a partir do commit `67e69d5`** (um `api_error`, sem resposta, fica `null`); nos records do piloto 1 ele é `null`. `RECITATION`, `SAFETY`, `PROHIBITED_CONTENT`, `BLOCKLIST`, `SPII` e `IMAGE_SAFETY` (e o bloqueio do prompt) são motivos de
 recusa e valem `refusal`; `MAX_TOKENS` vale `truncated`. Exceção de **infraestrutura** no build ou no render
 (disco, navegador fechado, `OSError`) vira `metric_error` **gravado** (a resposta paga já está em `response.raw.txt`) e a execução segue
 para a próxima célula. Já o app que não carrega em 30 s é falha do app: `render_ok = false` e status `nonexecutable`. Se a extração do DOM falhar
@@ -183,7 +184,8 @@ com o render ok, Design2Code e CLIP ficam `null` com a nota no record. Já pági
 casado com a referência, vale 0,0 (seção 10).
 **Ainda não existe comando para recuperar um `metric_error` de infraestrutura gravado antes do render** (sem `screenshot`):
 `specui evaluate --rebuild` (refazer build e render a partir de `response.raw.txt`, sem API) está planejado e adiado para depois do `analyze`;
-até lá, `analyze` recusa enquanto houver um desses records e `evaluate` o informa como erro.
+até lá, `analyze` recusa enquanto houver um desses records, e `evaluate` não o recupera: sem `screenshot` nem `dist/` os estágios falham e o record segue `metric_error`
+(com `--groups functional` só se registra a nota "sem servidor/navegador" e o record passa a `done` sem nota funcional, que o `analyze` também recusa).
 
 ## 9. Execução
 
@@ -212,8 +214,8 @@ nunca entra em `evaluate` (salvo `--include-mock`) nem em `analyze` (que o recus
 **Design2Code** (condicionais: só quem renderiza). `block_match` = área dos blocos pareados / área de todos os blocos dos dois lados;
 `text` = similaridade de Sørensen-Dice dos pares; `position` = 1 − max(|Δx|,|Δy|) dos centros normalizados; `color` = 1 − ΔE2000/100
 (limitado a [0,1]); `clip_inpainted` = cosseno CLIP ViT-B/32 dos screenshots com o texto removido por inpainting. O pareamento
-é húngaro com busca de **fusão de blocos vizinhos** (apêndice C); `n_merged_ref/gen` são registrados e `pairs.json` guarda pares e
-fusões para o overlay do painel. Direção: ↑.
+é húngaro com busca de **fusão de blocos vizinhos** (apêndice C); `n_merged_ref/gen` são registrados e `pairs.json` guarda pares, não pareados e
+fusões; o painel os mostra como JSON no expansor "Pares de blocos e fusões" (não há overlay sobre a imagem). Direção: ↑.
 
 **Figma2Code.** `ves_dinov2` (cosseno DINOv2-base, ↑); `mae` (erro absoluto médio de pixels em [0,1], ↓); `ssim` (secundária).
 Qualidade de código sobre o DOM renderizado e o CSS (escopo: dentro de `app-root`, sem `<svg>`, `ng-*`/`cdk-*`; camadas `theme`/`base`
@@ -229,7 +231,9 @@ cobertura de requisitos por `info_source`, marcadores de estrutura, referências
 puro, Bootstrap...). Custo: tokens de entrada/saída/raciocínio e latência.
 
 **Métrica não calculada fica `null` com o motivo em `errors`: nunca 0.** Isso vale para a extração do DOM que falhou, para a falta de
-blocos de referência e para a falta de `torch`/`transformers`. **Exceção por decisão (`specui/metrics/design2code.py:251-252`):** com blocos
+blocos de referência e para a falta de `torch`/`transformers`. Há duas exceções por decisão de projeto. **(1) Qualidade de código
+(`specui/metrics/code_quality.py:13-14`):** APR, AVU e ISR com denominador zero valem 0,0 (nada a penalizar), enquanto RUR, FU, STR e CCR ficam `None`.
+**(2) Design2Code (`specui/metrics/design2code.py:251-252`):** com blocos
 de referência presentes e nenhum par casado (o app renderizou sem nenhum bloco correspondente, ou sem nenhum bloco de texto), `text`,
 `position` e `color` valem 0,0 e `block_match` vale `área pareada / área total` (0,0 sem pares); o docstring da função diz "valem 0 por
 definição (nenhum bloco casou)". A média de um conjunto vazio não existe e 0,0 é o pior valor da escala. Essa decisão não foi validada
@@ -258,10 +262,9 @@ geometria que o prompt dá); `oracle-lint` rejeita `#id`, `.classe`, `data-testi
   Cada decisão está em `oracles/<tarefa>/pending.yaml`; o hash entra na proveniência.
 - **Dados criados pela UI:** os testes criam as próprias tarefas/cards; dados iniciais do app não afetam nenhuma asserção.
 - **Piloto:** todos os geradores, N = 1, em `results/pilot/`. As falhas são classificadas **por você** em `test_defect` |
-  `model_defect` | `ambiguity` | `adapter_gap`; só `test_defect` e `adapter_gap` editam o oráculo (registrado em
-  `oracles/CHANGELOG.md`). A classificação do piloto 1 está em `oracles/CHANGELOG.md` (seção "Classificação do pesquisador"), que
-  classifica os 3 casos de nível A que não deram YES (`M-A-06`, `M-A-12`, `H-A-03`: `model_defect`). Esses 3 foram copiados por
-  script para a coluna `classification` de `docs/pilot-1/failure_report.csv`; as outras 59 linhas (nível B) ficam sem classificação por
+  `model_defect` | `ambiguity` | `adapter_gap`; só `test_defect` e `adapter_gap` justificam editar o teste (registrado em
+  `oracles/CHANGELOG.md`). Uma `ambiguity` vira decisão em `pending.yaml` e só altera o oráculo quando a decisão muda o teste (PD-C1, PD-C2 e PD-H6 no CHANGELOG). A classificação do piloto 1 está em `oracles/CHANGELOG.md` (seção "Classificação do pesquisador"), que
+  classifica os 3 casos de nível A que não deram YES (`M-A-06`, `M-A-12`, `H-A-03`: `model_defect`). Esses 3 foram copiados do CHANGELOG, por um script pontual (não versionado), para a coluna `classification` de `docs/pilot-1/failure_report.csv`; as outras 59 linhas (nível B) ficam sem classificação por
   caso: o CHANGELOG registra as correções do oráculo que saíram delas, não uma classe por linha. O oráculo **nunca foi exercitado contra uma implementação real** antes do piloto: não há implementação
   de referência das tarefas, de propósito.
 - **Mutação** (`specui mutate`): sobre saídas do piloto que deram YES, estraga o app em tempo de execução (remover elementos, engolir
@@ -288,13 +291,14 @@ geometria que o prompt dá); `oracle-lint` rejeita `#id`, `.classe`, `data-testi
   só `executable`, sempre acompanhado da taxa de executabilidade.
 - **Contraste principal por modelo:** bootstrap estratificado (10 000 réplicas, percentil; reamostra dentro de cada tarefa × modalidade
   × fonte) e permutação estratificada (10 000, p bicaudal). As gerações são independentes: nada de pareamento por repetição.
-- **Secundários:** Δ por tarefa × modalidade × modelo; OLS com erros HC3 (`nota ~ spec*modalidade + tarefa + modelo + spec:modelo`).
-- **Consistência entre modelos (só com k ≥ 2):** sinal do Δ por estrato, diferença entre efeitos (todos os pares) com IC, gráfico forest e **TOST**
+- **Secundários:** Δ por tarefa × modalidade × modelo; OLS com erros HC3 (`nota ~ spec*modalidade + tarefa`; `+ modelo + spec:modelo` só entram com ≥ 2 modelos).
+- **Consistência entre modelos (só com k ≥ 2):** sinal do Δ por estrato, diferença entre efeitos (todos os pares) com IC e **TOST**
   opcional com margem `analysis.equivalence_margin` (gravada em `results/run_meta.json` no início da execução principal e não pode
-  mudar depois; `null` → o teste não roda e o relatório diz por quê).
+  mudar depois; `null` → o teste não roda e o relatório diz por quê). O gráfico forest (`results/aggregate/forest.html`) sai com qualquer k ≥ 1 e só inclui
+  as diferenças entre modelos quando k ≥ 2.
 - **Itens:** `flag_floor` / `flag_ceiling`, `blocked_rate`, discriminação por spec/modalidade/modelo, nota com e sem os casos marcados.
 - **Livres:** regressão da nota sobre cobertura e densidade com erros agrupados por participante, ITT por padrão, `accuracy_a_restricted`.
-- **`contract_failure`** por fonte do prompt, nos livres cruzada com `stack_requests`.
+- **`contract_failure`** por fonte do prompt, cruzada com `stack_requests` (`stack_any`; o cruzamento é calculado para todas as fontes, e é nos livres que ele interessa).
 - **Limitação atual:** o relatório (`results/aggregate/report.md`) usa só `accuracy_a`. `accuracy_b`, as métricas visuais (Design2Code,
   VES, CLIP, MAE, SSIM) e as de qualidade de código não entram em nenhum contraste; ficam em `runs.parquet` e `metrics_long.csv`, e o
   painel mostra qualidade de código × VES sem teste estatístico. **H3 não tem análise implementada.**
@@ -322,8 +326,8 @@ fora do fluxo principal, para depositar os dados com DOI (`MANIFEST.json` com sh
 
 `collection.yaml` exige `anonymous: true` e `participants_informed: true` (o formulário informa o uso e a possível publicação anônima
 dos textos). `specui prompts import --collection <id> --file respostas.csv --map map.yaml` gera ids `p001…`, **remove PII** do texto
-(e-mail, telefone, nomes) e **lista cada remoção** em `import_report.md` para revisão; o perfil entra só em faixas amplas e valores fora
-das faixas são recusados; o CSV bruto fica em `private/` (ignorado). O envelope declara que as restrições de stack prevalecem sobre
+(e-mail, CPF, telefone, URL de perfil, nomes apresentados por "meu nome é", "me chamo" ou "sou o/a", e os termos de `redact_terms` do `map.yaml`) e **lista cada remoção** em `import_report.md` para revisão; o perfil entra como o valor das colunas mapeadas em `profile:` do `map.yaml` e, nos campos com faixas declaradas em `profile_bands:`, um valor fora
+das faixas faz o prompt ser rejeitado (`profile_out_of_band`); o CSV bruto fica em `private/` (ignorado). O envelope declara que as restrições de stack prevalecem sobre
 pedidos de outra tecnologia, e `stack_requests` mede quantos prompts pedem outra stack.
 
 ## 15. Reprodutibilidade
@@ -340,16 +344,16 @@ A proveniência do oráculo (tag, hash da árvore e do conteúdo, `pending.yaml`
 - **Oráculos redigidos com apoio de um assistente de IA** (Claude Code, usado só na escrita do código, nunca como gerador nem como
   avaliador) podem refletir convenções de código gerado por LLM; mitigado por seletores semânticos, aceitação de leituras múltiplas
   (regra 1) e pela mutação/piloto, mas não eliminado.
-- **Recusas e truncamento** valem 0 na ITT; as taxas são reportadas.
+- **Recusas e truncamento** valem 0 na ITT; o relatório traz a taxa de executabilidade e a de `contract_failure`, e o painel mostra a contagem de execuções por status (`recusa` e `truncado` entre elas), mas não há taxa própria de recusa ou truncamento.
 - **Oráculo não validado contra implementação real** antes do piloto; defeitos de teste são corrigidos só depois, com registro.
-- **Teto da nota do nível A** (1,00 / 0,96 nas 12 células do piloto 1). O que no código do oráculo contribui para isso, declarado como
+- **Teto da nota do nível A** (`accuracy_a` = 1,00 em 9 das 12 células do piloto 1; nas outras três, 0,92, 0,96 e 0,96). O que no código do oráculo contribui para isso, declarado como
   ameaça e não corrigido: (a) PARTIAL vale 0,5, então asserções de invariante que passam com a funcionalidade quebrada davam piso de
   0,5 (tratado: passos não pontuam e o efeito principal é pré-condição, seção 11); (b) `find_play_button` aceita, sem nome acessível,
   qualquer botão abaixo do visor; (c) E-A-03 ("fundo branco") passa de graça com o `preflight` do Tailwind; (d) as faixas de matiz
   são largas (verde 76°–166°, azul 190°–251°) e somam ±5° (PD-C2) e o limite de croma do cinza; (e) a isenção de matiz do corpo
   de "Aprovado" em H-A-03 (PD-H6). No piloto, as únicas asserções A que caíram foram três leituras de cor (M-A-06, M-A-12, H-A-03),
   classificadas como `model_defect`.
-- **Piso da nota funcional:** uma página branca sem relação com a tarefa já passa no caso "fundo branco" (≈ 0,1 de `accuracy_a` no smoke com o gerador simulado); a ITT atribui 0 só a falhas de geração/execução, não a apps vazios.
+- **Piso da nota funcional:** uma página branca sem relação com a tarefa já passa no caso "fundo branco" (`accuracy_a` = 0,10 num run do gerador simulado em `results/pilot/`, fora do git: só E-A-03 deu YES); a ITT atribui 0 só a falhas de geração/execução, não a apps vazios.
 - **Pouca potência:** 3 tarefas × 2 modalidades × 5 repetições por modelo; os ICs refletem isso.
 - **Confusão tarefa × dificuldade**, um único gerador, spec mais longa que o prompt (seção 2).
 

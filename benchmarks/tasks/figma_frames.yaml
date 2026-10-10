@@ -1,5 +1,5 @@
 # Mapeia cada tarefa ao frame do Figma e ao PNG exportado (caminhos relativos a benchmarks/tasks/).
-# Os node ids ficam pendentes: na URL do Figma, node-id=12-345 vira "12:345".
+# Os node ids ja estao preenchidos (9:46, 9:47, 9:48). Na URL do Figma, node-id=12-345 vira "12:345".
 # `python scripts/fetch_figma.py --dry-run` mostra a URL exata antes de gastar a chamada unica.
 # O PNG precisa estar exportado em escala 1x (largura == largura do frame; hoje 1440x900): `derive_blocks` valida isso.
 frames:
