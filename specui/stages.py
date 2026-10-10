@@ -147,13 +147,24 @@ def stage_functional(ctx: StageContext) -> None:
         suite, ctx.session, ctx.url, ctx.render.viewport, levels=ctx.cfg.oracle_levels, block_network=ctx.cfg.block_network
     )
     requirements = {r.id: r for r in load_requirements(oracles_dir, ctx.task.id)}
-    sha, tag = ctx.record.oracle_content_sha256, ctx.record.oracle_suite_tag
-    if sha is None:  # reavaliação de um run sem proveniência gravada
-        prov = read_provenance(ctx.cfg.repo_root, oracles_dir)
-        sha, tag = prov.content_sha256, prov.tag
+    stamp_provenance(ctx)  # o que o record diz ter rodado é o que RODOU agora (nunca o que estava gravado antes)
     ctx.record.functional = compute_functional(
-        outcomes, requirements, ctx.record.material_shown, suite_sha256=sha, suite_git_tag=tag
+        outcomes, requirements, ctx.record.material_shown,
+        suite_sha256=ctx.record.oracle_content_sha256, suite_git_tag=ctx.record.oracle_suite_tag,
     )
+
+
+def stamp_provenance(ctx: StageContext) -> None:
+    """Grava no record a proveniência do oráculo e do navegador que executaram a nota funcional.
+
+    Numa reavaliação (`specui evaluate`) o oráculo pode ter mudado desde a geração: sobrescreve os seis campos `oracle_*`
+    e as versões do Playwright/Chromium, senão o record carregaria o hash antigo com a nota nova."""
+    prov = read_provenance(ctx.cfg.repo_root, ctx.cfg.path("oracles_dir"))
+    rec = ctx.record
+    rec.oracle_suite_tag, rec.oracle_tree_hash, rec.oracle_content_sha256 = prov.tag, prov.tree_hash, prov.content_sha256
+    rec.oracle_dirty, rec.pending_sha256, rec.mention_patterns_sha256 = prov.dirty, prov.pending_sha256, prov.mention_patterns_sha256
+    if ctx.session is not None:
+        rec.playwright_version, rec.browser_version = ctx.session.versions()
 
 
 STAGE_GROUPS: dict[str, list[MetricStage]] = {

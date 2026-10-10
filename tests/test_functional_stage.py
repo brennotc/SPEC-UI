@@ -82,3 +82,19 @@ def test_functional_group_without_a_browser_session_is_noted_not_fatal(stored):
     assert out.functional is None
     assert any("sem servidor/navegador" in e for e in out.errors)
     assert out.status == "done"
+
+
+def test_reevaluation_restamps_the_oracle_that_actually_ran(stored):
+    """Se o oráculo mudou desde a geração, o record não pode ficar com o hash antigo ao lado da nota nova."""
+    cfg, root, rec, task = stored
+    rec.oracle_content_sha256, rec.oracle_suite_tag, rec.oracle_dirty = "0" * 64, "oracle-v0", False
+    rec.pending_sha256, rec.mention_patterns_sha256, rec.oracle_tree_hash = "old", "old", "oldtree"
+    rec.playwright_version, rec.browser_version = "0.0", "old-chromium"
+    with BrowserSession() as session:
+        out = reevaluate_record(cfg, root, rec, task, groups=["functional"], session=session)
+        browser = session.versions()
+    assert out.oracle_content_sha256 != "0" * 64 and len(out.oracle_content_sha256) == 64
+    assert out.oracle_suite_tag is None and out.oracle_tree_hash is None  # oracles_dir de teste fica fora do git
+    assert out.pending_sha256 != "old" and out.mention_patterns_sha256 != "old"
+    assert (out.playwright_version, out.browser_version) == browser and out.browser_version != "old-chromium"
+    assert out.functional.suite_sha256 == out.oracle_content_sha256 and out.functional.suite_git_tag is None
