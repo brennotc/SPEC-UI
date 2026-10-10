@@ -144,19 +144,28 @@ def class_names(selector: str) -> set[str]:
     return {re.sub(r"\\(.)", r"\1", raw) for raw in _CLASS_IN_SELECTOR.findall(selector or "")}
 
 
+_UPPER_BOUND = re.compile(r"(?:max-width\s*:|width\s*<=?)\s*$")  # texto antes do número: ele é um limite SUPERIOR
+
+
 def media_boundaries(media: str | None) -> list[float]:
-    """Larguras (px) que a media query usa como limite. `em`/`rem` valem 16px. Uma query
-    negada (`not (min-width: 40rem)`, de `max-sm:`) mira as larguras ABAIXO do limite."""
+    """Larguras (px) que a media query usa como limite. `em`/`rem` valem 16px.
+
+    Limite inferior (`min-width: X`, `width >= X`, `X <= width`) vale X. Limite superior (`max-width: X`, `width < X`,
+    `width <= X`, o `B` de `A <= width < B`) vale X − 0,01: a query mira as larguras ABAIXO de X, então cai na faixa de baixo e
+    não na que começa em X. Uma query negada (`not (min-width: 40rem)`, que o Tailwind emite para `max-sm:`) inverte o sentido de
+    cada limite, em qualquer posição (`screen and not (...)`)."""
     if not media or "width" not in media:
         return []
-    negated = media.strip().startswith("not")
+    negated = re.search(r"\bnot\b", media) is not None
     bounds: list[float] = []
     for group in _MEDIA_GROUP.findall(media):
         if "width" not in group or "height" in group:
             continue
-        for number, unit in _MEDIA_LENGTH.findall(group):
+        for match in _MEDIA_LENGTH.finditer(group):
+            number, unit = match.groups()
             px = float(number) * (1.0 if unit == "px" else 16.0)
-            bounds.append(px - 0.01 if negated else px)
+            upper = _UPPER_BOUND.search(group[: match.start()]) is not None
+            bounds.append(px - 0.01 if upper != negated else px)
     return bounds
 
 

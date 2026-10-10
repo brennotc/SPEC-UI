@@ -163,9 +163,14 @@ def test_class_names_unescape_tailwind_selectors():
     [
         ("(min-width: 48rem)", [768.0]),
         ("(min-width: 640px)", [640.0]),
-        ("(max-width: 599px)", [599.0]),
+        ("(max-width: 599px)", [598.99]),  # limite superior: abaixo de 599
+        ("(max-width: 640px)", [639.99]),  # inclusivo, mas é a faixa S, não a M que começa em 640
         ("(width >= 40rem)", [640.0]),
-        ("(40rem <= width < 64rem)", [640.0, 1024.0]),
+        ("(40rem <= width < 64rem)", [640.0, 1023.99]),  # o B de A <= width < B é limite superior: faixa M, não L
+        ("(width < 40rem)", [639.99]),  # max-sm: em sintaxe de intervalo (S, não M)
+        ("(width <= 40rem)", [639.99]),
+        ("screen and not (min-width: 40rem)", [639.99]),  # negação fora da posição inicial
+        ("not (max-width: 639px)", [639.0]),  # negar um limite superior vira limite inferior
         ("(min-width: 700px) and (hover: hover)", [700.0]),
         ("not (min-width: 40rem)", [639.99]),  # max-sm: mira abaixo do limite
         ("(min-height: 500px)", []),
