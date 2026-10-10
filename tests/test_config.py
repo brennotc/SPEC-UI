@@ -75,3 +75,12 @@ def test_duplicate_generators_and_bad_sources_are_rejected():
     with pytest.raises(ValidationError):
         RunConfig(generators=[])
     RunConfig(generators=[gen], prompt_sources=["no_spec", "with_spec", "free:coleta_2026_11"])
+
+
+def test_python_requirement_matches_what_the_code_uses(repo_root):
+    """O harness usa `os.path.isjunction` (Python 3.12): o pacote não pode declarar uma versão menor."""
+    import os
+    import tomllib
+
+    declared = tomllib.loads((repo_root / "pyproject.toml").read_text(encoding="utf-8"))["project"]["requires-python"]
+    assert declared == ">=3.12" and hasattr(os.path, "isjunction")

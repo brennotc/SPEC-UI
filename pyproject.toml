@@ -7,7 +7,7 @@ name = "specui"
 version = "0.1.0"
 description = "SPEC-UI: avaliacao automatica do efeito de especificacoes na geracao de front-end por LLMs"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dynamic = ["dependencies"]
 
 [project.scripts]
