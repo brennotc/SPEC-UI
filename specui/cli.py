@@ -356,7 +356,12 @@ def mutate(
 ) -> None:
     """Mutação em tempo de execução sobre saídas do piloto que deram YES: o oráculo percebe o app quebrado?"""
     from specui.oracle import load_suite
-    from specui.oracle.mutations import run_mutations, summarize, write_sensitivity
+    from specui.oracle.mutations import (
+        run_mutations_with_baseline,
+        summarize,
+        write_baseline,
+        write_sensitivity,
+    )
     from specui.tasks import load_tasks
 
     cfg = _load(config, {"run_kind": "pilot"})
@@ -367,7 +372,7 @@ def mutate(
     if not records:
         console.print("[yellow]Nenhuma execução `done` do piloto encontrada.[/yellow]")
         raise typer.Exit(1)
-    rows = []
+    rows, baseline_rows = [], []
     with BrowserSession(cfg.clock_epoch_iso, cfg.render_settle_ms, cfg.block_network) as session:
         for rec in records:
             dist = store.root / rec.paths["run_dir"] / rec.paths.get("dist_dir", "dist")
@@ -376,9 +381,15 @@ def mutate(
                 continue
             suite = load_suite(cfg.path("oracles_dir"), rec.task_id)
             viewport = cfg.viewport or tasks[rec.task_id].image_size
-            rows += run_mutations(suite, session, dist, viewport, rec.run_id, block_network=cfg.block_network)
+            run_rows, run_baseline = run_mutations_with_baseline(suite, session, dist, viewport, rec.run_id, block_network=cfg.block_network)
+            rows += run_rows
+            baseline_rows += run_baseline
             console.print(f"  {rec.run_id}: {len(rows)} linhas acumuladas")
     out = write_sensitivity(rows, store.root / "sensitivity.csv")
+    baseline_out = write_baseline(baseline_rows, store.root / "sensitivity_baseline.csv")
+    not_applied = [r for r in rows if r.verdict == "NOT_APPLIED"]
+    for r in not_applied:  # todo NOT_APPLIED vem com o diagnóstico do baseline
+        console.print(f"[yellow]NOT_APPLIED[/yellow] {r.mutation_id} × {r.case_id} em {r.run_id}: {r.detail}")
     table = Table(title="Sensibilidade por caso")
     for column in ("caso", "KILLED", "WEAK", "SURVIVED", "NOT_APPLIED"):
         table.add_column(column)
@@ -386,6 +397,7 @@ def mutate(
         table.add_row(case_id, *(str(counts.get(v, 0)) for v in ("KILLED", "WEAK", "SURVIVED", "NOT_APPLIED")))
     console.print(table)
     console.print(f"[green]{out}[/green]  (casos com SURVIVED precisam ser revistos antes do congelamento)")
+    console.print(f"[green]{baseline_out}[/green]  (baseline de cada caso-alvo: outcome, bloqueio, asserções que falharam, erro)")
 
 
 # ----------------------------------------------------------------------------- prompts livres, análise, export

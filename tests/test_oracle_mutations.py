@@ -13,10 +13,12 @@ from specui.oracle.mutations import (
     neutralize_filters,
     remove_all,
     run_mutations,
+    run_mutations_with_baseline,
     summarize,
     text_replace,
     unclamp_overflow,
     verdict_for,
+    write_baseline,
     write_sensitivity,
 )
 
@@ -182,5 +184,13 @@ def test_neutralize_filters_kills_only_the_filter_case(tmp_path):
     blank.mkdir()
     (blank / "index.html").write_text("<!doctype html><body><app-root><p>sem filtro</p></app-root></body>", encoding="utf-8")
     with BrowserSession() as session:
-        rows = run_mutations(load_suite(root, "demo4"), session, blank, (1440, 900), "run-b", [neutralize_filters("X-B", ["F-A-02"])])
+        rows, baseline = run_mutations_with_baseline(
+            load_suite(root, "demo4"), session, blank, (1440, 900), "run-b", [neutralize_filters("X-B", ["F-A-02"])])
     assert rows[0].verdict == "NOT_APPLIED"  # baseline não era YES (a página não tem o formulário)
+    # ... e o NOT_APPLIED vem com o diagnóstico do baseline (o mesmo que o failure_report grava)
+    assert "outcome=NO" in rows[0].detail and "blocked=" in rows[0].detail and "failed=" in rows[0].detail
+    assert [(b.case_id, b.outcome, b.blocked) for b in baseline] == [("F-A-02", "NO", False)]  # act falhando e ok falhando: NO sem bloqueio
+    assert baseline[0].failed_assertions and baseline[0].run_id == "run-b" and baseline[0].duration_ms >= 0
+    out = write_baseline(baseline, tmp_path / "sensitivity_baseline.csv")
+    header, line = out.read_text(encoding="utf-8-sig").splitlines()[:2]
+    assert header.split(";")[:4] == ["run_id", "task_id", "case_id", "outcome"] and line.split(";")[3] == "NO"

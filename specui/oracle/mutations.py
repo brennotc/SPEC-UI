@@ -20,6 +20,7 @@ from pathlib import Path
 
 from specui.harness.browser import BrowserSession
 from specui.harness.server import StaticServer
+from specui.models import CaseOutcome
 from specui.oracle.protocol import CaseSpec
 from specui.oracle.runner import Suite, run_case
 
@@ -176,6 +177,39 @@ class MutationRow:
     extra: dict[str, str] = field(default_factory=dict)
 
 
+@dataclass
+class BaselineRow:
+    """O que o caso fez no app INTACTO, com o mesmo detalhe do `failure_report` (para explicar todo NOT_APPLIED)."""
+
+    run_id: str
+    task_id: str
+    case_id: str
+    outcome: str
+    blocked: bool
+    n_pass: int
+    n_total: int
+    n_steps: int
+    failed_assertions: str  # "<asserção> :: <detalhe>" separadas por " | ", como o failure_report
+    error: str
+    duration_ms: int
+
+
+def baseline_row(run_id: str, task_id: str, outcome: CaseOutcome) -> BaselineRow:
+    return BaselineRow(
+        run_id, task_id, outcome.case_id, outcome.outcome, outcome.blocked, outcome.n_pass, outcome.n_total, outcome.n_steps,
+        " | ".join(outcome.failed), outcome.error or "", outcome.duration_ms,
+    )
+
+
+def _diagnosis(b: BaselineRow) -> str:
+    parts = [f"outcome={b.outcome}", f"blocked={b.blocked}"]
+    if b.failed_assertions:
+        parts.append(f"failed={b.failed_assertions}")
+    if b.error:
+        parts.append(f"error={b.error}")
+    return "o caso não era YES no baseline (" + "; ".join(parts) + ")"
+
+
 def verdict_for(baseline: str | None, mutated: str | None, applied: bool) -> Verdict:
     if baseline != "YES" or not applied or mutated is None:
         return "NOT_APPLIED"
@@ -204,6 +238,15 @@ def run_mutations(
     catalog: Sequence[Mutation] | None = None, block_network: bool = True,
 ) -> list[MutationRow]:
     """Aplica cada mutação do catálogo da tarefa e compara cada caso-alvo com o baseline (app intacto)."""
+    return run_mutations_with_baseline(suite, session, dist_dir, viewport, run_id, catalog, block_network)[0]
+
+
+def run_mutations_with_baseline(
+    suite: Suite, session: BrowserSession, dist_dir: str | Path, viewport: tuple[int, int], run_id: str,
+    catalog: Sequence[Mutation] | None = None, block_network: bool = True,
+) -> tuple[list[MutationRow], list[BaselineRow]]:
+    """Como `run_mutations`, e devolve também o baseline detalhado de cada caso-alvo (outcome, bloqueio, asserções que
+    falharam, erro): um NOT_APPLIED nunca fica sem diagnóstico."""
     mutations = list(catalog if catalog is not None else CATALOG.get(suite.task_id, []))
     cases: dict[str, CaseSpec] = {c.id: c for c in suite.cases}
     wanted = {cid for m in mutations for cid in m.targets if cid in cases}
@@ -211,9 +254,10 @@ def run_mutations(
     dist_dir = Path(dist_dir)
 
     with StaticServer(dist_dir) as server:
-        baseline = {
-            cid: run_case(cases[cid], session, server.url, viewport, block_network).outcome for cid in sorted(wanted)
-        }
+        outcomes = {cid: run_case(cases[cid], session, server.url, viewport, block_network) for cid in sorted(wanted)}
+    baseline_rows = [baseline_row(run_id, suite.task_id, o) for o in outcomes.values()]
+    by_case = {b.case_id: b for b in baseline_rows}
+    baseline = {cid: o.outcome for cid, o in outcomes.items()}
 
     for mutation in mutations:
         targets = [cid for cid in mutation.targets if cid in cases]
@@ -225,7 +269,7 @@ def run_mutations(
                 for case_id in targets:
                     if baseline.get(case_id) != "YES":
                         rows.append(MutationRow(run_id, suite.task_id, mutation.id, mutation.operator, case_id,
-                                                baseline.get(case_id), None, "NOT_APPLIED", "o caso não era YES no baseline"))
+                                                baseline.get(case_id), None, "NOT_APPLIED", _diagnosis(by_case[case_id])))
                         continue
                     applied: list[bool] = []
                     outcome = run_case(cases[case_id], session, server.url, viewport, block_network,
@@ -236,7 +280,7 @@ def run_mutations(
                         verdict_for("YES", outcome.outcome, was_applied),
                         "" if was_applied else "a mutação não encontrou o que alterar",
                     ))
-    return rows
+    return rows, baseline_rows
 
 
 def write_sensitivity(rows: Sequence[MutationRow], path: str | Path) -> Path:
@@ -245,6 +289,20 @@ def write_sensitivity(rows: Sequence[MutationRow], path: str | Path) -> Path:
     fields = ["run_id", "task_id", "mutation_id", "operator", "case_id", "baseline", "mutated", "verdict", "detail"]
     with open(path, "w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({k: getattr(row, k) for k in fields})
+    return path
+
+
+def write_baseline(rows: Sequence[BaselineRow], path: str | Path) -> Path:
+    """`sensitivity_baseline.csv`: o baseline de cada caso-alvo em cada run, ao lado do `sensitivity.csv`."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fields = ["run_id", "task_id", "case_id", "outcome", "blocked", "n_pass", "n_total", "n_steps", "failed_assertions",
+              "error", "duration_ms"]
+    with open(path, "w", encoding="utf-8-sig", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fields, delimiter=";")
         writer.writeheader()
         for row in rows:
             writer.writerow({k: getattr(row, k) for k in fields})
