@@ -81,6 +81,10 @@ def analyze_frame(df: pd.DataFrame, cfg: RunConfig, records: list | None = None)
     return out
 
 
+def _thousands(n: int) -> str:
+    return f"{n:,}".replace(",", " ")
+
+
 def build_report(analysis: dict[str, Any], cfg: RunConfig) -> str:
     res_itt, res_cond = analysis["_results"]
     intro = (
@@ -91,7 +95,8 @@ def build_report(analysis: dict[str, Any], cfg: RunConfig) -> str:
     out.append(_section_contrast("Métrica primária: accuracy_a, conjunto ITT (contraste principal)", res_itt))
     out.append(
         "ITT: toda geração tentada entra; formato, contrato, build, recusa e truncamento valem 0. "
-        "Bootstrap estratificado e permutação estratificada, 10 000 réplicas.\n"
+        f"Bootstrap estratificado ({_thousands(cfg.analysis.n_boot)} réplicas) e permutação estratificada "
+        f"({_thousands(cfg.analysis.n_perm)} réplicas).\n"
     )
     out.append(_section_contrast("Conjunto condicional (só executáveis; secundário)", res_cond))
     ex = pd.DataFrame(analysis["executability"])

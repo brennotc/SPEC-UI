@@ -83,7 +83,7 @@ def test_analyze_refuses_without_main_runs(mock_config):
     assert result.exit_code == 1 and "recusada" in result.output
 
 
-def test_export_zip_has_manifest_and_skips_the_pilot(tmp_path):
+def test_export_zip_has_manifest_and_skips_the_pilot(tmp_path, caplog):
     import json
     import zipfile
 
@@ -98,7 +98,12 @@ def test_export_zip_has_manifest_and_skips_the_pilot(tmp_path):
     (run / "dist" / "main.js").write_text("x", encoding="utf-8")
     (results / "pilot" / "runs" / "p1").mkdir(parents=True)
     (results / "pilot" / "runs" / "p1" / "record.json").write_text("{}", encoding="utf-8")
-    out = export_results(results, tmp_path / "out" / "pkg.zip")
+    orphan = results / "runs" / "orfa"  # execução interrompida: só os prompts, sem record.json
+    orphan.mkdir()
+    (orphan / "prompt.user.txt").write_text("x", encoding="utf-8")
+    with caplog.at_level("WARNING", logger="specui.export"):
+        out = export_results(results, tmp_path / "out" / "pkg.zip")
+    assert "1 pasta(s) de runs/ sem record.json" in caplog.text and "orfa" in caplog.text
     with zipfile.ZipFile(out) as zf:
         names = set(zf.namelist())
         manifest = json.loads(zf.read("MANIFEST.json"))

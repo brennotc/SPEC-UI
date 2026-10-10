@@ -6,9 +6,12 @@ Conteúdo: record.json, prompts, resposta bruta, screenshot, arquivos gerados (s
 
 import hashlib
 import json
+import logging
 import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 _RUN_FILES = ("record.json", "prompt.system.txt", "prompt.user.txt", "response.raw.txt", "screenshot.png",
               "dom_blocks.json", "pairs.json", "axe.json", "build.stdout.txt", "build.stderr.txt")
@@ -22,11 +25,19 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def collect(results_dir: Path) -> list[Path]:
-    """Arquivos do pacote, relativos a `results_dir` (a pasta `pilot/` fica de fora)."""
+def collect(results_dir: Path, skipped: list[Path] | None = None) -> list[Path]:
+    """Arquivos do pacote, relativos a `results_dir` (a pasta `pilot/` fica de fora).
+
+    Pasta de `runs/` sem `record.json` (execução interrompida antes de gravar o record) não entra; as puladas vão para `skipped`."""
     files: list[Path] = []
     runs = results_dir / "runs"
     for run_dir in sorted(runs.iterdir()) if runs.is_dir() else []:
+        if not run_dir.is_dir():
+            continue
+        if not (run_dir / "record.json").is_file():
+            if skipped is not None:
+                skipped.append(run_dir)
+            continue
         for name in _RUN_FILES:
             if (run_dir / name).is_file():
                 files.append(run_dir / name)
@@ -44,7 +55,10 @@ def collect(results_dir: Path) -> list[Path]:
 
 def export_results(results_dir: str | Path, out: str | Path, extra: dict | None = None) -> Path:
     results_dir, out = Path(results_dir), Path(out)
-    files = collect(results_dir)
+    skipped: list[Path] = []
+    files = collect(results_dir, skipped)
+    if skipped:
+        logger.warning("%d pasta(s) de runs/ sem record.json ficaram fora do pacote: %s", len(skipped), ", ".join(p.name for p in skipped))
     if not files:
         raise FileNotFoundError(f"nada para exportar em {results_dir}")
     out.parent.mkdir(parents=True, exist_ok=True)

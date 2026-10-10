@@ -252,6 +252,7 @@ def test_run_analysis_writes_report_and_refuses_a_changed_margin(repo_root, tmp_
     report = paths["report"].read_text(encoding="utf-8")
     assert report.index("Métrica primária") < report.index("condicional") and "Consistência entre modelos" in report
     assert "nos modelos testados" in report and "TOST" in report
+    assert "(300 réplicas)" in report and "10 000" not in report  # o texto vem da configuração, não é fixo
     assert paths["analysis"].is_file() and paths["forest"].is_file() and paths["runs"].is_file()
 
     changed = cfg.model_copy(update={"analysis": cfg.analysis.model_copy(update={"equivalence_margin": 0.1})})
@@ -259,6 +260,17 @@ def test_run_analysis_writes_report_and_refuses_a_changed_margin(repo_root, tmp_
         run_analysis(changed)
     with pytest.raises(ValueError, match="mudou depois do congelamento"):
         store.freeze_meta(0.2, "sha")
+
+
+def test_report_text_reads_the_replicates_from_the_config(repo_root, tmp_path):
+    from specui.analysis.report import build_report
+
+    cfg = load_config(repo_root / "configs" / "default.yaml", overrides={"results_dir": str(tmp_path), "analysis": {"n_boot": 500, "n_perm": 250}})
+    report = build_report(analyze_frame(synthetic({"google:g": 0.2}, reps=2), cfg), cfg)
+    assert "bootstrap estratificado (500 réplicas) e permutação estratificada (250 réplicas)" in report.lower()
+    assert "10 000 réplicas" not in report
+    big = cfg.model_copy(update={"analysis": cfg.analysis.model_copy(update={"n_boot": 20000})})
+    assert "(20 000 réplicas)" in build_report(analyze_frame(synthetic({"google:g": 0.2}, reps=2), big), big)
 
 
 def test_analyze_frame_without_main_pairs_does_not_crash(repo_root, tmp_path):

@@ -135,11 +135,10 @@ with tabs[4]:
         if path.is_file():
             with st.expander(title):
                 st.code(path.read_text(encoding="utf-8")[:20000])
-    for title, key in (("Build (stderr)", "build_stderr"), ("Console e erros", None)):
-        path = base / rec.paths[key] if key and key in rec.paths else None
-        if path and path.is_file() and path.read_text(encoding="utf-8").strip():
-            with st.expander(title):
-                st.code(path.read_text(encoding="utf-8")[:8000])
+    stderr = base / rec.paths["build_stderr"] if "build_stderr" in rec.paths else None
+    if stderr and stderr.is_file() and stderr.read_text(encoding="utf-8").strip():
+        with st.expander("Build (stderr)"):
+            st.code(stderr.read_text(encoding="utf-8")[:8000])
     if rec.technical:
         with st.expander("Console / axe"):
             st.json({"console": rec.technical.console_errors, "bloqueadas": rec.technical.blocked_requests, "axe": rec.technical.axe_violations})
