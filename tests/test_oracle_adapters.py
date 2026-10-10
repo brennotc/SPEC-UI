@@ -5,7 +5,7 @@ from itertools import pairwise
 
 import pytest
 
-from oracles.common.colors import effective_background, hue_bucket, text_color
+from oracles.common.colors import computed_color, effective_background, hue_bucket, text_color
 from oracles.common.dates import LATER, TODAY, fill_date
 from oracles.common.dnd import STRATEGIES, DndDriver
 from oracles.common.geometry import box
@@ -35,6 +35,7 @@ from oracles.common.locators import (
     wait_display,
 )
 from specui.harness import BrowserSession, StaticServer
+from specui.harness.browser import _js
 
 pytestmark = pytest.mark.slow
 
@@ -240,9 +241,6 @@ def test_wait_display_polls_and_times_out(open_fixture):
 
 def test_colors_in_oklch_and_oklab_are_read_as_srgb(session, tmp_path):
     """O Tailwind 4 calcula as cores em oklch/oklab: os leitores precisam devolver sRGB, não None."""
-    from oracles.common.colors import computed_color, effective_background
-    from specui.harness.browser import _js
-
     html = """<!doctype html><body style="margin:0;background:oklch(0.85 0 0)"><app-root>
     <header style="height:70px;background:oklch(0.63 0.2 25)"><svg width="20" height="20"><rect width="20" height="20" style="fill:oklab(0.6 -0.15 0.12)"/></svg>
     <span style="color:oklch(1 0 0)">Titulo</span></header><p style="color:oklab(0.5 -0.05 -0.15 / 0.9)">azul</p></app-root></body>"""
