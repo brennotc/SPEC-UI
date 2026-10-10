@@ -1,0 +1,394 @@
+```css file=src/styles.css
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+@import "tailwindcss";
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  color: #333333;
+}
+
+/* Remover spinners de input number se desejado */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+```
+
+```ts file=src/app/app.ts
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { NgIconComponent, provideIcons } from '@ng-icons/core';
+import { lucidePlay, lucidePause, lucideApple } from '@ng-icons/lucide';
+
+export type PomodoroMode = 'focus' | 'shortPause' | 'longPause';
+
+export interface TimerConfig {
+  focus: number;       // em segundos (padrão 1500 = 25 min)
+  shortPause: number;  // em segundos (padrão 300 = 5 min)
+  longPause: number;   // em segundos (padrão 900 = 15 min)
+}
+
+export interface PomodoroState {
+  currentMode: PomodoroMode;
+  timeRemainingInSeconds: number;
+  isRunning: boolean;
+  config: TimerConfig;
+}
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, FormsModule, NgIconComponent],
+  providers: [
+    provideIcons({
+      lucidePlay,
+      lucidePause,
+      lucideApple
+    })
+  ],
+  templateUrl: './app.html',
+  styleUrls: ['./app.css']
+})
+export class App implements OnInit, OnDestroy {
+  readonly modeColors: Record<PomodoroMode, string> = {
+    focus: '#D74747',
+    shortPause: '#658B5C',
+    longPause: '#5684D9'
+  };
+
+  readonly modeLabels: Record<PomodoroMode, string> = {
+    focus: 'Foco Total',
+    shortPause: 'Pausa Curta',
+    longPause: 'Pausa Longa'
+  };
+
+  state: PomodoroState = {
+    currentMode: 'focus',
+    timeRemainingInSeconds: 1500,
+    isRunning: false,
+    config: {
+      focus: 1500,
+      shortPause: 300,
+      longPause: 900
+    }
+  };
+
+  // Minutos para os inputs numéricos
+  minutesInput: Record<PomodoroMode, number> = {
+    focus: 25,
+    shortPause: 5,
+    longPause: 15
+  };
+
+  private timerInterval: ReturnType<typeof setInterval> | null = null;
+  private alarmAudio: HTMLAudioElement | null = null;
+
+  ngOnInit(): void {
+    this.initAudio();
+  }
+
+  ngOnDestroy(): void {
+    this.stopTimer();
+  }
+
+  get currentColor(): string {
+    return this.modeColors[this.state.currentMode];
+  }
+
+  get currentLabel(): string {
+    return this.modeLabels[this.state.currentMode];
+  }
+
+  get formattedTime(): string {
+    return this.formatTime(this.state.timeRemainingInSeconds);
+  }
+
+  formatTime(totalSeconds: number): string {
+    const minutes = Math.floor(Math.max(0, totalSeconds) / 60);
+    const seconds = Math.floor(Math.max(0, totalSeconds) % 60);
+    const mm = minutes.toString().padStart(2, '0');
+    const ss = seconds.toString().padStart(2, '0');
+    return `${mm}:${ss}`;
+  }
+
+  setMode(mode: PomodoroMode): void {
+    if (this.state.currentMode === mode && this.state.isRunning) {
+      return;
+    }
+    this.stopTimer();
+    this.state.currentMode = mode;
+    this.state.timeRemainingInSeconds = this.state.config[mode];
+  }
+
+  toggleTimer(): void {
+    if (this.state.isRunning) {
+      this.pauseTimer();
+    } else {
+      this.startTimer();
+    }
+  }
+
+  startTimer(): void {
+    if (this.state.timeRemainingInSeconds <= 0) {
+      this.state.timeRemainingInSeconds = this.state.config[this.state.currentMode];
+    }
+    this.state.isRunning = true;
+    this.timerInterval = setInterval(() => {
+      if (this.state.timeRemainingInSeconds > 0) {
+        this.state.timeRemainingInSeconds--;
+        if (this.state.timeRemainingInSeconds === 0) {
+          this.handleTimerFinished();
+        }
+      }
+    }, 1000);
+  }
+
+  pauseTimer(): void {
+    this.stopTimer();
+  }
+
+  private stopTimer(): void {
+    this.state.isRunning = false;
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+  }
+
+  private handleTimerFinished(): void {
+    this.stopTimer();
+    this.playAlarm();
+  }
+
+  private initAudio(): void {
+    try {
+      // Criar um áudio curto via base64 WAV para funcionar 100% offline
+      const wavBase64 = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YV4GAACBhYqFbF1fdJivrJBhNjVgodDbq2EcHCek3fLbuWscHCGW1/Teu2scHiid2vLbu2sdHi2h2/LbvWwhIS6i3PPcvnAiJC2k3PPdv3IlJS+m3vTewXMnJjCn3vTgwnYqKTOo3/ThxHksLTap4PXiynwwLjmr4ffky38zLz2u4vjmzYI2MD2w4/rnz4U4MT6y5Pvo0Yg6Mz+05fzo04w9NEK35/3p1ZBE';
+      this.alarmAudio = new Audio(wavBase64);
+      this.alarmAudio.volume = 1.0;
+    } catch {
+      this.alarmAudio = new Audio();
+    }
+  }
+
+  private playAlarm(): void {
+    try {
+      if (!this.alarmAudio) {
+        this.alarmAudio = new Audio();
+      }
+      this.alarmAudio.currentTime = 0;
+      const playPromise = this.alarmAudio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Fallback para Web Audio API se o navegador bloquear autoplay
+          this.playBeepWebAudio();
+        });
+      }
+    } catch {
+      this.playBeepWebAudio();
+    }
+  }
+
+  private playBeepWebAudio(): void {
+    try {
+      const audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.2);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 1.2);
+    } catch {
+      // Falha silenciosa
+    }
+  }
+
+  onMinutesChange(mode: PomodoroMode, newMinutes: number): void {
+    if (this.state.isRunning) return;
+
+    const validatedMinutes = Math.max(1, Number(newMinutes) || 1);
+    this.minutesInput[mode] = validatedMinutes;
+    this.state.config[mode] = validatedMinutes * 60;
+
+    // Se o modo alterado for o modo atual, atualiza o tempo restante principal imediatamente
+    if (this.state.currentMode === mode) {
+      this.state.timeRemainingInSeconds = this.state.config[mode];
+    }
+  }
+}
+```
+
+```html file=src/app/app.html
+<div class="min-h-screen bg-white flex flex-col justify-between select-none">
+  <!-- HEADER -->
+  <header class="w-full h-[70px] bg-[#E56060] flex items-center px-8 shadow-sm z-10">
+    <div class="flex items-center gap-3 text-white">
+      <ng-icon name="lucideApple" class="text-3xl"></ng-icon>
+      <span class="text-2xl font-bold tracking-tight">Pomodoro</span>
+    </div>
+  </header>
+
+  <!-- MAIN / CÍRCULO CENTRAL -->
+  <main class="flex-1 flex flex-col items-center justify-center p-4">
+    <!-- Círculo de 503px x 503px -->
+    <section
+      class="w-[503px] h-[503px] max-w-[90vw] max-h-[90vw] rounded-full border-[3px] flex flex-col items-center justify-between py-12 px-6 transition-colors duration-300 relative shadow-sm"
+      [style.borderColor]="currentColor"
+      aria-label="Temporizador Pomodoro"
+    >
+      <!-- Nome do período no topo (tamanho 36) -->
+      <button
+        type="button"
+        (click)="setMode(state.currentMode)"
+        class="text-[36px] font-semibold leading-tight tracking-wide focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg px-3 transition-colors"
+        [style.color]="currentColor"
+        [style.--tw-ring-color]="currentColor"
+        title="Modo atual"
+      >
+        {{ currentLabel }}
+      </button>
+
+      <!-- Tempo formatado no meio (tamanho 128) -->
+      <div
+        class="text-[104px] sm:text-[128px] font-bold tracking-tighter leading-none select-all text-neutral-800"
+        aria-live="polite"
+      >
+        {{ formattedTime }}
+      </div>
+
+      <!-- Botão circular de Play/Pause na parte inferior interna -->
+      <button
+        type="button"
+        (click)="toggleTimer()"
+        [attr.aria-label]="state.isRunning ? 'Pausar temporizador' : 'Iniciar temporizador'"
+        class="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-md transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-offset-2"
+        [style.backgroundColor]="currentColor"
+        [style.--tw-ring-color]="currentColor"
+      >
+        <ng-icon
+          [name]="state.isRunning ? 'lucidePause' : 'lucidePlay'"
+          class="text-3xl text-white ml-0.5"
+          [class.ml-0.5]="!state.isRunning"
+        ></ng-icon>
+      </button>
+    </section>
+  </main>
+
+  <!-- RODAPÉ / CONFIGURAÇÕES -->
+  <footer class="w-full pb-8">
+    <!-- Linha divisória horizontal Cinza padrão (#716C6C) -->
+    <div class="w-full border-t border-[#716C6C] mb-6"></div>
+
+    <!-- Controles nos 3 pontos: Esquerda (alinhado com logo), Centro e Direita -->
+    <section class="max-w-7xl mx-auto px-8 w-full">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <!-- Foco Total (canto inferior esquerdo alinhado horizontalmente com a logo) -->
+        <div class="flex items-center gap-2">
+          <label
+            for="input-focus"
+            (click)="setMode('focus')"
+            class="font-semibold text-base cursor-pointer hover:underline transition-all"
+            [style.color]="modeColors.focus"
+          >
+            Foco Total:
+          </label>
+          <div
+            class="w-[89px] h-[40px] rounded flex items-center justify-center px-1"
+            [style.backgroundColor]="modeColors.focus"
+          >
+            <input
+              id="input-focus"
+              type="number"
+              min="1"
+              max="120"
+              [disabled]="state.isRunning"
+              [ngModel]="minutesInput.focus"
+              (ngModelChange)="onMinutesChange('focus', $event)"
+              class="w-full h-full bg-transparent text-white text-center font-semibold text-lg focus:outline-none disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
+            />
+          </div>
+        </div>
+
+        <!-- Pausa Curta (alinhado horizontalmente com o centro da página) -->
+        <div class="flex items-center gap-2">
+          <label
+            for="input-shortPause"
+            (click)="setMode('shortPause')"
+            class="font-semibold text-base cursor-pointer hover:underline transition-all"
+            [style.color]="modeColors.shortPause"
+          >
+            Pausa Curta:
+          </label>
+          <div
+            class="w-[89px] h-[40px] rounded flex items-center justify-center px-1"
+            [style.backgroundColor]="modeColors.shortPause"
+          >
+            <input
+              id="input-shortPause"
+              type="number"
+              min="1"
+              max="60"
+              [disabled]="state.isRunning"
+              [ngModel]="minutesInput.shortPause"
+              (ngModelChange)="onMinutesChange('shortPause', $event)"
+              class="w-full h-full bg-transparent text-white text-center font-semibold text-lg focus:outline-none disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
+            />
+          </div>
+        </div>
+
+        <!-- Pausa Longa (alinhado horizontalmente no lado oposto de Foco Total) -->
+        <div class="flex items-center gap-2">
+          <label
+            for="input-longPause"
+            (click)="setMode('longPause')"
+            class="font-semibold text-base cursor-pointer hover:underline transition-all"
+            [style.color]="modeColors.longPause"
+          >
+            Pausa Longa:
+          </label>
+          <div
+            class="w-[89px] h-[40px] rounded flex items-center justify-center px-1"
+            [style.backgroundColor]="modeColors.longPause"
+          >
+            <input
+              id="input-longPause"
+              type="number"
+              min="1"
+              max="90"
+              [disabled]="state.isRunning"
+              [ngModel]="minutesInput.longPause"
+              (ngModelChange)="onMinutesChange('longPause', $event)"
+              class="w-full h-full bg-transparent text-white text-center font-semibold text-lg focus:outline-none disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  </footer>
+</div>
+```
+
+```css file=src/app/app.css
+/* Estilos específicos complementares */
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+```

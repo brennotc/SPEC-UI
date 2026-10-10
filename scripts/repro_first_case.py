@@ -16,10 +16,10 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
-from specui.config import load_config  # noqa: E402
-from specui.harness import BrowserSession, StaticServer  # noqa: E402
-from specui.oracle import load_suite  # noqa: E402
-from specui.oracle.runner import run_case  # noqa: E402
+from specui.config import load_config
+from specui.harness import BrowserSession, StaticServer
+from specui.oracle import load_suite
+from specui.oracle.runner import run_case
 
 
 def main() -> int:

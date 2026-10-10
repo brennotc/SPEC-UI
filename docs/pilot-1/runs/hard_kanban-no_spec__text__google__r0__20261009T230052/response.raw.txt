@@ -1,0 +1,482 @@
+```ts file=src/app/app.ts
+import { Component, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { NgIconComponent, provideIcons } from '@ng-icons/core';
+import {
+  lucideList,
+  lucidePencil,
+  lucideTrash2,
+  lucidePlus,
+  lucideCheck,
+  lucideX,
+  lucideAlertCircle
+} from '@ng-icons/lucide';
+
+interface KanbanCard {
+  id: string;
+  text: string;
+  isEditing?: boolean;
+  editText?: string;
+}
+
+interface KanbanColumn {
+  id: string;
+  title: string;
+  headerBg: string;
+  bodyBg: string;
+  borderColor: string;
+  dropBorderColor: string;
+  cards: KanbanCard[];
+}
+
+interface DragSource {
+  colIndex: number;
+  cardIndex: number;
+  cardId: string;
+}
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, FormsModule, NgIconComponent],
+  viewProviders: [
+    provideIcons({
+      lucideList,
+      lucidePencil,
+      lucideTrash2,
+      lucidePlus,
+      lucideCheck,
+      lucideX,
+      lucideAlertCircle
+    })
+  ],
+  template: `
+    <div class="min-h-screen bg-slate-200 flex flex-col font-sans select-none">
+      <!-- Header verde com ícone de lista e escrito Kanban -->
+      <header class="bg-emerald-700 text-white px-6 py-4 shadow-md flex items-center justify-between shrink-0 z-10">
+        <div class="flex items-center gap-3">
+          <div class="bg-emerald-800/80 p-2 rounded-lg flex items-center justify-center">
+            <ng-icon name="lucideList" class="text-2xl text-emerald-100" />
+          </div>
+          <span class="text-2xl font-bold tracking-wide">Kanban</span>
+        </div>
+        <div class="text-xs md:text-sm text-emerald-100/90 hidden sm:flex items-center gap-2 bg-emerald-800/50 px-3 py-1.5 rounded-full border border-emerald-600">
+          <span>Regra de fluxo: 1 etapa para a direita &bull; livre para a esquerda</span>
+        </div>
+      </header>
+
+      <!-- Feedback de movimento proibido -->
+      @if (blockedNotice()) {
+        <div class="fixed top-16 right-6 z-50 bg-rose-600 text-white px-4 py-2.5 rounded-lg shadow-xl text-sm flex items-center gap-2 animate-bounce">
+          <ng-icon name="lucideAlertCircle" class="text-lg shrink-0" />
+          <span>{{ blockedNotice() }}</span>
+        </div>
+      }
+
+      <!-- Área principal com 4 colunas de mesma largura -->
+      <main class="flex-1 p-4 md:p-6 overflow-x-auto">
+        <div class="grid grid-cols-4 gap-4 md:gap-6 min-w-[960px] h-full max-w-[1800px] mx-auto items-start">
+          @for (col of columns; track col.id; let colIdx = $index) {
+            <section
+              class="flex flex-col rounded-2xl shadow-sm border transition-colors duration-200 min-h-[calc(100vh-120px)] pb-4 overflow-hidden"
+              [ngClass]="[
+                col.bodyBg,
+                col.borderColor,
+                currentDragOverCol() === colIdx && isDropAllowed(colIdx) ? 'ring-4 ' + col.dropBorderColor : '',
+                currentDragOverCol() === colIdx && !isDropAllowed(colIdx) ? 'ring-4 ring-rose-400 bg-rose-50/70' : ''
+              ]"
+              (dragover)="onColumnDragOver($event, colIdx)"
+              (dragleave)="onColumnDragLeave(colIdx)"
+              (drop)="onColumnDrop($event, colIdx)"
+            >
+              <!-- Header da Coluna com cor forte e título branco -->
+              <div
+                class="px-4 py-3.5 flex items-center justify-between shadow-sm shrink-0"
+                [ngClass]="col.headerBg"
+              >
+                <div class="flex items-center gap-2">
+                  <h2 class="text-white font-bold text-base md:text-lg tracking-wide uppercase">
+                    {{ col.title }}
+                  </h2>
+                </div>
+                <span class="bg-white/20 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full backdrop-blur-sm">
+                  {{ col.cards.length }}
+                </span>
+              </div>
+
+              <!-- Lista de Cards da Coluna -->
+              <div class="p-3 md:p-4 flex flex-col gap-4 flex-1 overflow-y-auto">
+                @for (card of col.cards; track card.id; let cardIdx = $index) {
+                  <!-- Card Quadrado off-white com bordas arredondadas -->
+                  <div
+                    draggable="true"
+                    (dragstart)="onDragStart($event, colIdx, cardIdx, card.id)"
+                    (dragend)="onDragEnd()"
+                    (dragover)="onCardDragOver($event, colIdx, cardIdx)"
+                    (drop)="onCardDrop($event, colIdx, cardIdx)"
+                    class="relative aspect-square bg-[#faf9f6] rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 border border-stone-200/80 flex flex-col justify-between group cursor-grab active:cursor-grabbing"
+                    [class.opacity-40]="dragSource?.cardId === card.id"
+                    [class.ring-2]="dragOverTargetCard() === card.id"
+                    [class.ring-indigo-500]="dragOverTargetCard() === card.id && isDropAllowed(colIdx)"
+                  >
+                    <!-- Canto superior direito: Ações do Card -->
+                    <div class="flex justify-end gap-1.5 self-end z-10">
+                      @if (!card.isEditing) {
+                        <!-- Ícone do lápis azul para editar -->
+                        <button
+                          type="button"
+                          (click)="startEditingCard(card)"
+                          title="Editar tarefa"
+                          class="p-1.5 rounded-lg text-blue-600 hover:text-blue-700 hover:bg-blue-50 transition-colors"
+                        >
+                          <ng-icon name="lucidePencil" class="text-base" />
+                        </button>
+                        <!-- Ícone da lixeira vermelha para deletar -->
+                        <button
+                          type="button"
+                          (click)="deleteCard(colIdx, cardIdx)"
+                          title="Excluir tarefa"
+                          class="p-1.5 rounded-lg text-rose-600 hover:text-rose-700 hover:bg-rose-50 transition-colors"
+                        >
+                          <ng-icon name="lucideTrash2" class="text-base" />
+                        </button>
+                      } @else {
+                        <!-- Confirmação e Cancelamento da edição -->
+                        <button
+                          type="button"
+                          (click)="saveCardEdit(card)"
+                          title="Confirmar edição"
+                          class="p-1.5 rounded-lg text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 transition-colors"
+                        >
+                          <ng-icon name="lucideCheck" class="text-lg font-bold" />
+                        </button>
+                        <button
+                          type="button"
+                          (click)="cancelCardEdit(card)"
+                          title="Cancelar edição"
+                          class="p-1.5 rounded-lg text-rose-600 hover:text-rose-700 hover:bg-rose-50 transition-colors"
+                        >
+                          <ng-icon name="lucideX" class="text-lg font-bold" />
+                        </button>
+                      }
+                    </div>
+
+                    <!-- Centro: Descrição da tarefa em preto ou Input de Edição -->
+                    <div class="my-auto flex items-center justify-center w-full px-2 text-center overflow-hidden">
+                      @if (!card.isEditing) {
+                        <p class="text-black font-medium text-sm md:text-base leading-snug break-words max-h-full overflow-y-auto w-full">
+                          {{ card.text }}
+                        </p>
+                      } @else {
+                        <textarea
+                          [(ngModel)]="card.editText"
+                          (keydown.enter)="$event.preventDefault(); saveCardEdit(card)"
+                          (keydown.escape)="cancelCardEdit(card)"
+                          class="w-full text-center text-sm md:text-base font-medium text-black bg-white rounded-lg p-2 border border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none h-24"
+                          placeholder="Descrição da tarefa"
+                          autofocus
+                        ></textarea>
+                      }
+                    </div>
+
+                    <!-- Rodapé sutil para manter equilíbrio e espaço visual quadrado -->
+                    <div class="h-3 shrink-0"></div>
+                  </div>
+                }
+
+                <!-- Card de Adição: Exclusivo da primeira coluna (Para Fazer) -->
+                @if (colIdx === 0) {
+                  @if (!isAddingCard()) {
+                    <!-- Estado Inicial Esmaecido com contorno dashed e ícone + cinza no centro -->
+                    <button
+                      type="button"
+                      (click)="enableAddCardMode()"
+                      title="Adicionar nova tarefa"
+                      class="relative aspect-square w-full rounded-2xl border-2 border-dashed border-neutral-300 bg-white/40 hover:bg-white/80 opacity-75 hover:opacity-100 transition-all duration-300 flex items-center justify-center cursor-pointer group hover:shadow-sm"
+                    >
+                      <div class="p-4 rounded-full bg-neutral-200/50 group-hover:bg-neutral-200 transition-colors">
+                        <ng-icon name="lucidePlus" class="text-4xl text-gray-400 group-hover:text-gray-600 transition-colors" />
+                      </div>
+                    </button>
+                  } @else {
+                    <!-- Estado de Edição Animado com cor dos restantes e controles de check e X -->
+                    <div
+                      class="relative aspect-square w-full bg-[#faf9f6] rounded-2xl p-4 shadow-md border border-stone-200 flex flex-col justify-between transition-all duration-300 animate-in fade-in zoom-in-95"
+                    >
+                      <!-- Canto superior direito com Check em verde e X em vermelho -->
+                      <div class="flex justify-end gap-1.5 self-end z-10">
+                        <button
+                          type="button"
+                          (click)="confirmAddCard()"
+                          title="Confirmar criação"
+                          class="p-1.5 rounded-lg text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 transition-colors"
+                        >
+                          <ng-icon name="lucideCheck" class="text-xl font-bold" />
+                        </button>
+                        <button
+                          type="button"
+                          (click)="cancelAddCard()"
+                          title="Cancelar"
+                          class="p-1.5 rounded-lg text-rose-600 hover:text-rose-700 hover:bg-rose-50 transition-colors"
+                        >
+                          <ng-icon name="lucideX" class="text-xl font-bold" />
+                        </button>
+                      </div>
+
+                      <!-- Centro com input para escrever a descrição -->
+                      <div class="my-auto flex items-center justify-center w-full px-2">
+                        <textarea
+                          [(ngModel)]="newCardText"
+                          (keydown.enter)="$event.preventDefault(); confirmAddCard()"
+                          (keydown.escape)="cancelAddCard()"
+                          placeholder="Digite a descrição da tarefa..."
+                          class="w-full text-center text-sm md:text-base font-medium text-black bg-white rounded-xl p-2.5 border border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none h-24 shadow-inner"
+                          autofocus
+                        ></textarea>
+                      </div>
+
+                      <div class="text-[11px] text-center text-neutral-400">
+                        Pressione Enter para salvar ou Esc para cancelar
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+            </section>
+          }
+        </div>
+      </main>
+    </div>
+  `
+})
+export class App {
+  isAddingCard = signal(false);
+  newCardText = '';
+
+  dragSource: DragSource | null = null;
+  currentDragOverCol = signal<number | null>(null);
+  dragOverTargetCard = signal<string | null>(null);
+  blockedNotice = signal<string | null>(null);
+  private noticeTimeout: any = null;
+
+  columns: KanbanColumn[] = [
+    {
+      id: 'todo',
+      title: 'Para Fazer',
+      headerBg: 'bg-blue-600',
+      bodyBg: 'bg-blue-50/80',
+      borderColor: 'border-blue-200',
+      dropBorderColor: 'ring-blue-400',
+      cards: [
+        { id: 'c1', text: 'Desenhar wireframes da nova landing page' },
+        { id: 'c2', text: 'Definir paleta de cores acessível' }
+      ]
+    },
+    {
+      id: 'in-progress',
+      title: 'Em Progresso',
+      headerBg: 'bg-orange-600',
+      bodyBg: 'bg-orange-50/80',
+      borderColor: 'border-orange-200',
+      dropBorderColor: 'ring-orange-400',
+      cards: [
+        { id: 'c3', text: 'Implementar autenticação JWT' }
+      ]
+    },
+    {
+      id: 'done',
+      title: 'Feito',
+      headerBg: 'bg-purple-600',
+      bodyBg: 'bg-purple-50/80',
+      borderColor: 'border-purple-200',
+      dropBorderColor: 'ring-purple-400',
+      cards: [
+        { id: 'c4', text: 'Configurar pipeline de CI/CD' }
+      ]
+    },
+    {
+      id: 'approved',
+      title: 'Aprovado',
+      headerBg: 'bg-emerald-600',
+      bodyBg: 'bg-emerald-50/80',
+      borderColor: 'border-emerald-200',
+      dropBorderColor: 'ring-emerald-400',
+      cards: [
+        { id: 'c5', text: 'Documentação da API v1 finalizada' }
+      ]
+    }
+  ];
+
+  // Adicionar Cartão na primeira coluna
+  enableAddCardMode() {
+    this.isAddingCard.set(true);
+    this.newCardText = '';
+  }
+
+  confirmAddCard() {
+    const text = this.newCardText.trim();
+    if (!text) {
+      this.showBlockedNotice('A descrição do card não pode estar vazia.');
+      return;
+    }
+
+    const newCard: KanbanCard = {
+      id: 'c_' + Date.now(),
+      text
+    };
+
+    this.columns[0].cards.push(newCard);
+    this.isAddingCard.set(false);
+    this.newCardText = '';
+  }
+
+  cancelAddCard() {
+    this.isAddingCard.set(false);
+    this.newCardText = '';
+  }
+
+  // Edição de Cartão Existente
+  startEditingCard(card: KanbanCard) {
+    card.isEditing = true;
+    card.editText = card.text;
+  }
+
+  saveCardEdit(card: KanbanCard) {
+    if (card.editText && card.editText.trim()) {
+      card.text = card.editText.trim();
+    }
+    card.isEditing = false;
+    card.editText = undefined;
+  }
+
+  cancelCardEdit(card: KanbanCard) {
+    card.isEditing = false;
+    card.editText = undefined;
+  }
+
+  deleteCard(colIndex: number, cardIndex: number) {
+    this.columns[colIndex].cards.splice(cardIndex, 1);
+  }
+
+  // Validação de Movimento do Drag and Drop
+  // - Mesma coluna: permitido (reordenar)
+  // - Para a direita: permitido apenas 1 etapa (colIndex + 1)
+  // - Para a esquerda: permitido quantos passos quiser (colIndex < sourceColIndex)
+  isDropAllowed(targetColIndex: number): boolean {
+    if (!this.dragSource) return false;
+    const sourceCol = this.dragSource.colIndex;
+
+    if (targetColIndex === sourceCol) {
+      return true;
+    }
+    if (targetColIndex === sourceCol + 1) {
+      return true;
+    }
+    if (targetColIndex < sourceCol) {
+      return true;
+    }
+
+    return false;
+  }
+
+  onDragStart(event: DragEvent, colIndex: number, cardIndex: number, cardId: string) {
+    this.dragSource = { colIndex, cardIndex, cardId };
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', cardId);
+    }
+  }
+
+  onDragEnd() {
+    this.dragSource = null;
+    this.currentDragOverCol.set(null);
+    this.dragOverTargetCard.set(null);
+  }
+
+  onColumnDragOver(event: DragEvent, colIndex: number) {
+    if (!this.dragSource) return;
+    event.preventDefault();
+
+    if (this.isDropAllowed(colIndex)) {
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = 'move';
+      }
+      this.currentDragOverCol.set(colIndex);
+    } else {
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = 'none';
+      }
+      this.currentDragOverCol.set(colIndex);
+    }
+  }
+
+  onColumnDragLeave(colIndex: number) {
+    if (this.currentDragOverCol() === colIndex) {
+      this.currentDragOverCol.set(null);
+    }
+  }
+
+  onCardDragOver(event: DragEvent, colIndex: number, cardIndex: number) {
+    if (!this.dragSource) return;
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.currentDragOverCol.set(colIndex);
+    const targetCard = this.columns[colIndex].cards[cardIndex];
+    if (targetCard && targetCard.id !== this.dragSource.cardId) {
+      this.dragOverTargetCard.set(targetCard.id);
+    }
+  }
+
+  onCardDrop(event: DragEvent, targetColIndex: number, targetCardIndex: number) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.executeMove(targetColIndex, targetCardIndex);
+  }
+
+  onColumnDrop(event: DragEvent, targetColIndex: number) {
+    event.preventDefault();
+    this.executeMove(targetColIndex, this.columns[targetColIndex].cards.length);
+  }
+
+  private executeMove(targetColIndex: number, targetCardIndex: number) {
+    if (!this.dragSource) return;
+
+    const sourceColIndex = this.dragSource.colIndex;
+    const sourceCardIndex = this.dragSource.cardIndex;
+
+    // Verificar se o movimento é permitido conforme as regras
+    if (!this.isDropAllowed(targetColIndex)) {
+      this.showBlockedNotice('Só é permitido avançar 1 etapa à direita por vez!');
+      this.onDragEnd();
+      return;
+    }
+
+    const [movedCard] = this.columns[sourceColIndex].cards.splice(sourceCardIndex, 1);
+
+    if (sourceColIndex === targetColIndex) {
+      // Reordenação na mesma coluna
+      let destinationIndex = targetCardIndex;
+      if (sourceCardIndex < targetCardIndex) {
+        destinationIndex = Math.max(0, targetCardIndex - 1);
+      }
+      this.columns[targetColIndex].cards.splice(destinationIndex, 0, movedCard);
+    } else {
+      // Movimento para outra coluna permitida
+      const adjustedIndex = Math.min(targetCardIndex, this.columns[targetColIndex].cards.length);
+      this.columns[targetColIndex].cards.splice(adjustedIndex, 0, movedCard);
+    }
+
+    this.onDragEnd();
+  }
+
+  private showBlockedNotice(msg: string) {
+    this.blockedNotice.set(msg);
+    if (this.noticeTimeout) clearTimeout(this.noticeTimeout);
+    this.noticeTimeout = setTimeout(() => {
+      this.blockedNotice.set(null);
+    }, 2800);
+  }
+}
+```

@@ -1,0 +1,512 @@
+```html file=src/app/app.html
+<div class="min-h-screen flex flex-col bg-[#d2cdcd] text-stone-900 font-sans select-none overflow-x-auto">
+  <!-- Header Verde Superior -->
+  <header class="h-13 bg-[#115b17] text-white flex items-center px-4 shadow-sm shrink-0">
+    <div class="flex items-center gap-2 font-medium text-xl tracking-wide">
+      <!-- Ícone customizado idêntico ao da imagem (lista com marcadores em chevron duplo) -->
+      <svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 6h2M9 6h11M4 12h2M9 12h11M4 18h2M9 18h11" />
+        <path d="M2.5 5.25L4 6.5l-1.5 1.25M2.5 11.25L4 12.5l-1.5 1.25M2.5 17.25L4 18.5l-1.5 1.25" />
+      </svg>
+      <span>Kanban</span>
+    </div>
+  </header>
+
+  <!-- Container Principal das 4 Colunas -->
+  <main class="flex-1 p-4 md:p-6 grid grid-cols-1 md:grid-cols-4 gap-4 max-w-[1700px] w-full mx-auto items-start">
+    @for (column of columns; track column.id; let colIdx = $index) {
+      <section 
+        class="flex flex-col rounded-xl overflow-hidden shadow-sm transition-all duration-200"
+        [style.background-color]="column.bgColor"
+        (dragover)="onDragOverColumn($event, colIdx)"
+        (dragleave)="onDragLeaveColumn($event, colIdx)"
+        (drop)="onDropColumn($event, colIdx)"
+        [class.ring-4]="dragOverColumnIndex === colIdx && isDropAllowed(draggedCardColIndex, colIdx)"
+        [class.ring-sky-500]="dragOverColumnIndex === colIdx && isDropAllowed(draggedCardColIndex, colIdx)"
+        [class.opacity-90]="dragOverColumnIndex === colIdx && !isDropAllowed(draggedCardColIndex, colIdx)"
+      >
+        <!-- Header da Coluna -->
+        <div 
+          class="py-2.5 px-4 text-center font-bold text-white text-lg tracking-wide rounded-t-xl"
+          [style.background-color]="column.headerColor"
+        >
+          {{ column.title }}
+        </div>
+
+        <!-- Conteúdo / Lista de Cards -->
+        <div class="p-3.5 flex flex-col gap-3 min-h-[500px]">
+          @for (card of column.cards; track card.id; let cardIdx = $index) {
+            <article
+              draggable="true"
+              (dragstart)="onDragStart($event, card, colIdx, cardIdx)"
+              (dragend)="onDragEnd()"
+              (dragover)="onDragOverCard($event, colIdx, cardIdx)"
+              (dragleave)="onDragLeaveCard()"
+              (drop)="onDropCard($event, colIdx, cardIdx)"
+              class="relative rounded-xl p-4 bg-[#dad4d3] shadow-xs cursor-grab active:cursor-grabbing transition-transform duration-150 hover:shadow-md min-h-[140px] flex flex-col justify-between"
+              [class.opacity-40]="draggedCard?.id === card.id"
+              [class.border-t-4]="dragOverCardId === card.id && dropPosition === 'before'"
+              [class.border-b-4]="dragOverCardId === card.id && dropPosition === 'after'"
+              [class.border-blue-600]="dragOverCardId === card.id"
+            >
+              <!-- Ações no canto superior direito do card -->
+              <div class="flex justify-end items-center gap-2 text-stone-600">
+                @if (editingCardId === card.id) {
+                  <!-- Botões durante edição -->
+                  <button 
+                    type="button"
+                    (click)="saveEditingCard(card)" 
+                    class="p-1 hover:scale-110 text-emerald-600 transition-transform cursor-pointer"
+                    title="Salvar alteração"
+                  >
+                    <ng-icon name="lucideCheck" class="text-lg"></ng-icon>
+                  </button>
+                  <button 
+                    type="button"
+                    (click)="cancelEditing()" 
+                    class="p-1 hover:scale-110 text-rose-600 transition-transform cursor-pointer"
+                    title="Cancelar alteração"
+                  >
+                    <ng-icon name="lucideX" class="text-lg"></ng-icon>
+                  </button>
+                } @else {
+                  <!-- Ícone lápis azul para editar -->
+                  <button 
+                    type="button"
+                    (click)="startEditing(card)"
+                    class="p-1 hover:scale-115 text-[#137ec2] transition-transform cursor-pointer" 
+                    title="Editar tarefa"
+                  >
+                    <ng-icon name="lucidePencil" class="text-base"></ng-icon>
+                  </button>
+                  <!-- Ícone lixeira vermelha para deletar -->
+                  <button 
+                    type="button"
+                    (click)="deleteCard(colIdx, card.id)"
+                    class="p-1 hover:scale-115 text-[#b91c1c] transition-transform cursor-pointer" 
+                    title="Excluir tarefa"
+                  >
+                    <ng-icon name="lucideTrash2" class="text-base"></ng-icon>
+                  </button>
+                }
+              </div>
+
+              <!-- Centro: Descrição da tarefa -->
+              <div class="my-auto py-2 text-center text-sm md:text-base leading-relaxed text-stone-900 font-normal">
+                @if (editingCardId === card.id) {
+                  <textarea
+                    #editInput
+                    [(ngModel)]="editingText"
+                    (keydown.enter)="$event.preventDefault(); saveEditingCard(card)"
+                    (keydown.escape)="cancelEditing()"
+                    class="w-full text-center bg-white/80 border border-stone-400 rounded-md p-2 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#137ec2] resize-none"
+                    rows="3"
+                  ></textarea>
+                } @else {
+                  <p class="whitespace-pre-line">{{ card.description }}</p>
+                }
+              </div>
+
+              <!-- Rodapé invisível para manter equilíbrio vertical como na imagem -->
+              <div class="h-2"></div>
+            </article>
+          }
+
+          <!-- Card de Adição no final da 1ª Coluna ("Para fazer") -->
+          @if (colIdx === 0) {
+            <div 
+              class="relative rounded-xl min-h-[140px] flex flex-col justify-between transition-all duration-300"
+              [class.bg-[#dad4d3]]="isAddingCard"
+              [class.shadow-xs]="isAddingCard"
+              [class.p-4]="isAddingCard"
+              [class.border-2]="!isAddingCard"
+              [class.border-dashed]="!isAddingCard"
+              [class.border-stone-500/60]="!isAddingCard"
+              [class.bg-stone-400/20]="!isAddingCard"
+              [class.hover:bg-stone-400/30]="!isAddingCard"
+              [class.cursor-pointer]="!isAddingCard"
+              (click)="!isAddingCard && openAddCard()"
+            >
+              @if (!isAddingCard) {
+                <!-- Estado Esmaecido com + no centro -->
+                <div class="w-full h-full flex-1 flex items-center justify-center py-10">
+                  <ng-icon name="lucidePlus" class="text-3xl text-stone-600 font-bold transition-transform hover:scale-125"></ng-icon>
+                </div>
+              } @else {
+                <!-- Estado Expandido / Editável -->
+                <!-- Canto superior direito: Check verde e X vermelho -->
+                <div class="flex justify-end items-center gap-2">
+                  <button 
+                    type="button"
+                    (click)="$event.stopPropagation(); confirmAddCard()"
+                    class="p-1 hover:scale-120 text-emerald-600 hover:text-emerald-700 transition-transform cursor-pointer"
+                    title="Adicionar cartão"
+                  >
+                    <ng-icon name="lucideCheck" class="text-xl stroke-[2.5]"></ng-icon>
+                  </button>
+                  <button 
+                    type="button"
+                    (click)="$event.stopPropagation(); cancelAddCard()"
+                    class="p-1 hover:scale-120 text-rose-600 hover:text-rose-700 transition-transform cursor-pointer"
+                    title="Cancelar"
+                  >
+                    <ng-icon name="lucideX" class="text-xl stroke-[2.5]"></ng-icon>
+                  </button>
+                </div>
+
+                <!-- Input no centro do cartão -->
+                <div class="my-auto py-2">
+                  <textarea
+                    #newCardInput
+                    [(ngModel)]="newCardText"
+                    (keydown.enter)="$event.preventDefault(); confirmAddCard()"
+                    (keydown.escape)="cancelAddCard()"
+                    placeholder="Digite a descrição da tarefa..."
+                    class="w-full text-center bg-white/85 border border-stone-400 rounded-md p-2 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-[#137ec2] resize-none"
+                    rows="3"
+                  ></textarea>
+                </div>
+
+                <div class="text-center text-[11px] text-stone-500">
+                  Pressione Enter para confirmar
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </section>
+    }
+  </main>
+</div>
+```
+
+```ts file=src/app/app.ts
+import { Component, ElementRef, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucidePencil, lucideTrash2, lucidePlus, lucideCheck, lucideX } from '@ng-icons/lucide';
+
+export interface KanbanCard {
+  id: string;
+  description: string;
+}
+
+export interface KanbanColumn {
+  id: string;
+  title: string;
+  headerColor: string;
+  bgColor: string;
+  cards: KanbanCard[];
+}
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, FormsModule, NgIcon],
+  viewProviders: [
+    provideIcons({
+      lucidePencil,
+      lucideTrash2,
+      lucidePlus,
+      lucideCheck,
+      lucideX
+    })
+  ],
+  templateUrl: './app.html',
+  styleUrls: ['./app.css']
+})
+export class App {
+  @ViewChild('newCardInput') newCardInputRef?: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('editInput') editInputRef?: ElementRef<HTMLTextAreaElement>;
+
+  // As 4 colunas solicitadas com as exatas cores da imagem
+  columns: KanbanColumn[] = [
+    {
+      id: 'todo',
+      title: 'Para fazer',
+      headerColor: '#137ec2', // Azul forte
+      bgColor: '#92b5ce',     // Azul tom fraco
+      cards: [
+        {
+          id: 'card-1',
+          description: 'Testes end-to-end para garantir o funcionamento do site'
+        },
+        {
+          id: 'card-2',
+          description: 'Testes unitários no backend para garantir respostas consistentes'
+        }
+      ]
+    },
+    {
+      id: 'in-progress',
+      title: 'Em Progresso',
+      headerColor: '#c9800e', // Laranja / Ocre forte
+      bgColor: '#cbb399',     // Ocre tom fraco
+      cards: [
+        {
+          id: 'card-3',
+          description: 'Testes end-to-end para garantir o funcionamento do site'
+        },
+        {
+          id: 'card-4',
+          description: 'Testes unitários no backend para garantir respostas consistentes'
+        }
+      ]
+    },
+    {
+      id: 'done',
+      title: 'Feito',
+      headerColor: '#4e12c4', // Roxo forte
+      bgColor: '#9c94c9',     // Roxo tom fraco
+      cards: [
+        {
+          id: 'card-5',
+          description: 'Testes end-to-end para garantir o funcionamento do site'
+        },
+        {
+          id: 'card-6',
+          description: 'Testes unitários no backend para garantir respostas consistentes'
+        }
+      ]
+    },
+    {
+      id: 'approved',
+      title: 'Aprovado',
+      headerColor: '#1b671a', // Verde forte
+      bgColor: '#c1cc9e',     // Verde tom fraco
+      cards: [
+        {
+          id: 'card-7',
+          description: 'Testes end-to-end para garantir o funcionamento do site'
+        },
+        {
+          id: 'card-8',
+          description: 'Testes unitários no backend para garantir respostas consistentes'
+        }
+      ]
+    }
+  ];
+
+  // Estado da adição de novo card na 1ª coluna
+  isAddingCard = false;
+  newCardText = '';
+
+  // Estado de edição de card existente
+  editingCardId: string | null = null;
+  editingText = '';
+
+  // Estado do Drag and Drop
+  draggedCard: KanbanCard | null = null;
+  draggedCardColIndex: number = -1;
+  draggedCardIndex: number = -1;
+
+  dragOverColumnIndex: number | null = null;
+  dragOverCardId: string | null = null;
+  dropPosition: 'before' | 'after' | null = null;
+
+  // Regra de transição do Kanban:
+  // - Apenas 1 coluna à direita (ex: 0 -> 1, 1 -> 2, 2 -> 3)
+  // - Quantas colunas quiser para a esquerda (ex: 3 -> 0, 3 -> 1, 2 -> 0, etc.)
+  // - Mesma coluna (reordenação) é permitida
+  isDropAllowed(fromColIndex: number, toColIndex: number): boolean {
+    if (fromColIndex < 0 || toColIndex < 0) return false;
+    if (fromColIndex === toColIndex) return true; // Reordenação na mesma coluna
+    if (toColIndex < fromColIndex) return true;   // Para a esquerda: quantos passos quiser
+    if (toColIndex === fromColIndex + 1) return true; // Para a direita: APENAS 1 etapa
+    return false; // Pular mais de 1 etapa à direita é proibido
+  }
+
+  // --- Handlers de Adição de Cartão ---
+  openAddCard(): void {
+    this.isAddingCard = true;
+    this.newCardText = '';
+    setTimeout(() => {
+      this.newCardInputRef?.nativeElement.focus();
+    }, 50);
+  }
+
+  confirmAddCard(): void {
+    const trimmed = this.newCardText.trim();
+    if (trimmed) {
+      this.columns[0].cards.push({
+        id: 'card-' + Date.now(),
+        description: trimmed
+      });
+    }
+    this.cancelAddCard();
+  }
+
+  cancelAddCard(): void {
+    this.isAddingCard = false;
+    this.newCardText = '';
+  }
+
+  // --- Handlers de Edição ---
+  startEditing(card: KanbanCard): void {
+    this.editingCardId = card.id;
+    this.editingText = card.description;
+    setTimeout(() => {
+      this.editInputRef?.nativeElement.focus();
+    }, 50);
+  }
+
+  saveEditingCard(card: KanbanCard): void {
+    const trimmed = this.editingText.trim();
+    if (trimmed) {
+      card.description = trimmed;
+    }
+    this.editingCardId = null;
+    this.editingText = '';
+  }
+
+  cancelEditing(): void {
+    this.editingCardId = null;
+    this.editingText = '';
+  }
+
+  // --- Handlers de Exclusão ---
+  deleteCard(colIndex: number, cardId: string): void {
+    this.columns[colIndex].cards = this.columns[colIndex].cards.filter(c => c.id !== cardId);
+  }
+
+  // --- Drag and Drop Handlers ---
+  onDragStart(event: DragEvent, card: KanbanCard, colIndex: number, cardIndex: number): void {
+    this.draggedCard = card;
+    this.draggedCardColIndex = colIndex;
+    this.draggedCardIndex = cardIndex;
+
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', card.id);
+    }
+  }
+
+  onDragEnd(): void {
+    this.draggedCard = null;
+    this.draggedCardColIndex = -1;
+    this.draggedCardIndex = -1;
+    this.dragOverColumnIndex = null;
+    this.dragOverCardId = null;
+    this.dropPosition = null;
+  }
+
+  onDragOverColumn(event: DragEvent, colIndex: number): void {
+    if (!this.draggedCard) return;
+
+    if (this.isDropAllowed(this.draggedCardColIndex, colIndex)) {
+      event.preventDefault();
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = 'move';
+      }
+      this.dragOverColumnIndex = colIndex;
+    } else {
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = 'none';
+      }
+    }
+  }
+
+  onDragLeaveColumn(event: DragEvent, colIndex: number): void {
+    if (this.dragOverColumnIndex === colIndex) {
+      this.dragOverColumnIndex = null;
+    }
+  }
+
+  onDropColumn(event: DragEvent, targetColIndex: number): void {
+    event.preventDefault();
+    if (!this.draggedCard || !this.isDropAllowed(this.draggedCardColIndex, targetColIndex)) {
+      this.onDragEnd();
+      return;
+    }
+
+    const sourceColIndex = this.draggedCardColIndex;
+    const card = this.draggedCard;
+
+    // Se o drop não foi em cima de um card específico, adiciona no final da coluna
+    if (!this.dragOverCardId) {
+      // Remove da coluna original
+      this.columns[sourceColIndex].cards = this.columns[sourceColIndex].cards.filter(c => c.id !== card.id);
+      // Adiciona na coluna destino
+      this.columns[targetColIndex].cards.push(card);
+    }
+
+    this.onDragEnd();
+  }
+
+  onDragOverCard(event: DragEvent, colIndex: number, cardIndex: number): void {
+    if (!this.draggedCard) return;
+
+    if (this.isDropAllowed(this.draggedCardColIndex, colIndex)) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const targetCard = this.columns[colIndex].cards[cardIndex];
+      this.dragOverCardId = targetCard.id;
+      this.dragOverColumnIndex = colIndex;
+
+      const targetEl = event.currentTarget as HTMLElement;
+      const rect = targetEl.getBoundingClientRect();
+      const relativeY = event.clientY - rect.top;
+
+      this.dropPosition = relativeY > rect.height / 2 ? 'after' : 'before';
+    }
+  }
+
+  onDragLeaveCard(): void {
+    this.dragOverCardId = null;
+    this.dropPosition = null;
+  }
+
+  onDropCard(event: DragEvent, targetColIndex: number, targetCardIndex: number): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!this.draggedCard || !this.isDropAllowed(this.draggedCardColIndex, targetColIndex)) {
+      this.onDragEnd();
+      return;
+    }
+
+    const sourceColIndex = this.draggedCardColIndex;
+    const card = this.draggedCard;
+    const currentCardList = this.columns[sourceColIndex].cards;
+    const fromIndex = currentCardList.findIndex(c => c.id === card.id);
+
+    // Remove do local original
+    if (fromIndex !== -1) {
+      currentCardList.splice(fromIndex, 1);
+    }
+
+    // Calcula índice de destino
+    const targetCardList = this.columns[targetColIndex].cards;
+    let insertIndex = targetCardIndex;
+
+    // Se movendo na mesma coluna e o item original estava antes do alvo
+    if (sourceColIndex === targetColIndex && fromIndex < targetCardIndex) {
+      insertIndex = targetCardIndex;
+    }
+
+    if (this.dropPosition === 'after') {
+      insertIndex++;
+    }
+
+    // Garante limites válidos
+    insertIndex = Math.max(0, Math.min(insertIndex, targetCardList.length));
+    targetCardList.splice(insertIndex, 0, card);
+
+    this.onDragEnd();
+  }
+}
+```
+
+```css file=src/app/app.css
+/* Ajustes finos de animação e tipografia */
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+textarea {
+  font-family: inherit;
+}
+```

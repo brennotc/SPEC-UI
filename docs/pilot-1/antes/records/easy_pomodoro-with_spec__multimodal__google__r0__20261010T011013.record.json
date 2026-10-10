@@ -1,0 +1,498 @@
+{
+  "run_id": "easy_pomodoro-with_spec__multimodal__google__r0__20261010T011013",
+  "run_kind": "pilot",
+  "cell_key": "easy_pomodoro/with_spec|multimodal|google:gemini-3.8-flash|r0",
+  "task_id": "easy_pomodoro",
+  "difficulty": "easy",
+  "prompt_kind": "with_spec",
+  "prompt_id": "easy_pomodoro/with_spec",
+  "material_shown": null,
+  "modality": "multimodal",
+  "rep": 0,
+  "created_at": "2026-10-10T01:10:13+00:00",
+  "provider": "google",
+  "model_id_requested": "gemini-3.8-flash",
+  "model_id_returned": "gemini-3.8-flash",
+  "temperature": null,
+  "thinking": {
+    "thinking_budget": 8192
+  },
+  "seed": 20260101,
+  "prompt_sha256": "e27a1372ea5aee8bbb554b8132d285e83f4a47de312dff603b5810b7b9a037c1",
+  "image_sha256": "d31bf1895365b188ea5e26cc0099043e1a11907450b216af136259e512d2fc3a",
+  "envelope_sha256": "39799bf1cb796bc406f839863d96a53bfd49f96651ed119058d01f47fab003b7",
+  "envelope_version": "2",
+  "scaffold_version": "1.0.0",
+  "scaffold_lock_sha256": "784afb58f71e45c4990c69fce629efa36d90dc42535e13c8b841b7b993e7a20b",
+  "scaffold_tree_sha256": "f79ded644d270fbfedd50ffddbe1933a77a4ee2ebdbad5325ca03f633305631f",
+  "repo_commit": "b820545+dirty",
+  "config_sha256": "6822b0bda4671902a996130050ca63e69f349313fbf1b369b378f6ab423db2cb",
+  "oracle_suite_tag": null,
+  "oracle_tree_hash": null,
+  "oracle_content_sha256": "d41f9cdc10518ae4da6c37177b748be1077eb2309e2388d8d6619403f19923b6",
+  "oracle_dirty": true,
+  "pending_sha256": "480c46ccde6e37c012f012375713aa582be1e19f71debd611f94e00a21f8af06",
+  "mention_patterns_sha256": "fa945d0a404ef14d7a98df754c092e713324805861a89bf4dfaff8cc7e38b4ad",
+  "playwright_version": "1.62.0",
+  "browser_version": "151.0.7922.34",
+  "paths": {
+    "run_dir": "runs/easy_pomodoro-with_spec__multimodal__google__r0__20261010T011013",
+    "response_raw": "response.raw.txt",
+    "generated_dir": "generated",
+    "dist_dir": "dist",
+    "build_stdout": "build.stdout.txt",
+    "build_stderr": "build.stderr.txt",
+    "screenshot": "screenshot.png",
+    "dom_blocks": "dom_blocks.json",
+    "css_snapshot": "css_snapshot.json",
+    "axe": "axe.json"
+  },
+  "exec": {
+    "format_ok": true,
+    "files_accepted": 3,
+    "files_rejected": [],
+    "contract_ok": true,
+    "build_ok": true,
+    "build_timed_out": false,
+    "build_time_s": 8.34,
+    "build_stdout_path": "build.stdout.txt",
+    "build_stderr_path": "build.stderr.txt",
+    "build_error_messages": [],
+    "render_ok": true,
+    "executable": true
+  },
+  "design2code": {
+    "n_ref_blocks": 9,
+    "n_gen_blocks": 9,
+    "n_matched": 8,
+    "n_merged_ref": 0,
+    "n_merged_gen": 0,
+    "block_match": 0.9673948078171883,
+    "text": 0.8928571428571428,
+    "position": 0.9594590277777778,
+    "color": 1.0,
+    "clip_inpainted": 0.9265052566822822,
+    "reference_source": "figma",
+    "pairs_path": "pairs.json"
+  },
+  "embeddings": {
+    "ves_dinov2": 0.9629350513854793,
+    "mae": 0.025686293840408325,
+    "ssim": 0.9083127975463867,
+    "dinov2_model": "facebook/dinov2-base",
+    "clip_model": "openai/clip-vit-base-patch32"
+  },
+  "code_quality": {
+    "rur": 0.75,
+    "apr": 0.0,
+    "fu": 0.7777777777777778,
+    "bc": 0.25,
+    "str": 0.42857142857142855,
+    "avu": 0.14479638009049775,
+    "isr": 0.0,
+    "ccr": null,
+    "counts": {
+      "layout_declarations_relative": 27,
+      "layout_declarations_total": 36,
+      "positioned_absolute": 0,
+      "positioned_total": 1,
+      "containers_flex_grid": 14,
+      "containers_total": 18,
+      "bands_covered": 1,
+      "bands_total": 4,
+      "semantic_elements": 12,
+      "elements_total": 28,
+      "arbitrary_classes": 32,
+      "classes_total": 221,
+      "inline_style_elements": 0,
+      "custom_classes_reused": 0,
+      "custom_classes_used": 0,
+      "custom_classes_dead": 0,
+      "classes_undefined": 0
+    }
+  },
+  "functional": {
+    "accuracy_a": 1.0,
+    "accuracy_a_restricted": 1.0,
+    "accuracy_b": 0.9545454545454546,
+    "cases": [
+      {
+        "case_id": "E-A-01",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 5,
+        "n_total": 5,
+        "requirements": [
+          "E-04",
+          "E-05",
+          "E-06"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 2079
+      },
+      {
+        "case_id": "E-A-02",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 4,
+        "n_total": 4,
+        "requirements": [
+          "E-02"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 375
+      },
+      {
+        "case_id": "E-A-03",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 2,
+        "n_total": 2,
+        "requirements": [
+          "E-01"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 296
+      },
+      {
+        "case_id": "E-A-04",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 4,
+        "n_total": 4,
+        "requirements": [
+          "E-03",
+          "E-04"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 375
+      },
+      {
+        "case_id": "E-A-05",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 4,
+        "n_total": 4,
+        "requirements": [
+          "E-05",
+          "E-06"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 469
+      },
+      {
+        "case_id": "E-A-06",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 7,
+        "n_total": 7,
+        "requirements": [
+          "E-06"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 485
+      },
+      {
+        "case_id": "E-A-07",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 7,
+        "n_total": 7,
+        "requirements": [
+          "E-07",
+          "E-08"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 390
+      },
+      {
+        "case_id": "E-A-08",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 5,
+        "n_total": 5,
+        "requirements": [
+          "E-09"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1219
+      },
+      {
+        "case_id": "E-A-09",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 7,
+        "n_total": 7,
+        "requirements": [
+          "E-12"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 781
+      },
+      {
+        "case_id": "E-A-10",
+        "level": "A",
+        "outcome": "PENDING",
+        "blocked": false,
+        "n_pass": 0,
+        "n_total": 0,
+        "requirements": [
+          "E-10"
+        ],
+        "failed": [],
+        "error": "pendente: PD-E2",
+        "duration_ms": 0
+      },
+      {
+        "case_id": "E-A-11",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 3,
+        "n_total": 3,
+        "requirements": [
+          "E-03"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 344
+      },
+      {
+        "case_id": "E-B-01",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 5,
+        "n_total": 5,
+        "requirements": [
+          "E-S01"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 359
+      },
+      {
+        "case_id": "E-B-02",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 5,
+        "n_total": 5,
+        "requirements": [
+          "E-S02"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 344
+      },
+      {
+        "case_id": "E-B-03",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 3,
+        "n_total": 3,
+        "requirements": [
+          "E-S03"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 297
+      },
+      {
+        "case_id": "E-B-04",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 7,
+        "n_total": 7,
+        "requirements": [
+          "E-S04"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 375
+      },
+      {
+        "case_id": "E-B-05",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 5,
+        "n_total": 5,
+        "requirements": [
+          "E-S05",
+          "E-S10"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 375
+      },
+      {
+        "case_id": "E-B-06",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 4,
+        "n_total": 4,
+        "requirements": [
+          "E-S06"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 375
+      },
+      {
+        "case_id": "E-B-07",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 4,
+        "n_total": 4,
+        "requirements": [
+          "E-S07"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 344
+      },
+      {
+        "case_id": "E-B-08",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 3,
+        "n_total": 3,
+        "requirements": [
+          "E-S08"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 297
+      },
+      {
+        "case_id": "E-B-09",
+        "level": "B",
+        "outcome": "PARTIAL",
+        "blocked": false,
+        "n_pass": 13,
+        "n_total": 14,
+        "requirements": [
+          "E-S09"
+        ],
+        "failed": [
+          "Foco Total alinhado à logo (±24 px) :: x=128 logo=48"
+        ],
+        "error": null,
+        "duration_ms": 765
+      },
+      {
+        "case_id": "E-B-10",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 5,
+        "n_total": 5,
+        "requirements": [
+          "E-S03"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 406
+      },
+      {
+        "case_id": "E-B-11",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 7,
+        "n_total": 7,
+        "requirements": [
+          "E-S11"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 485
+      }
+    ],
+    "suite_sha256": "d41f9cdc10518ae4da6c37177b748be1077eb2309e2388d8d6619403f19923b6",
+    "suite_git_tag": null
+  },
+  "technical": {
+    "console_errors": [],
+    "console_error_count": 0,
+    "blocked_requests": [],
+    "axe_violations": {
+      "critical": 0,
+      "serious": 1,
+      "moderate": 0,
+      "minor": 0
+    },
+    "axe_report_path": "axe.json"
+  },
+  "input_spec": {
+    "chars": 5988,
+    "words": 926,
+    "constraint_density": {
+      "hex": 5,
+      "px": 5,
+      "defaults": 7,
+      "aria": 1,
+      "html_tags": 8
+    },
+    "requirement_coverage": {
+      "total": 1.0,
+      "by_info_source": {
+        "image": 1.0,
+        "behavior": 1.0,
+        "spec_only": 1.0
+      }
+    },
+    "structure_markers": {
+      "lists": 57,
+      "numbering": 5,
+      "headings": 6,
+      "code_blocks": 1,
+      "type_decls": 3
+    },
+    "image_references": 0,
+    "stack_requests": {
+      "react": false,
+      "vue": false,
+      "svelte": false,
+      "next": false,
+      "html_puro": false,
+      "bootstrap": false,
+      "jquery": false,
+      "outros": []
+    },
+    "envelope_chars": 2173
+  },
+  "cost": {
+    "prompt_tokens": 2422,
+    "input_tokens": 3515,
+    "output_tokens": 4276,
+    "thoughts_tokens": 9704,
+    "latency_ms": 97375
+  },
+  "status": "done",
+  "errors": []
+}

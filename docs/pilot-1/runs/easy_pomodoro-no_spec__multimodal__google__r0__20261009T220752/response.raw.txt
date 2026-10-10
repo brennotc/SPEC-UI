@@ -1,0 +1,454 @@
+```ts file=src/app/app.ts
+import { Component, OnDestroy, OnInit, signal, computed, effect } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+type PomodoroMode = 'focus' | 'shortBreak' | 'longBreak';
+
+interface ModeConfig {
+  id: PomodoroMode;
+  name: string;
+  defaultMinutes: number;
+  colorHex: string;
+  bgHex: string;
+  badgeBg: string;
+}
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './app.html',
+  styleUrls: ['./app.css']
+})
+export class App implements OnInit, OnDestroy {
+  // Configurações dos modos
+  readonly modes: Record<PomodoroMode, ModeConfig> = {
+    focus: {
+      id: 'focus',
+      name: 'Foco Total',
+      defaultMinutes: 25,
+      colorHex: '#df5353',
+      bgHex: '#df5353',
+      badgeBg: 'bg-[#d84a4a]'
+    },
+    shortBreak: {
+      id: 'shortBreak',
+      name: 'Pausa Curta',
+      defaultMinutes: 5,
+      colorHex: '#4d8055',
+      bgHex: '#4d8055',
+      badgeBg: 'bg-[#477e52]'
+    },
+    longBreak: {
+      id: 'longBreak',
+      name: 'Pausa Longa',
+      defaultMinutes: 15,
+      colorHex: '#487ecb',
+      bgHex: '#487ecb',
+      badgeBg: 'bg-[#437bc6]'
+    }
+  };
+
+  // Estado atual
+  currentMode = signal<PomodoroMode>('focus');
+  isRunning = signal<boolean>(false);
+  timeRemaining = signal<number>(25 * 60);
+
+  // Valores de tempo configurados em minutos para cada modo
+  focusMinutes = signal<number>(25);
+  shortBreakMinutes = signal<number>(5);
+  longBreakMinutes = signal<number>(15);
+
+  // Strings para edição no input
+  focusInput = signal<string>('25:00');
+  shortBreakInput = signal<string>('05:00');
+  longBreakInput = signal<string>('15:00');
+
+  private timerInterval: any = null;
+  private audioCtx: AudioContext | null = null;
+
+  currentModeConfig = computed(() => this.modes[this.currentMode()]);
+
+  formattedTime = computed(() => {
+    const totalSeconds = this.timeRemaining();
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${this.padZero(minutes)}:${this.padZero(seconds)}`;
+  });
+
+  ngOnInit(): void {
+    this.updateTitle();
+  }
+
+  ngOnDestroy(): void {
+    this.stopTimer();
+    if (this.audioCtx) {
+      this.audioCtx.close().catch(() => {});
+    }
+  }
+
+  private padZero(num: number): string {
+    return num.toString().padStart(2, '0');
+  }
+
+  togglePlayPause(): void {
+    if (this.isRunning()) {
+      this.pauseTimer();
+    } else {
+      this.startTimer();
+    }
+  }
+
+  startTimer(): void {
+    if (this.isRunning()) return;
+
+    this.initAudio();
+    this.isRunning.set(true);
+
+    this.timerInterval = setInterval(() => {
+      const current = this.timeRemaining();
+      if (current > 1) {
+        this.timeRemaining.set(current - 1);
+        this.updateTitle();
+      } else {
+        this.timeRemaining.set(0);
+        this.updateTitle();
+        this.onTimerFinished();
+      }
+    }, 1000);
+  }
+
+  pauseTimer(): void {
+    this.isRunning.set(false);
+    this.stopTimer();
+  }
+
+  private stopTimer(): void {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+  }
+
+  setMode(mode: PomodoroMode): void {
+    if (this.currentMode() === mode) return;
+
+    this.pauseTimer();
+    this.currentMode.set(mode);
+
+    let targetMinutes = 25;
+    if (mode === 'focus') targetMinutes = this.focusMinutes();
+    else if (mode === 'shortBreak') targetMinutes = this.shortBreakMinutes();
+    else if (mode === 'longBreak') targetMinutes = this.longBreakMinutes();
+
+    this.timeRemaining.set(targetMinutes * 60);
+    this.updateTitle();
+  }
+
+  private onTimerFinished(): void {
+    this.pauseTimer();
+    this.playBeepSound();
+
+    // Notificação ou transição para o próximo modo
+    setTimeout(() => {
+      if (this.currentMode() === 'focus') {
+        this.setMode('shortBreak');
+      } else {
+        this.setMode('focus');
+      }
+    }, 1200);
+  }
+
+  // Manipulação dos inputs editáveis
+  onInputChange(mode: PomodoroMode, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    let val = input.value.trim();
+
+    // Parse minutos:segundos ou apenas minutos
+    let minutes = 0;
+    let seconds = 0;
+
+    if (val.includes(':')) {
+      const parts = val.split(':');
+      minutes = parseInt(parts[0], 10) || 0;
+      seconds = parseInt(parts[1], 10) || 0;
+    } else {
+      minutes = parseInt(val, 10) || 0;
+      seconds = 0;
+    }
+
+    // Limites de segurança
+    if (minutes < 1 && seconds < 5) {
+      minutes = 1;
+      seconds = 0;
+    }
+    if (minutes > 120) {
+      minutes = 120;
+      seconds = 0;
+    }
+
+    const totalSec = minutes * 60 + seconds;
+    const formatted = `${this.padZero(minutes)}:${this.padZero(seconds)}`;
+
+    if (mode === 'focus') {
+      this.focusMinutes.set(minutes);
+      this.focusInput.set(formatted);
+      if (this.currentMode() === 'focus' && !this.isRunning()) {
+        this.timeRemaining.set(totalSec);
+      }
+    } else if (mode === 'shortBreak') {
+      this.shortBreakMinutes.set(minutes);
+      this.shortBreakInput.set(formatted);
+      if (this.currentMode() === 'shortBreak' && !this.isRunning()) {
+        this.timeRemaining.set(totalSec);
+      }
+    } else if (mode === 'longBreak') {
+      this.longBreakMinutes.set(minutes);
+      this.longBreakInput.set(formatted);
+      if (this.currentMode() === 'longBreak' && !this.isRunning()) {
+        this.timeRemaining.set(totalSec);
+      }
+    }
+    this.updateTitle();
+  }
+
+  private updateTitle(): void {
+    const status = this.isRunning() ? '▶ ' : '';
+    document.title = `${status}${this.formattedTime()} - Pomodoro`;
+  }
+
+  private initAudio(): void {
+    if (!this.audioCtx) {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioContextClass) {
+        this.audioCtx = new AudioContextClass();
+      }
+    }
+    if (this.audioCtx && this.audioCtx.state === 'suspended') {
+      this.audioCtx.resume();
+    }
+  }
+
+  // Alerta sonoro agradável usando Web Audio API sem dependências externas
+  playBeepSound(): void {
+    try {
+      this.initAudio();
+      if (!this.audioCtx) return;
+
+      const now = this.audioCtx.currentTime;
+
+      // Tríade suave de sinos/bips (880Hz, 1174Hz, 1760Hz)
+      const freqs = [880, 1174.66, 1760];
+      freqs.forEach((freq, idx) => {
+        const osc = this.audioCtx!.createOscillator();
+        const gain = this.audioCtx!.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.16);
+
+        gain.gain.setValueAtTime(0.001, now + idx * 0.16);
+        gain.gain.exponentialRampToValueAtTime(0.3, now + idx * 0.16 + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.16 + 0.45);
+
+        osc.connect(gain);
+        gain.connect(this.audioCtx!.destination);
+
+        osc.start(now + idx * 0.16);
+        osc.stop(now + idx * 0.16 + 0.5);
+      });
+    } catch {
+      // Ignora erro caso navegador bloqueie som sem interação
+    }
+  }
+}
+```
+
+```html file=src/app/app.html
+<main class="flex flex-col min-h-screen bg-white font-['Inter',sans-serif] select-none">
+  <!-- Header Vermelho Claro com Logo de Tomate e Pomodoro -->
+  <header class="w-full bg-[#df5656] text-white px-6 py-3.5 flex items-center shadow-xs">
+    <div class="flex items-center gap-2.5">
+      <!-- Ícone Tomate SVG -->
+      <svg
+        class="w-7 h-7 text-white fill-none stroke-current"
+        viewBox="0 0 24 24"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <!-- Caule e Folhas do Tomate -->
+        <path d="M12 2v3" stroke-width="2" />
+        <path d="M12 5c-1.5-1.8-3.5-2.2-5-1.5 1 1.2 1.8 2.2 2.5 3" />
+        <path d="M12 5c1.5-1.8 3.5-2.2 5-1.5-1 1.2-1.8 2.2-2.5 3" />
+        <path d="M9.5 6.5C10.5 7 11.2 7 12 7c.8 0 1.5 0 2.5-.5" />
+        <!-- Corpo do Tomate arredondado -->
+        <circle cx="12" cy="13.5" r="7.8" fill="rgba(255,255,255,0.15)" stroke-width="1.8" />
+      </svg>
+      <span class="text-[22px] font-normal tracking-tight">Pomodoro</span>
+    </div>
+  </header>
+
+  <!-- Área Central com o Círculo Pomodoro -->
+  <section class="flex-1 flex flex-col items-center justify-center p-6">
+    <!-- Círculo Grande do Timer -->
+    <div
+      class="relative flex flex-col items-center justify-center rounded-full transition-colors duration-500 timer-circle"
+      [style.border-color]="currentModeConfig().colorHex"
+    >
+      <!-- Nome do período atual -->
+      <span class="text-[#595959] text-xl md:text-2xl font-normal mb-1 tracking-wide">
+        {{ currentModeConfig().name }}
+      </span>
+
+      <!-- Dígitos do tempo regressivo -->
+      <div class="text-[#404040] text-7xl md:text-[92px] font-light tracking-tight my-1 tabular-nums font-timer">
+        {{ formattedTime() }}
+      </div>
+
+      <!-- Botão Play / Pause redondo no centro inferior do círculo -->
+      <button
+        type="button"
+        (click)="togglePlayPause()"
+        [attr.aria-label]="isRunning() ? 'Pausar Pomodoro' : 'Iniciar Pomodoro'"
+        title="{{ isRunning() ? 'Pausar' : 'Iniciar' }}"
+        class="mt-2 w-12 h-12 rounded-full bg-[#525252] hover:bg-[#3f3f3f] active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer shadow-sm focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
+      >
+        <!-- Se estiver rodando mostra Pause, se parado mostra Play, ou o ícone combinado play/pause -->
+        <svg
+          *ngIf="!isRunning()"
+          class="w-6 h-6 ml-0.5"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path d="M8 5v14l11-7z" />
+        </svg>
+
+        <svg
+          *ngIf="isRunning()"
+          class="w-5 h-5"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+        </svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- Divisória Cinza -->
+  <div class="w-full border-t border-gray-300"></div>
+
+  <!-- Barra de Configuração e Modos no Rodapé -->
+  <footer class="w-full px-6 py-5">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      
+      <!-- Foco Total -->
+      <div class="flex items-center gap-2 cursor-pointer" (click)="setMode('focus')">
+        <span
+          class="text-base transition-colors"
+          [ngClass]="currentMode() === 'focus' ? 'text-[#df5353] font-semibold' : 'text-[#df5353] font-normal'"
+        >
+          Foco Total:
+        </span>
+        <div class="relative">
+          <input
+            type="text"
+            [value]="focusInput()"
+            (change)="onInputChange('focus', $event)"
+            (keyup.enter)="onInputChange('focus', $event)"
+            title="Clique para editar o tempo de Foco (ex: 25:00)"
+            class="w-[72px] text-center font-medium text-white text-sm py-1 px-2 rounded-md bg-[#df5353] hover:opacity-90 focus:ring-2 focus:ring-red-400 focus:outline-hidden transition-all shadow-xs"
+          />
+        </div>
+      </div>
+
+      <!-- Pausa Curta -->
+      <div class="flex items-center gap-2 cursor-pointer" (click)="setMode('shortBreak')">
+        <span
+          class="text-base transition-colors"
+          [ngClass]="currentMode() === 'shortBreak' ? 'text-[#4d8055] font-semibold' : 'text-[#4d8055] font-normal'"
+        >
+          Pausa Curta:
+        </span>
+        <div class="relative">
+          <input
+            type="text"
+            [value]="shortBreakInput()"
+            (change)="onInputChange('shortBreak', $event)"
+            (keyup.enter)="onInputChange('shortBreak', $event)"
+            title="Clique para editar o tempo de Pausa Curta (ex: 05:00)"
+            class="w-[72px] text-center font-medium text-white text-sm py-1 px-2 rounded-md bg-[#4d8055] hover:opacity-90 focus:ring-2 focus:ring-green-400 focus:outline-hidden transition-all shadow-xs"
+          />
+        </div>
+      </div>
+
+      <!-- Pausa Longa -->
+      <div class="flex items-center gap-2 cursor-pointer" (click)="setMode('longBreak')">
+        <span
+          class="text-base transition-colors"
+          [ngClass]="currentMode() === 'longBreak' ? 'text-[#487ecb] font-semibold' : 'text-[#487ecb] font-normal'"
+        >
+          Pausa Longa:
+        </span>
+        <div class="relative">
+          <input
+            type="text"
+            [value]="longBreakInput()"
+            (change)="onInputChange('longBreak', $event)"
+            (keyup.enter)="onInputChange('longBreak', $event)"
+            title="Clique para editar o tempo de Pausa Longa (ex: 15:00)"
+            class="w-[72px] text-center font-medium text-white text-sm py-1 px-2 rounded-md bg-[#487ecb] hover:opacity-90 focus:ring-2 focus:ring-blue-400 focus:outline-hidden transition-all shadow-xs"
+          />
+        </div>
+      </div>
+
+    </div>
+  </footer>
+</main>
+```
+
+```css file=src/app/app.css
+.timer-circle {
+  width: min(85vw, 360px);
+  height: min(85vw, 360px);
+  border-width: 9px;
+  border-style: solid;
+  background-color: #ffffff;
+}
+
+@media (min-width: 640px) {
+  .timer-circle {
+    width: 380px;
+    height: 380px;
+    border-width: 10px;
+  }
+}
+
+.font-timer {
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+input {
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+}
+```
+
+```css file=src/styles.css
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #ffffff;
+  color: #1f2937;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+```

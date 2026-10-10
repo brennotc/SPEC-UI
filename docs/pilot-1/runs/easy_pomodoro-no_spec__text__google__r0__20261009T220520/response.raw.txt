@@ -1,0 +1,564 @@
+```ts file=src/app/app.ts
+import { Component, signal, computed, effect, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { NgIconComponent, provideIcons } from '@ng-icons/core';
+import { 
+  lucidePlay, 
+  lucidePause, 
+  lucideRotateCcw, 
+  lucideSkipForward,
+  lucideVolume2,
+  lucideVolumeX
+} from '@ng-icons/lucide';
+
+export type PomodoroMode = 'focus' | 'shortBreak' | 'longBreak';
+
+interface ModeConfig {
+  name: string;
+  defaultMinutes: number;
+  colorBorder: string;
+  colorText: string;
+  colorBadgeBg: string;
+  colorBadgeText: string;
+  colorBtn: string;
+  ringProgressColor: string;
+}
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, FormsModule, NgIconComponent],
+  viewProviders: [
+    provideIcons({
+      lucidePlay,
+      lucidePause,
+      lucideRotateCcw,
+      lucideSkipForward,
+      lucideVolume2,
+      lucideVolumeX
+    })
+  ],
+  template: `
+    <div class="min-h-screen bg-white text-gray-800 flex flex-col font-sans select-none">
+      <!-- Header Vermelho Claro -->
+      <header class="w-full bg-red-100 border-b border-red-200 px-6 py-4 shadow-sm flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <!-- Logo de Tomate em SVG -->
+          <div class="relative w-9 h-9 flex items-center justify-center filter drop-shadow-sm transition-transform hover:scale-105">
+            <svg viewBox="0 0 64 64" class="w-full h-full fill-current" aria-label="Logo de Tomate">
+              <!-- Folha/Caule -->
+              <path d="M32 4 C30 11, 24 14, 20 14 C25 15, 29 18, 30 22 C33 17, 39 16, 44 14 C39 13, 34 10, 32 4 Z" fill="#2E7D32"/>
+              <path d="M31 15 C33 9, 37 5, 41 2" stroke="#1B5E20" stroke-width="3" stroke-linecap="round" fill="none"/>
+              <!-- Corpo do Tomate -->
+              <path d="M32 20 C20 17 6 25 6 41 C6 54 20 62 32 62 C44 62 58 54 58 41 C58 25 44 17 32 20 Z" fill="#E53935"/>
+              <!-- Brilho no Tomate -->
+              <ellipse cx="23" cy="32" rx="6" ry="11" transform="rotate(-30 23 32)" fill="#FF8A80" opacity="0.6"/>
+            </svg>
+          </div>
+          <span class="text-2xl font-black tracking-tight text-red-900">Pomodoro</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Toggle Som -->
+          <button 
+            type="button"
+            (click)="soundEnabled.set(!soundEnabled())"
+            [title]="soundEnabled() ? 'Desativar aviso sonoro' : 'Ativar aviso sonoro'"
+            class="px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors border"
+            [ngClass]="soundEnabled() ? 'bg-red-50 text-red-700 border-red-200 hover:bg-red-200' : 'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200'"
+          >
+            <ng-icon [name]="soundEnabled() ? 'lucideVolume2' : 'lucideVolumeX'" class="text-base"></ng-icon>
+            <span class="hidden sm:inline">{{ soundEnabled() ? 'Som Ligado' : 'Mudo' }}</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Conteúdo Central -->
+      <main class="flex-1 flex flex-col items-center justify-center p-6 max-w-4xl w-full mx-auto">
+        <!-- Navegação / Seletor de Modo -->
+        <div class="flex items-center justify-center gap-2 mb-8 bg-gray-50 p-1.5 rounded-full border border-gray-200 shadow-xs">
+          <button
+            type="button"
+            (click)="setMode('focus')"
+            class="px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200"
+            [ngClass]="currentMode() === 'focus' ? 'bg-red-600 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
+          >
+            Foco Total
+          </button>
+          <button
+            type="button"
+            (click)="setMode('shortBreak')"
+            class="px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200"
+            [ngClass]="currentMode() === 'shortBreak' ? 'bg-emerald-600 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
+          >
+            Pausa Curta
+          </button>
+          <button
+            type="button"
+            (click)="setMode('longBreak')"
+            class="px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200"
+            [ngClass]="currentMode() === 'longBreak' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
+          >
+            Pausa Longa
+          </button>
+        </div>
+
+        <!-- Círculo Central do Pomodoro -->
+        <div class="relative flex items-center justify-center my-2">
+          <!-- Círculo com borda que troca de cor -->
+          <div 
+            class="w-72 h-72 sm:w-88 sm:h-88 rounded-full border-8 flex flex-col items-center justify-center relative transition-all duration-500 shadow-xl bg-white"
+            [ngClass]="modeConfig[currentMode()].colorBorder"
+          >
+            <!-- SVG Progress Ring sutil para feedback visual contínuo -->
+            <svg class="absolute inset-0 w-full h-full -rotate-90 pointer-events-none p-1">
+              <circle
+                cx="50%"
+                cy="50%"
+                r="46%"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                class="opacity-20 text-current"
+                [ngClass]="modeConfig[currentMode()].colorText"
+              />
+              <circle
+                cx="50%"
+                cy="50%"
+                r="46%"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="5"
+                stroke-linecap="round"
+                class="transition-all duration-300"
+                [ngClass]="modeConfig[currentMode()].colorText"
+                [style.strokeDasharray]="circumference"
+                [style.strokeDashoffset]="progressOffset()"
+              />
+            </svg>
+
+            <!-- Nome do Período -->
+            <span 
+              class="text-sm sm:text-base font-bold uppercase tracking-wider mb-2 px-3 py-1 rounded-full border transition-colors"
+              [ngClass]="[modeConfig[currentMode()].colorBadgeBg, modeConfig[currentMode()].colorBadgeText]"
+            >
+              {{ modeConfig[currentMode()].name }}
+            </span>
+
+            <!-- Tempo Formatado 00:00 -->
+            <div class="text-6xl sm:text-7xl font-mono font-bold tracking-tight text-gray-800 my-1 tabular-nums">
+              {{ formattedTime() }}
+            </div>
+
+            <!-- Botão Redondo de Play/Pause -->
+            <div class="flex items-center gap-3 mt-4">
+              <button
+                type="button"
+                (click)="toggleTimer()"
+                [attr.aria-label]="isRunning() ? 'Pausar timer' : 'Iniciar timer'"
+                class="w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center text-white shadow-lg transition-transform active:scale-95 hover:scale-105 focus:outline-hidden focus:ring-4 focus:ring-opacity-40"
+                [ngClass]="[modeConfig[currentMode()].colorBtn]"
+              >
+                <ng-icon 
+                  [name]="isRunning() ? 'lucidePause' : 'lucidePlay'" 
+                  class="text-2xl sm:text-3xl"
+                  [class.ml-1]="!isRunning()"
+                ></ng-icon>
+              </button>
+
+              <!-- Botão de Reiniciar etapa atual -->
+              <button
+                type="button"
+                (click)="resetCurrentTimer()"
+                title="Reiniciar este timer"
+                class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
+              >
+                <ng-icon name="lucideRotateCcw" class="text-lg"></ng-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Indicador de Status / Ciclo -->
+        <p class="text-xs sm:text-sm text-gray-500 mt-6 tracking-wide text-center">
+          <span *ngIf="isRunning()" class="inline-flex items-center gap-1.5 text-emerald-600 font-medium">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            Timer em andamento...
+          </span>
+          <span *ngIf="!isRunning() && timeLeft() > 0" class="text-gray-500">
+            Clique no botão de play para iniciar
+          </span>
+          <span *ngIf="timeLeft() === 0" class="font-semibold text-red-600">
+            Tempo concluído!
+          </span>
+        </p>
+
+        <!-- Linha divisória em cinza -->
+        <hr class="w-full max-w-2xl border-t border-gray-300 my-10" />
+
+        <!-- Configuração dos tempos com Inputs -->
+        <section class="w-full max-w-2xl">
+          <h2 class="text-center text-sm font-semibold text-gray-500 uppercase tracking-wider mb-6">
+            Configurar duração dos períodos (minutos)
+          </h2>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <!-- Foco Total Input -->
+            <div 
+              class="flex flex-col items-center bg-white border rounded-xl p-4 transition-all duration-200 shadow-2xs"
+              [ngClass]="currentMode() === 'focus' ? 'border-red-400 ring-2 ring-red-100' : 'border-gray-200 hover:border-gray-300'"
+            >
+              <label for="focusInput" class="text-sm font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-600 inline-block"></span>
+                Foco Total
+              </label>
+              <span class="text-xs text-gray-400 mb-2">Padrão: 25 min</span>
+              <div class="flex items-center w-full justify-center">
+                <input
+                  id="focusInput"
+                  type="number"
+                  min="1"
+                  max="120"
+                  step="1"
+                  [ngModel]="focusMinutes()"
+                  (ngModelChange)="onMinutesChange('focus', $event)"
+                  class="w-24 text-center text-2xl font-mono font-bold py-1.5 px-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-hidden focus:border-red-500 focus:bg-white focus:ring-2 focus:ring-red-200 transition-colors"
+                />
+                <span class="ml-2 text-sm text-gray-500 font-medium">min</span>
+              </div>
+            </div>
+
+            <!-- Pausa Curta Input -->
+            <div 
+              class="flex flex-col items-center bg-white border rounded-xl p-4 transition-all duration-200 shadow-2xs"
+              [ngClass]="currentMode() === 'shortBreak' ? 'border-emerald-400 ring-2 ring-emerald-100' : 'border-gray-200 hover:border-gray-300'"
+            >
+              <label for="shortBreakInput" class="text-sm font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block"></span>
+                Pausa Curta
+              </label>
+              <span class="text-xs text-gray-400 mb-2">Padrão: 5 min</span>
+              <div class="flex items-center w-full justify-center">
+                <input
+                  id="shortBreakInput"
+                  type="number"
+                  min="1"
+                  max="60"
+                  step="1"
+                  [ngModel]="shortBreakMinutes()"
+                  (ngModelChange)="onMinutesChange('shortBreak', $event)"
+                  class="w-24 text-center text-2xl font-mono font-bold py-1.5 px-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-hidden focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-200 transition-colors"
+                />
+                <span class="ml-2 text-sm text-gray-500 font-medium">min</span>
+              </div>
+            </div>
+
+            <!-- Pausa Longa Input -->
+            <div 
+              class="flex flex-col items-center bg-white border rounded-xl p-4 transition-all duration-200 shadow-2xs"
+              [ngClass]="currentMode() === 'longBreak' ? 'border-blue-400 ring-2 ring-blue-100' : 'border-gray-200 hover:border-gray-300'"
+            >
+              <label for="longBreakInput" class="text-sm font-bold text-gray-700 mb-1 flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span>
+                Pausa Longa
+              </label>
+              <span class="text-xs text-gray-400 mb-2">Padrão: 15 min</span>
+              <div class="flex items-center w-full justify-center">
+                <input
+                  id="longBreakInput"
+                  type="number"
+                  min="1"
+                  max="90"
+                  step="1"
+                  [ngModel]="longBreakMinutes()"
+                  (ngModelChange)="onMinutesChange('longBreak', $event)"
+                  class="w-24 text-center text-2xl font-mono font-bold py-1.5 px-2 bg-gray-50 border border-gray-300 rounded-lg focus:outline-hidden focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200 transition-colors"
+                />
+                <span class="ml-2 text-sm text-gray-500 font-medium">min</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 flex justify-center">
+            <button
+              type="button"
+              (click)="resetDefaults()"
+              class="text-xs text-gray-400 hover:text-gray-700 underline transition-colors cursor-pointer"
+            >
+              Restaurar tempos padrão (25 / 5 / 15 min)
+            </button>
+          </div>
+        </section>
+      </main>
+
+      <footer class="py-4 text-center text-xs text-gray-400 border-t border-gray-100">
+        Pomodoro Timer • Mantenha o foco e equilibre suas pausas
+      </footer>
+    </div>
+  `
+})
+export class App implements OnDestroy {
+  // Configurações visuais por modo
+  readonly modeConfig: Record<PomodoroMode, ModeConfig> = {
+    focus: {
+      name: 'Foco Total',
+      defaultMinutes: 25,
+      colorBorder: 'border-red-600',
+      colorText: 'text-red-600',
+      colorBadgeBg: 'bg-red-50 border-red-200',
+      colorBadgeText: 'text-red-700',
+      colorBtn: 'bg-red-600 hover:bg-red-700 focus:ring-red-300',
+      ringProgressColor: '#dc2626'
+    },
+    shortBreak: {
+      name: 'Pausa Curta',
+      defaultMinutes: 5,
+      colorBorder: 'border-emerald-600',
+      colorText: 'text-emerald-600',
+      colorBadgeBg: 'bg-emerald-50 border-emerald-200',
+      colorBadgeText: 'text-emerald-700',
+      colorBtn: 'bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-300',
+      ringProgressColor: '#059669'
+    },
+    longBreak: {
+      name: 'Pausa Longa',
+      defaultMinutes: 15,
+      colorBorder: 'border-blue-600',
+      colorText: 'text-blue-600',
+      colorBadgeBg: 'bg-blue-50 border-blue-200',
+      colorBadgeText: 'text-blue-700',
+      colorBtn: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-300',
+      ringProgressColor: '#2563eb'
+    }
+  };
+
+  // Raio do círculo SVG: r=46%, perímetro normalizado 2 * PI * 130 ~ 816
+  readonly circumference = 2 * Math.PI * 135;
+
+  // Estados com Signals
+  readonly currentMode = signal<PomodoroMode>('focus');
+  readonly focusMinutes = signal<number>(25);
+  readonly shortBreakMinutes = signal<number>(5);
+  readonly longBreakMinutes = signal<number>(15);
+
+  readonly timeLeft = signal<number>(25 * 60);
+  readonly totalDuration = signal<number>(25 * 60);
+  readonly isRunning = signal<boolean>(false);
+  readonly soundEnabled = signal<boolean>(true);
+
+  private timerInterval: any = null;
+  private audioCtx: AudioContext | null = null;
+
+  // Formatação do tempo: 00:00
+  readonly formattedTime = computed(() => {
+    const seconds = this.timeLeft();
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${pad(mins)}:${pad(secs)}`;
+  });
+
+  // Cálculo da barra de progresso circular
+  readonly progressOffset = computed(() => {
+    const total = this.totalDuration();
+    if (total <= 0) return 0;
+    const current = this.timeLeft();
+    const progress = (total - current) / total;
+    return this.circumference * (1 - progress);
+  });
+
+  constructor() {
+    // Sincroniza o título da aba com o tempo restante
+    effect(() => {
+      const time = this.formattedTime();
+      const modeName = this.modeConfig[this.currentMode()].name;
+      if (typeof document !== 'undefined') {
+        document.title = `${time} - ${modeName} | Pomodoro`;
+      }
+    });
+  }
+
+  setMode(mode: PomodoroMode): void {
+    if (this.currentMode() === mode) return;
+
+    this.pauseTimer();
+    this.currentMode.set(mode);
+    const mins = this.getMinutesForMode(mode);
+    this.totalDuration.set(mins * 60);
+    this.timeLeft.set(mins * 60);
+  }
+
+  toggleTimer(): void {
+    if (this.isRunning()) {
+      this.pauseTimer();
+    } else {
+      if (this.timeLeft() <= 0) {
+        // Se já estava zerado, reinicia
+        const mins = this.getMinutesForMode(this.currentMode());
+        this.timeLeft.set(mins * 60);
+      }
+      this.startTimer();
+    }
+  }
+
+  startTimer(): void {
+    this.isRunning.set(true);
+    this.clearInterval();
+
+    this.timerInterval = setInterval(() => {
+      const current = this.timeLeft();
+      if (current > 1) {
+        this.timeLeft.set(current - 1);
+      } else if (current === 1) {
+        this.timeLeft.set(0);
+        this.onTimerCompleted();
+      }
+    }, 1000);
+  }
+
+  pauseTimer(): void {
+    this.isRunning.set(false);
+    this.clearInterval();
+  }
+
+  resetCurrentTimer(): void {
+    this.pauseTimer();
+    const mins = this.getMinutesForMode(this.currentMode());
+    this.totalDuration.set(mins * 60);
+    this.timeLeft.set(mins * 60);
+  }
+
+  onMinutesChange(mode: PomodoroMode, rawValue: any): void {
+    let value = parseInt(rawValue, 10);
+    if (isNaN(value) || value < 1) {
+      value = 1;
+    } else if (value > 180) {
+      value = 180;
+    }
+
+    if (mode === 'focus') this.focusMinutes.set(value);
+    if (mode === 'shortBreak') this.shortBreakMinutes.set(value);
+    if (mode === 'longBreak') this.longBreakMinutes.set(value);
+
+    // Se o modo editado for o modo atual e não estiver rodando, atualiza o tempo restante
+    if (this.currentMode() === mode && !this.isRunning()) {
+      this.totalDuration.set(value * 60);
+      this.timeLeft.set(value * 60);
+    }
+  }
+
+  resetDefaults(): void {
+    this.pauseTimer();
+    this.focusMinutes.set(25);
+    this.shortBreakMinutes.set(5);
+    this.longBreakMinutes.set(15);
+    const mins = this.getMinutesForMode(this.currentMode());
+    this.totalDuration.set(mins * 60);
+    this.timeLeft.set(mins * 60);
+  }
+
+  private getMinutesForMode(mode: PomodoroMode): number {
+    switch (mode) {
+      case 'focus': return this.focusMinutes();
+      case 'shortBreak': return this.shortBreakMinutes();
+      case 'longBreak': return this.longBreakMinutes();
+    }
+  }
+
+  private onTimerCompleted(): void {
+    this.pauseTimer();
+    this.playChime();
+  }
+
+  /**
+   * Som de aviso agradável e harmônico construído puramente com Web Audio API.
+   * Não precisa de arquivos externos de áudio e funciona offline.
+   */
+  private playChime(): void {
+    if (!this.soundEnabled()) return;
+
+    try {
+      const AudioCtxClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtxClass) return;
+
+      if (!this.audioCtx || this.audioCtx.state === 'closed') {
+        this.audioCtx = new AudioCtxClass();
+      }
+
+      if (this.audioCtx.state === 'suspended') {
+        this.audioCtx.resume();
+      }
+
+      const now = this.audioCtx.currentTime;
+
+      // Acorde suave de sino (E5, G#5, B5, E6)
+      const notes = [659.25, 830.61, 987.77, 1318.51];
+
+      notes.forEach((freq, idx) => {
+        if (!this.audioCtx) return;
+        const osc = this.audioCtx.createOscillator();
+        const gain = this.audioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+
+        gain.gain.setValueAtTime(0, now + idx * 0.12);
+        gain.gain.linearRampToValueAtTime(0.25, now + idx * 0.12 + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.12 + 1.2);
+
+        osc.connect(gain);
+        gain.connect(this.audioCtx.destination);
+
+        osc.start(now + idx * 0.12);
+        osc.stop(now + idx * 0.12 + 1.25);
+      });
+    } catch (e) {
+      console.warn('Erro ao reproduzir áudio com Web Audio API:', e);
+    }
+  }
+
+  private clearInterval(): void {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.clearInterval();
+    if (this.audioCtx && this.audioCtx.state !== 'closed') {
+      this.audioCtx.close().catch(() => {});
+    }
+  }
+}
+```
+
+```css file=src/styles.css
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/inter/700.css';
+@import '@fontsource/inter/800.css';
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff;
+  color: #1f2937;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Remover flechas padrão de inputs do tipo number em browsers modernos */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+```

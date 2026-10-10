@@ -1,0 +1,394 @@
+```css file=src/styles.css
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #ffffff;
+    color: #716c6c;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+  }
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+```
+
+```ts file=src/app/app.ts
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { NgIconComponent, provideIcons } from '@ng-icons/core';
+import { lucideApple, lucidePlay, lucidePause } from '@ng-icons/lucide';
+
+export type PomodoroMode = 'focus' | 'shortPause' | 'longPause';
+
+export interface TimerConfig {
+  focus: number;       // tempo em segundos. Padrão 1500 (25 minutos)
+  shortPause: number;  // tempo em segundos. Padrão 300 (5 minutos)
+  longPause: number;   // tempo em segundos. Padrão 900 (15 minutos)
+}
+
+export interface PomodoroState {
+  currentMode: PomodoroMode;
+  timeRemainingInSeconds: number;
+  isRunning: boolean;
+  config: TimerConfig;
+}
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, FormsModule, NgIconComponent],
+  viewProviders: [
+    provideIcons({
+      lucideApple,
+      lucidePlay,
+      lucidePause
+    })
+  ],
+  templateUrl: './app.html'
+})
+export class App implements OnInit, OnDestroy {
+  public state: PomodoroState = {
+    currentMode: 'focus',
+    timeRemainingInSeconds: 1500,
+    isRunning: false,
+    config: {
+      focus: 1500,
+      shortPause: 300,
+      longPause: 900
+    }
+  };
+
+  private timerIntervalId: ReturnType<typeof setInterval> | null = null;
+  private beepAudioDataUri = '';
+
+  public readonly modeDetails: Record<PomodoroMode, { title: string; color: string; bgClass: string; borderClass: string; textClass: string }> = {
+    focus: {
+      title: 'Foco Total',
+      color: '#D74747',
+      bgClass: 'bg-[#D74747]',
+      borderClass: 'border-[#D74747]',
+      textClass: 'text-[#D74747]'
+    },
+    shortPause: {
+      title: 'Pausa Curta',
+      color: '#658B5C',
+      bgClass: 'bg-[#658B5C]',
+      borderClass: 'border-[#658B5C]',
+      textClass: 'text-[#658B5C]'
+    },
+    longPause: {
+      title: 'Pausa Longa',
+      color: '#5684D9',
+      bgClass: 'bg-[#5684D9]',
+      borderClass: 'border-[#5684D9]',
+      textClass: 'text-[#5684D9]'
+    }
+  };
+
+  ngOnInit(): void {
+    this.beepAudioDataUri = this.generateBeepDataUri();
+  }
+
+  ngOnDestroy(): void {
+    this.stopTimer();
+  }
+
+  get currentBorderColor(): string {
+    return this.modeDetails[this.state.currentMode].borderClass;
+  }
+
+  get currentModeTitle(): string {
+    return this.modeDetails[this.state.currentMode].title;
+  }
+
+  get formattedTime(): string {
+    const mins = Math.floor(this.state.timeRemainingInSeconds / 60);
+    const secs = this.state.timeRemainingInSeconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  get focusMinutes(): number {
+    return Math.floor(this.state.config.focus / 60);
+  }
+
+  get shortPauseMinutes(): number {
+    return Math.floor(this.state.config.shortPause / 60);
+  }
+
+  get longPauseMinutes(): number {
+    return Math.floor(this.state.config.longPause / 60);
+  }
+
+  public toggleTimer(): void {
+    if (this.state.isRunning) {
+      this.pauseTimer();
+    } else {
+      this.startTimer();
+    }
+  }
+
+  public startTimer(): void {
+    if (this.state.timeRemainingInSeconds <= 0) {
+      this.state.timeRemainingInSeconds = this.state.config[this.state.currentMode];
+    }
+
+    this.state.isRunning = true;
+
+    if (this.timerIntervalId) {
+      clearInterval(this.timerIntervalId);
+    }
+
+    this.timerIntervalId = setInterval(() => {
+      if (this.state.timeRemainingInSeconds > 0) {
+        this.state.timeRemainingInSeconds--;
+
+        if (this.state.timeRemainingInSeconds === 0) {
+          this.pauseTimer();
+          this.playAlertSound();
+        }
+      } else {
+        this.pauseTimer();
+      }
+    }, 1000);
+  }
+
+  public pauseTimer(): void {
+    this.state.isRunning = false;
+    this.stopTimer();
+  }
+
+  private stopTimer(): void {
+    if (this.timerIntervalId) {
+      clearInterval(this.timerIntervalId);
+      this.timerIntervalId = null;
+    }
+  }
+
+  public setMode(mode: PomodoroMode): void {
+    if (this.state.currentMode === mode) {
+      return;
+    }
+
+    this.pauseTimer();
+    this.state.currentMode = mode;
+    this.state.timeRemainingInSeconds = this.state.config[mode];
+  }
+
+  public onMinutesConfigChange(mode: PomodoroMode, event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    const minutesValue = Number(inputElement.value);
+
+    if (!isNaN(minutesValue) && minutesValue > 0) {
+      const newSeconds = Math.floor(minutesValue * 60);
+      this.state.config[mode] = newSeconds;
+
+      if (this.state.currentMode === mode && !this.state.isRunning) {
+        this.state.timeRemainingInSeconds = newSeconds;
+      }
+    }
+  }
+
+  private playAlertSound(): void {
+    try {
+      const audio = new Audio(this.beepAudioDataUri);
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Fallback silencioso se o navegador bloquear autoplay
+        });
+      }
+    } catch {
+      // Fallback
+    }
+  }
+
+  private generateBeepDataUri(): string {
+    const sampleRate = 8000;
+    const duration = 0.5;
+    const numSamples = Math.floor(sampleRate * duration);
+    const buffer = new ArrayBuffer(44 + numSamples);
+    const view = new DataView(buffer);
+
+    // RIFF
+    view.setUint32(0, 0x52494646, false);
+    view.setUint32(4, 36 + numSamples, true);
+    view.setUint32(8, 0x57415645, false);
+
+    // fmt
+    view.setUint32(12, 0x666d7420, false);
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, 1, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate, true);
+    view.setUint16(32, 1, true);
+    view.setUint16(34, 8, true);
+
+    // data
+    view.setUint32(36, 0x64617461, false);
+    view.setUint32(40, numSamples, true);
+
+    const freq = 880;
+    for (let i = 0; i < numSamples; i++) {
+      const t = i / sampleRate;
+      const sample = Math.sin(2 * Math.PI * freq * t);
+      view.setUint8(44 + i, Math.floor((sample + 1) * 127.5));
+    }
+
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    for (let i = 0; i < bytes.length; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+
+    return 'data:audio/wav;base64,' + btoa(binary);
+  }
+}
+```
+
+```html file=src/app/app.html
+<div class="flex flex-col min-h-screen bg-white text-[#716C6C]">
+  <!-- Header fixo no topo com 70px de altura e fundo #E56060 -->
+  <header class="w-full h-[70px] bg-[#E56060] flex items-center px-8 md:px-12 select-none shrink-0 shadow-xs">
+    <div class="flex items-center gap-2 text-white">
+      <ng-icon name="lucideApple" class="text-3xl fill-transparent stroke-[2.2] w-7 h-7" aria-hidden="true"></ng-icon>
+      <h1 class="text-2xl font-normal tracking-wide text-white">Pomodoro</h1>
+    </div>
+  </header>
+
+  <!-- Área Central Principal com o Timer dentro do círculo de 503px X 503px -->
+  <main class="flex-1 flex items-center justify-center py-6 px-4">
+    <div
+      class="relative flex flex-col items-center justify-center w-[330px] h-[330px] sm:w-[420px] sm:h-[420px] md:w-[503px] md:h-[503px] rounded-full border-[9px] bg-transparent transition-colors duration-300"
+      [ngClass]="currentBorderColor"
+    >
+      <!-- Nome do período no topo (fonte tamanho 36) -->
+      <span class="text-2xl sm:text-3xl md:text-[36px] font-normal text-[#716C6C] mb-2 sm:mb-4 select-none">
+        {{ currentModeTitle }}
+      </span>
+
+      <!-- Tempo formatado MM:SS no meio (fonte tamanho 128) -->
+      <span class="text-6xl sm:text-8xl md:text-[128px] font-normal leading-none tracking-tight text-[#716C6C] my-1 sm:my-2 select-none font-mono tabular-nums">
+        {{ formattedTime }}
+      </span>
+
+      <!-- Botão circular de Play/Pause na parte inferior interna do círculo -->
+      <button
+        type="button"
+        (click)="toggleTimer()"
+        [attr.aria-label]="state.isRunning ? 'Pausar temporizador' : 'Iniciar temporizador'"
+        class="mt-4 sm:mt-6 w-14 h-14 rounded-full bg-[#716C6C] hover:bg-[#5f5a5a] active:scale-95 text-white flex items-center justify-center shadow-md transition focus:outline-none focus:ring-4 focus:ring-gray-300 cursor-pointer"
+      >
+        <div class="flex items-center justify-center gap-0.5 text-white">
+          <ng-icon name="lucidePlay" class="w-4 h-4 fill-white text-white translate-x-[-1px]"></ng-icon>
+          <ng-icon name="lucidePause" class="w-4 h-4 fill-white text-white"></ng-icon>
+        </div>
+      </button>
+    </div>
+  </main>
+
+  <!-- Rodapé / Configurações com linha divisória horizontal #716C6C -->
+  <footer class="w-full shrink-0 pb-6 pt-0">
+    <hr class="border-t border-[#716C6C]/40 w-full mb-6" />
+
+    <section class="max-w-7xl mx-auto px-8 md:px-12 flex flex-col md:flex-row items-center justify-between gap-4 select-none">
+      <!-- Foco Total no canto inferior esquerdo alinhado com o logo -->
+      <div
+        class="flex items-center gap-2 cursor-pointer transition-opacity"
+        [ngClass]="{ 'opacity-100 font-medium': state.currentMode === 'focus', 'opacity-85 hover:opacity-100': state.currentMode !== 'focus' }"
+        (click)="setMode('focus')"
+      >
+        <label
+          for="focus-input"
+          class="text-lg md:text-xl text-[#D74747] cursor-pointer"
+        >
+          Foco Total:
+        </label>
+        <div class="w-[89px] h-[40px] bg-[#D74747] rounded-lg flex items-center justify-center shadow-xs">
+          <input
+            id="focus-input"
+            type="number"
+            min="1"
+            max="120"
+            [value]="focusMinutes"
+            [disabled]="state.isRunning"
+            (input)="onMinutesConfigChange('focus', $event)"
+            (click)="$event.stopPropagation()"
+            class="w-full h-full bg-transparent text-white text-center text-lg md:text-xl font-medium focus:outline-none focus:ring-2 focus:ring-white/80 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed"
+          />
+        </div>
+      </div>
+
+      <!-- Pausa Curta alinhada horizontalmente ao centro -->
+      <div
+        class="flex items-center gap-2 cursor-pointer transition-opacity"
+        [ngClass]="{ 'opacity-100 font-medium': state.currentMode === 'shortPause', 'opacity-85 hover:opacity-100': state.currentMode !== 'shortPause' }"
+        (click)="setMode('shortPause')"
+      >
+        <label
+          for="short-pause-input"
+          class="text-lg md:text-xl text-[#658B5C] cursor-pointer"
+        >
+          Pausa Curta:
+        </label>
+        <div class="w-[89px] h-[40px] bg-[#658B5C] rounded-lg flex items-center justify-center shadow-xs">
+          <input
+            id="short-pause-input"
+            type="number"
+            min="1"
+            max="60"
+            [value]="shortPauseMinutes"
+            [disabled]="state.isRunning"
+            (input)="onMinutesConfigChange('shortPause', $event)"
+            (click)="$event.stopPropagation()"
+            class="w-full h-full bg-transparent text-white text-center text-lg md:text-xl font-medium focus:outline-none focus:ring-2 focus:ring-white/80 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed"
+          />
+        </div>
+      </div>
+
+      <!-- Pausa Longa alinhada horizontalmente no lado oposto (canto direito) -->
+      <div
+        class="flex items-center gap-2 cursor-pointer transition-opacity"
+        [ngClass]="{ 'opacity-100 font-medium': state.currentMode === 'longPause', 'opacity-85 hover:opacity-100': state.currentMode !== 'longPause' }"
+        (click)="setMode('longPause')"
+      >
+        <label
+          for="long-pause-input"
+          class="text-lg md:text-xl text-[#5684D9] cursor-pointer"
+        >
+          Pausa Longa:
+        </label>
+        <div class="w-[89px] h-[40px] bg-[#5684D9] rounded-lg flex items-center justify-center shadow-xs">
+          <input
+            id="long-pause-input"
+            type="number"
+            min="1"
+            max="90"
+            [value]="longPauseMinutes"
+            [disabled]="state.isRunning"
+            (input)="onMinutesConfigChange('longPause', $event)"
+            (click)="$event.stopPropagation()"
+            class="w-full h-full bg-transparent text-white text-center text-lg md:text-xl font-medium focus:outline-none focus:ring-2 focus:ring-white/80 rounded-lg disabled:opacity-60 disabled:cursor-not-allowed"
+          />
+        </div>
+      </div>
+    </section>
+  </footer>
+</div>
+```

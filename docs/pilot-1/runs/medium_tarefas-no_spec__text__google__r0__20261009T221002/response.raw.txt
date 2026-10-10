@@ -1,0 +1,589 @@
+```ts file=src/app/app.ts
+import { Component, computed, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import {
+  lucideList,
+  lucidePencil,
+  lucideTrash2,
+  lucidePlus,
+  lucideCheck,
+  lucideX
+} from '@ng-icons/lucide';
+
+export type PriorityType = 'URGENTE' | 'MEDIO' | 'RELAXA';
+
+export interface TaskItem {
+  id: string;
+  title: string;
+  date: string; // formato DD/MM/AAAA
+  priority: PriorityType;
+  completed: boolean;
+}
+
+interface GroupedTasks {
+  groupLabel: string;
+  dateStr: string;
+  timestamp: number;
+  tasks: TaskItem[];
+}
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, FormsModule, NgIcon],
+  viewProviders: [
+    provideIcons({
+      lucideList,
+      lucidePencil,
+      lucideTrash2,
+      lucidePlus,
+      lucideCheck,
+      lucideX
+    })
+  ],
+  template: `
+    <div class="h-screen w-screen bg-black text-white flex flex-col font-sans select-none overflow-hidden">
+      <!-- HEADER AZUL -->
+      <header class="bg-blue-600 h-16 px-6 flex items-center justify-between shadow-md shrink-0 border-b border-blue-500">
+        <div class="flex items-center gap-3">
+          <ng-icon name="lucideList" class="text-2xl text-white"></ng-icon>
+          <h1 class="text-xl font-bold tracking-wide text-white">Tarefas Para Fazer</h1>
+        </div>
+        <div class="text-xs text-blue-100 font-medium hidden sm:block">
+          {{ completedCount() }} de {{ tasks().length }} tarefas concluídas
+        </div>
+      </header>
+
+      <!-- BARRA DE FILTROS -->
+      <div class="px-6 py-4 flex flex-wrap items-center gap-4 bg-zinc-950 shrink-0 border-b border-zinc-800">
+        <!-- Filtro de Data -->
+        <div class="flex items-center gap-2">
+          <label for="filterDate" class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Data:</label>
+          <div class="relative">
+            <input
+              id="filterDate"
+              type="text"
+              placeholder="DD/MM/AAAA"
+              maxlength="10"
+              [value]="filterDate()"
+              (input)="onFilterDateInput($event)"
+              class="w-32 bg-zinc-900 border border-zinc-700 rounded px-2.5 py-1.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            />
+            @if (filterDate()) {
+              <button
+                type="button"
+                (click)="filterDate.set('')"
+                class="absolute right-2 top-2 text-zinc-400 hover:text-white"
+                title="Limpar filtro"
+              >
+                <ng-icon name="lucideX" class="text-xs"></ng-icon>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Filtro de Prioridade -->
+        <div class="flex items-center gap-2">
+          <label for="filterPriority" class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Prioridade:</label>
+          <select
+            id="filterPriority"
+            [ngModel]="filterPriority()"
+            (ngModelChange)="filterPriority.set($event)"
+            class="bg-zinc-900 border border-zinc-700 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 cursor-pointer"
+          >
+            <option value="TODAS">Todas</option>
+            <option value="URGENTE">Urgente</option>
+            <option value="MEDIO">Médio</option>
+            <option value="RELAXA">Relaxa</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- LISTA DE TAREFAS COM ROLAGEM EXCLUSIVA -->
+      <main class="flex-1 overflow-y-auto px-6 py-4 custom-scrollbar">
+        @if (groupedTasks().length === 0) {
+          <div class="h-full flex flex-col items-center justify-center text-zinc-500">
+            <ng-icon name="lucideList" class="text-5xl mb-3 opacity-30"></ng-icon>
+            <p class="text-base font-medium">Nenhuma tarefa encontrada.</p>
+            <p class="text-xs text-zinc-600 mt-1">Adicione uma nova tarefa no rodapé abaixo.</p>
+          </div>
+        } @else {
+          <div class="space-y-6 max-w-7xl mx-auto">
+            @for (group of groupedTasks(); track group.dateStr) {
+              <section class="space-y-2">
+                <!-- Cabeçalho do Grupo -->
+                <div class="flex items-center gap-3 border-b border-zinc-800 pb-1.5 pt-1">
+                  <h2 class="text-sm font-bold tracking-wider text-blue-400 uppercase">
+                    {{ group.groupLabel }}
+                  </h2>
+                  <span class="text-xs text-zinc-500 font-mono">({{ group.dateStr }})</span>
+                  <div class="flex-1"></div>
+                  <span class="text-xs text-zinc-500 font-semibold">
+                    {{ group.tasks.length }} {{ group.tasks.length === 1 ? 'tarefa' : 'tarefas' }}
+                  </span>
+                </div>
+
+                <!-- Lista de Itens do Grupo -->
+                <div class="space-y-2 pt-1">
+                  @for (task of group.tasks; track task.id) {
+                    <div
+                      class="flex items-center gap-3 bg-zinc-900 hover:bg-zinc-850 px-4 py-3 rounded-lg border border-zinc-800 transition duration-150"
+                      [class.opacity-60]="task.completed"
+                    >
+                      <!-- RETÂNGULO DA PRIORIDADE -->
+                      @if (task.priority === 'URGENTE') {
+                        <div class="w-24 shrink-0 bg-red-600 text-white font-bold text-xs uppercase px-2.5 py-1.5 rounded text-center tracking-wide shadow-sm">
+                          URGENTE
+                        </div>
+                      } @else if (task.priority === 'MEDIO') {
+                        <div class="w-24 shrink-0 bg-amber-500 text-white font-bold text-xs uppercase px-2.5 py-1.5 rounded text-center tracking-wide shadow-sm">
+                          MÉDIO
+                        </div>
+                      } @else {
+                        <div class="w-24 shrink-0 bg-emerald-600 text-white font-bold text-xs uppercase px-2.5 py-1.5 rounded text-center tracking-wide shadow-sm">
+                          RELAXA
+                        </div>
+                      }
+
+                      <!-- CHECKBOX -->
+                      <div class="shrink-0 flex items-center">
+                        <label class="cursor-pointer relative flex items-center justify-center">
+                          <input
+                            type="checkbox"
+                            [checked]="task.completed"
+                            (change)="toggleTask(task.id)"
+                            class="peer appearance-none w-5 h-5 rounded border border-zinc-600 bg-zinc-800 checked:bg-blue-600 checked:border-blue-600 transition cursor-pointer focus:outline-none"
+                          />
+                          <ng-icon
+                            name="lucideCheck"
+                            class="absolute text-white text-xs opacity-0 peer-checked:opacity-100 pointer-events-none transition"
+                          ></ng-icon>
+                        </label>
+                      </div>
+
+                      <!-- NOME / DESCRIÇÃO DA TAREFA -->
+                      <div class="flex-1 min-w-0 pr-2">
+                        @if (editingTaskId() === task.id) {
+                          <div class="flex items-center gap-2">
+                            <input
+                              type="text"
+                              [value]="editingText()"
+                              (input)="editingText.set($any($event.target).value)"
+                              (keydown.enter)="saveEditing(task.id)"
+                              (keydown.escape)="cancelEditing()"
+                              class="w-full bg-zinc-950 border border-blue-500 rounded px-2.5 py-1 text-sm text-white focus:outline-none"
+                              #editInput
+                            />
+                            <button
+                              type="button"
+                              (click)="saveEditing(task.id)"
+                              class="text-emerald-400 hover:text-emerald-300 p-1"
+                              title="Salvar"
+                            >
+                              <ng-icon name="lucideCheck" class="text-base"></ng-icon>
+                            </button>
+                            <button
+                              type="button"
+                              (click)="cancelEditing()"
+                              class="text-zinc-400 hover:text-zinc-200 p-1"
+                              title="Cancelar"
+                            >
+                              <ng-icon name="lucideX" class="text-base"></ng-icon>
+                            </button>
+                          </div>
+                        } @else {
+                          <span
+                            class="text-sm font-medium text-zinc-100 break-words"
+                            [class.line-through]="task.completed"
+                            [class.text-zinc-400]="task.completed"
+                          >
+                            {{ task.title }}
+                          </span>
+                        }
+                      </div>
+
+                      <!-- AÇÕES: LÁPIS E LIXEIRA NO EXTREMO DIREITO -->
+                      <div class="flex items-center gap-1 shrink-0 ml-auto">
+                        <button
+                          type="button"
+                          (click)="startEditing(task)"
+                          class="p-2 text-zinc-400 hover:text-blue-400 hover:bg-zinc-800 rounded transition"
+                          title="Editar tarefa"
+                        >
+                          <ng-icon name="lucidePencil" class="text-base"></ng-icon>
+                        </button>
+                        <button
+                          type="button"
+                          (click)="deleteTask(task.id)"
+                          class="p-2 text-zinc-400 hover:text-red-500 hover:bg-zinc-800 rounded transition"
+                          title="Excluir tarefa"
+                        >
+                          <ng-icon name="lucideTrash2" class="text-base"></ng-icon>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </section>
+            }
+          </div>
+        }
+      </main>
+
+      <!-- LINHA BRANCA SEPARADORA -->
+      <div class="w-full border-t border-white shrink-0"></div>
+
+      <!-- RODAPÉ: FORMULÁRIO DE NOVA TAREFA -->
+      <footer class="bg-black px-6 py-4 shrink-0">
+        <form (submit)="addTask($event)" class="max-w-7xl mx-auto flex flex-wrap items-center gap-3 md:gap-4">
+          <!-- Texto "Nova tarefa:" -->
+          <span class="text-sm font-bold text-white tracking-wide shrink-0 whitespace-nowrap">
+            Nova tarefa:
+          </span>
+
+          <!-- Input com máscara de data -->
+          <div class="shrink-0">
+            <input
+              type="text"
+              placeholder="DD/MM/AAAA"
+              maxlength="10"
+              [value]="newDate()"
+              (input)="onNewDateInput($event)"
+              class="w-32 bg-zinc-900 border border-zinc-700 rounded px-3 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              required
+            />
+          </div>
+
+          <!-- Input de seleção Prioridade -->
+          <div class="shrink-0">
+            <select
+              [ngModel]="newPriority()"
+              (ngModelChange)="newPriority.set($event)"
+              name="newPriority"
+              class="bg-zinc-900 border border-zinc-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 cursor-pointer"
+            >
+              <option value="" disabled selected>Prioridade</option>
+              <option value="URGENTE">Urgente</option>
+              <option value="MEDIO">Médio</option>
+              <option value="RELAXA">Relaxa</option>
+            </select>
+          </div>
+
+          <!-- Longo input com label Descrição da tarefa -->
+          <div class="flex-1 min-w-[200px]">
+            <input
+              type="text"
+              placeholder="Descrição da tarefa"
+              [ngModel]="newTitle()"
+              (ngModelChange)="newTitle.set($event)"
+              name="newTitle"
+              class="w-full bg-zinc-900 border border-zinc-700 rounded px-4 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              required
+            />
+          </div>
+
+          <!-- Ícone de + no extremo direito -->
+          <button
+            type="submit"
+            [disabled]="!isFormValid()"
+            class="shrink-0 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:hover:bg-blue-600 disabled:cursor-not-allowed text-white p-2.5 rounded-lg flex items-center justify-center transition shadow-md"
+            title="Adicionar Tarefa"
+          >
+            <ng-icon name="lucidePlus" class="text-xl"></ng-icon>
+          </button>
+        </form>
+      </footer>
+    </div>
+  `,
+  styles: [`
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #09090b;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #27272a;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #3f3f46;
+    }
+  `]
+})
+export class App {
+  // Dados das tarefas
+  tasks = signal<TaskItem[]>([]);
+
+  // Filtros
+  filterDate = signal<string>('');
+  filterPriority = signal<string>('TODAS');
+
+  // Nova Tarefa Form
+  newDate = signal<string>('');
+  newPriority = signal<PriorityType | ''>('MEDIO');
+  newTitle = signal<string>('');
+
+  // Edição inline
+  editingTaskId = signal<string | null>(null);
+  editingText = signal<string>('');
+
+  constructor() {
+    this.initInitialTasks();
+  }
+
+  // Gera datas de referência (Hoje, Amanhã, Depois de amanhã)
+  private getFormattedDateOffset(offsetDays: number): string {
+    const d = new Date();
+    d.setDate(d.getDate() + offsetDays);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+
+  private initInitialTasks() {
+    const today = this.getFormattedDateOffset(0);
+    const tomorrow = this.getFormattedDateOffset(1);
+    const dayAfter = this.getFormattedDateOffset(2);
+
+    this.newDate.set(today);
+
+    this.tasks.set([
+      {
+        id: '1',
+        title: 'Enviar relatório financeiro trimestral para a diretoria',
+        date: today,
+        priority: 'URGENTE',
+        completed: false
+      },
+      {
+        id: '2',
+        title: 'Reunião de alinhamento com equipe de engenharia',
+        date: today,
+        priority: 'MEDIO',
+        completed: true
+      },
+      {
+        id: '3',
+        title: 'Assistir webinar de novas tecnologias web',
+        date: today,
+        priority: 'RELAXA',
+        completed: false
+      },
+      {
+        id: '4',
+        title: 'Finalizar testes de integração do módulo de pagamento',
+        date: tomorrow,
+        priority: 'URGENTE',
+        completed: false
+      },
+      {
+        id: '5',
+        title: 'Organizar documentação interna e repositórios',
+        date: tomorrow,
+        priority: 'MEDIO',
+        completed: false
+      },
+      {
+        id: '6',
+        title: 'Pesquisar inspirações de design e referências visuais',
+        date: dayAfter,
+        priority: 'RELAXA',
+        completed: false
+      }
+    ]);
+  }
+
+  completedCount = computed(() => {
+    return this.tasks().filter(t => t.completed).length;
+  });
+
+  isFormValid = computed(() => {
+    return (
+      this.newTitle().trim().length > 0 &&
+      this.newDate().trim().length === 10 &&
+      this.newPriority() !== ''
+    );
+  });
+
+  // Agrupamento ordenado por dias: Hoje, Amanhã, depois os dias escritos
+  groupedTasks = computed(() => {
+    const todayStr = this.getFormattedDateOffset(0);
+    const tomorrowStr = this.getFormattedDateOffset(1);
+
+    const fDate = this.filterDate().trim();
+    const fPriority = this.filterPriority();
+
+    // Filtra tarefas
+    const filtered = this.tasks().filter(t => {
+      if (fDate && t.date !== fDate) return false;
+      if (fPriority !== 'TODAS' && t.priority !== fPriority) return false;
+      return true;
+    });
+
+    // Mapeia por chave de data
+    const map = new Map<string, TaskItem[]>();
+    for (const t of filtered) {
+      if (!map.has(t.date)) {
+        map.set(t.date, []);
+      }
+      map.get(t.date)!.push(t);
+    }
+
+    const groups: GroupedTasks[] = [];
+
+    map.forEach((taskList, dateStr) => {
+      const parsedTimestamp = this.parseDateToTimestamp(dateStr);
+      let label = '';
+
+      if (dateStr === todayStr) {
+        label = 'Hoje';
+      } else if (dateStr === tomorrowStr) {
+        label = 'Amanhã';
+      } else {
+        label = this.getWrittenDayName(dateStr);
+      }
+
+      groups.push({
+        groupLabel: label,
+        dateStr,
+        timestamp: parsedTimestamp,
+        tasks: taskList
+      });
+    });
+
+    // Ordenação: Hoje sempre primeiro, Amanhã segundo, depois cronológico
+    groups.sort((a, b) => {
+      if (a.dateStr === todayStr) return -1;
+      if (b.dateStr === todayStr) return 1;
+      if (a.dateStr === tomorrowStr) return -1;
+      if (b.dateStr === tomorrowStr) return 1;
+      return a.timestamp - b.timestamp;
+    });
+
+    return groups;
+  });
+
+  private parseDateToTimestamp(dateStr: string): number {
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const year = parseInt(parts[2], 10);
+      const d = new Date(year, month, day);
+      return d.getTime() || 0;
+    }
+    return 0;
+  }
+
+  private getWrittenDayName(dateStr: string): string {
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const year = parseInt(parts[2], 10);
+      const date = new Date(year, month, day);
+
+      const daysOfWeek = [
+        'Domingo',
+        'Segunda-feira',
+        'Terça-feira',
+        'Quarta-feira',
+        'Quinta-feira',
+        'Sexta-feira',
+        'Sábado'
+      ];
+      const dayName = daysOfWeek[date.getDay()];
+      if (dayName) {
+        return dayName;
+      }
+    }
+    return dateStr;
+  }
+
+  // Máscara de data DD/MM/AAAA
+  private applyMask(value: string): string {
+    const digits = value.replace(/\D/g, '').slice(0, 8);
+    if (digits.length > 4) {
+      return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+    }
+    if (digits.length > 2) {
+      return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    }
+    return digits;
+  }
+
+  onFilterDateInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const masked = this.applyMask(input.value);
+    input.value = masked;
+    this.filterDate.set(masked);
+  }
+
+  onNewDateInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const masked = this.applyMask(input.value);
+    input.value = masked;
+    this.newDate.set(masked);
+  }
+
+  toggleTask(taskId: string) {
+    this.tasks.update(all =>
+      all.map(t => (t.id === taskId ? { ...t, completed: !t.completed } : t))
+    );
+  }
+
+  deleteTask(taskId: string) {
+    this.tasks.update(all => all.filter(t => t.id !== taskId));
+    if (this.editingTaskId() === taskId) {
+      this.editingTaskId.set(null);
+    }
+  }
+
+  startEditing(task: TaskItem) {
+    this.editingTaskId.set(task.id);
+    this.editingText.set(task.title);
+  }
+
+  saveEditing(taskId: string) {
+    const newTitle = this.editingText().trim();
+    if (newTitle) {
+      this.tasks.update(all =>
+        all.map(t => (t.id === taskId ? { ...t, title: newTitle } : t))
+      );
+    }
+    this.editingTaskId.set(null);
+  }
+
+  cancelEditing() {
+    this.editingTaskId.set(null);
+  }
+
+  addTask(event: Event) {
+    event.preventDefault();
+    const title = this.newTitle().trim();
+    const date = this.newDate().trim();
+    const priority = this.newPriority() as PriorityType;
+
+    if (!title || date.length !== 10 || !priority) {
+      return;
+    }
+
+    const newTask: TaskItem = {
+      id: Date.now().toString(),
+      title,
+      date,
+      priority,
+      completed: false
+    };
+
+    this.tasks.update(all => [...all, newTask]);
+
+    // Limpa campos mantendo a data corrente para agilidade
+    this.newTitle.set('');
+  }
+}
+```

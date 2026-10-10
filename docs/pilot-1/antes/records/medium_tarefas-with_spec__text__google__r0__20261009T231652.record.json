@@ -1,0 +1,570 @@
+{
+  "run_id": "medium_tarefas-with_spec__text__google__r0__20261009T231652",
+  "run_kind": "pilot",
+  "cell_key": "medium_tarefas/with_spec|text|google:gemini-3.8-flash|r0",
+  "task_id": "medium_tarefas",
+  "difficulty": "medium",
+  "prompt_kind": "with_spec",
+  "prompt_id": "medium_tarefas/with_spec",
+  "material_shown": null,
+  "modality": "text",
+  "rep": 0,
+  "created_at": "2026-10-09T23:16:52+00:00",
+  "provider": "google",
+  "model_id_requested": "gemini-3.8-flash",
+  "model_id_returned": "gemini-3.8-flash",
+  "temperature": null,
+  "thinking": {
+    "thinking_budget": 8192
+  },
+  "seed": 20260101,
+  "prompt_sha256": "dd19310368bac1ad346b4b1052aa8ccc504c49871e279805c1eafa1de2678297",
+  "image_sha256": null,
+  "envelope_sha256": "39799bf1cb796bc406f839863d96a53bfd49f96651ed119058d01f47fab003b7",
+  "envelope_version": "2",
+  "scaffold_version": "1.0.0",
+  "scaffold_lock_sha256": "784afb58f71e45c4990c69fce629efa36d90dc42535e13c8b841b7b993e7a20b",
+  "scaffold_tree_sha256": "f79ded644d270fbfedd50ffddbe1933a77a4ee2ebdbad5325ca03f633305631f",
+  "repo_commit": "b820545+dirty",
+  "config_sha256": "6822b0bda4671902a996130050ca63e69f349313fbf1b369b378f6ab423db2cb",
+  "oracle_suite_tag": null,
+  "oracle_tree_hash": null,
+  "oracle_content_sha256": "94b727c0f823294aac5fc03c7bd0c9b63bf8a8340419e1486c70362ccad1e2a3",
+  "oracle_dirty": true,
+  "pending_sha256": "f60a6e8a1906722fb38a942bb8af76332e3677f814642da0feff1a1bc78a1382",
+  "mention_patterns_sha256": "fa945d0a404ef14d7a98df754c092e713324805861a89bf4dfaff8cc7e38b4ad",
+  "playwright_version": "1.62.0",
+  "browser_version": "151.0.7922.34",
+  "paths": {
+    "run_dir": "runs/medium_tarefas-with_spec__text__google__r0__20261009T231652",
+    "response_raw": "response.raw.txt",
+    "generated_dir": "generated",
+    "dist_dir": "dist",
+    "build_stdout": "build.stdout.txt",
+    "build_stderr": "build.stderr.txt",
+    "screenshot": "screenshot.png",
+    "dom_blocks": "dom_blocks.json",
+    "css_snapshot": "css_snapshot.json",
+    "axe": "axe.json"
+  },
+  "exec": {
+    "format_ok": true,
+    "files_accepted": 5,
+    "files_rejected": [],
+    "contract_ok": true,
+    "build_ok": true,
+    "build_timed_out": false,
+    "build_time_s": 7.69,
+    "build_stdout_path": "build.stdout.txt",
+    "build_stderr_path": "build.stderr.txt",
+    "build_error_messages": [],
+    "render_ok": true,
+    "executable": true
+  },
+  "design2code": {
+    "n_ref_blocks": 21,
+    "n_gen_blocks": 27,
+    "n_matched": 15,
+    "n_merged_ref": 0,
+    "n_merged_gen": 0,
+    "block_match": 0.4555975133329842,
+    "text": 0.9444444444444444,
+    "position": 0.9481803240740743,
+    "color": 0.8666666666666667,
+    "clip_inpainted": 0.9332294388145004,
+    "reference_source": "figma",
+    "pairs_path": "pairs.json"
+  },
+  "embeddings": {
+    "ves_dinov2": 0.9621491662328372,
+    "mae": 0.08620724081993103,
+    "ssim": 0.7057607769966125,
+    "dinov2_model": "facebook/dinov2-base",
+    "clip_model": "openai/clip-vit-base-patch32"
+  },
+  "code_quality": {
+    "rur": 0.7727272727272727,
+    "apr": 0.5789473684210527,
+    "fu": 0.3978494623655914,
+    "bc": 0.25,
+    "str": 0.3120567375886525,
+    "avu": 0.08151382823871907,
+    "isr": 0.2198581560283688,
+    "ccr": 0.0,
+    "counts": {
+      "layout_declarations_relative": 34,
+      "layout_declarations_total": 44,
+      "positioned_absolute": 11,
+      "positioned_total": 19,
+      "containers_flex_grid": 37,
+      "containers_total": 93,
+      "bands_covered": 1,
+      "bands_total": 4,
+      "semantic_elements": 44,
+      "elements_total": 141,
+      "arbitrary_classes": 56,
+      "classes_total": 687,
+      "inline_style_elements": 31,
+      "custom_classes_reused": 0,
+      "custom_classes_used": 1,
+      "custom_classes_dead": 0,
+      "classes_undefined": 0
+    }
+  },
+  "functional": {
+    "accuracy_a": 1.0,
+    "accuracy_a_restricted": 1.0,
+    "accuracy_b": 0.8928571428571429,
+    "cases": [
+      {
+        "case_id": "M-A-01",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 5,
+        "n_total": 5,
+        "requirements": [
+          "M-01"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 359
+      },
+      {
+        "case_id": "M-A-02",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 7,
+        "n_total": 7,
+        "requirements": [
+          "M-02"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 469
+      },
+      {
+        "case_id": "M-A-03",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 8,
+        "n_total": 8,
+        "requirements": [
+          "M-10"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 422
+      },
+      {
+        "case_id": "M-A-04",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 8,
+        "n_total": 8,
+        "requirements": [
+          "M-11"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1156
+      },
+      {
+        "case_id": "M-A-05",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 8,
+        "n_total": 8,
+        "requirements": [
+          "M-03"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 2422
+      },
+      {
+        "case_id": "M-A-06",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 12,
+        "n_total": 12,
+        "requirements": [
+          "M-04"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 2562
+      },
+      {
+        "case_id": "M-A-07",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 8,
+        "n_total": 8,
+        "requirements": [
+          "M-05"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1141
+      },
+      {
+        "case_id": "M-A-08",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 8,
+        "n_total": 8,
+        "requirements": [
+          "M-06",
+          "M-07"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 2234
+      },
+      {
+        "case_id": "M-A-09",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 18,
+        "n_total": 18,
+        "requirements": [
+          "M-09"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 10282
+      },
+      {
+        "case_id": "M-A-10",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 6,
+        "n_total": 6,
+        "requirements": [
+          "M-12"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 2203
+      },
+      {
+        "case_id": "M-A-11",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 9,
+        "n_total": 9,
+        "requirements": [
+          "M-12"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 3422
+      },
+      {
+        "case_id": "M-A-12",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 2,
+        "n_total": 2,
+        "requirements": [
+          "M-10",
+          "M-11"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 547
+      },
+      {
+        "case_id": "M-A-13",
+        "level": "A",
+        "outcome": "PENDING",
+        "blocked": false,
+        "n_pass": 0,
+        "n_total": 0,
+        "requirements": [
+          "M-08"
+        ],
+        "failed": [],
+        "error": "pendente: PD-M3",
+        "duration_ms": 0
+      },
+      {
+        "case_id": "M-B-01",
+        "level": "B",
+        "outcome": "PARTIAL",
+        "blocked": false,
+        "n_pass": 4,
+        "n_total": 5,
+        "requirements": [
+          "M-S01"
+        ],
+        "failed": [
+          "ícone preto :: cor=(255, 255, 255)"
+        ],
+        "error": null,
+        "duration_ms": 406
+      },
+      {
+        "case_id": "M-B-02",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 10,
+        "n_total": 10,
+        "requirements": [
+          "M-S02"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 469
+      },
+      {
+        "case_id": "M-B-03",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 12,
+        "n_total": 12,
+        "requirements": [
+          "M-S04"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 2421
+      },
+      {
+        "case_id": "M-B-04",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 8,
+        "n_total": 8,
+        "requirements": [
+          "M-S03",
+          "M-S15"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1797
+      },
+      {
+        "case_id": "M-B-05",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 5,
+        "n_total": 5,
+        "requirements": [
+          "M-S05"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1328
+      },
+      {
+        "case_id": "M-B-06",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 4,
+        "n_total": 4,
+        "requirements": [
+          "M-S06"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1313
+      },
+      {
+        "case_id": "M-B-07",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 12,
+        "n_total": 12,
+        "requirements": [
+          "M-S07"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 3125
+      },
+      {
+        "case_id": "M-B-08",
+        "level": "B",
+        "outcome": "PARTIAL",
+        "blocked": false,
+        "n_pass": 3,
+        "n_total": 4,
+        "requirements": [
+          "M-S08"
+        ],
+        "failed": [
+          "data vazia"
+        ],
+        "error": null,
+        "duration_ms": 1172
+      },
+      {
+        "case_id": "M-B-09",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 4,
+        "n_total": 4,
+        "requirements": [
+          "M-S09"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 2344
+      },
+      {
+        "case_id": "M-B-10",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 11,
+        "n_total": 11,
+        "requirements": [
+          "M-S10"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 3390
+      },
+      {
+        "case_id": "M-B-11",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 5,
+        "n_total": 5,
+        "requirements": [
+          "M-S11",
+          "M-S12"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1031
+      },
+      {
+        "case_id": "M-B-12",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 4,
+        "n_total": 4,
+        "requirements": [
+          "M-S13"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 313
+      },
+      {
+        "case_id": "M-B-13",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 6,
+        "n_total": 6,
+        "requirements": [
+          "M-S14"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1203
+      },
+      {
+        "case_id": "M-B-14",
+        "level": "B",
+        "outcome": "PARTIAL",
+        "blocked": false,
+        "n_pass": 7,
+        "n_total": 8,
+        "requirements": [
+          "M-S16"
+        ],
+        "failed": [
+          "o + usa o azul do header :: (255, 255, 255)"
+        ],
+        "error": null,
+        "duration_ms": 547
+      }
+    ],
+    "suite_sha256": "94b727c0f823294aac5fc03c7bd0c9b63bf8a8340419e1486c70362ccad1e2a3",
+    "suite_git_tag": null
+  },
+  "technical": {
+    "console_errors": [],
+    "console_error_count": 0,
+    "blocked_requests": [],
+    "axe_violations": {
+      "critical": 0,
+      "serious": 1,
+      "moderate": 0,
+      "minor": 0
+    },
+    "axe_report_path": "axe.json"
+  },
+  "input_spec": {
+    "chars": 8755,
+    "words": 1365,
+    "constraint_density": {
+      "hex": 5,
+      "px": 13,
+      "defaults": 2,
+      "aria": 3,
+      "html_tags": 12
+    },
+    "requirement_coverage": {
+      "total": 1.0,
+      "by_info_source": {
+        "image": 1.0,
+        "behavior": 1.0,
+        "spec_only": 1.0
+      }
+    },
+    "structure_markers": {
+      "lists": 75,
+      "numbering": 6,
+      "headings": 6,
+      "code_blocks": 1,
+      "type_decls": 4
+    },
+    "image_references": 0,
+    "stack_requests": {
+      "react": false,
+      "vue": false,
+      "svelte": false,
+      "next": false,
+      "html_puro": false,
+      "bootstrap": false,
+      "jquery": false,
+      "outros": []
+    },
+    "envelope_chars": 2173
+  },
+  "cost": {
+    "prompt_tokens": 3126,
+    "input_tokens": 3127,
+    "output_tokens": 7576,
+    "thoughts_tokens": null,
+    "latency_ms": 64061
+  },
+  "status": "done",
+  "errors": []
+}

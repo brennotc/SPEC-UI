@@ -1,0 +1,568 @@
+{
+  "run_id": "hard_kanban-no_spec__text__google__r0__20261009T230052",
+  "run_kind": "pilot",
+  "cell_key": "hard_kanban/no_spec|text|google:gemini-3.8-flash|r0",
+  "task_id": "hard_kanban",
+  "difficulty": "hard",
+  "prompt_kind": "no_spec",
+  "prompt_id": "hard_kanban/no_spec",
+  "material_shown": null,
+  "modality": "text",
+  "rep": 0,
+  "created_at": "2026-10-09T23:00:52+00:00",
+  "provider": "google",
+  "model_id_requested": "gemini-3.8-flash",
+  "model_id_returned": "gemini-3.8-flash",
+  "temperature": null,
+  "thinking": {
+    "thinking_budget": 8192
+  },
+  "seed": 20260101,
+  "prompt_sha256": "933dd0f73e282c97f2cbe3833bb805ca3c84b159663bf632cd02e496f3b44e17",
+  "image_sha256": null,
+  "envelope_sha256": "39799bf1cb796bc406f839863d96a53bfd49f96651ed119058d01f47fab003b7",
+  "envelope_version": "2",
+  "scaffold_version": "1.0.0",
+  "scaffold_lock_sha256": "784afb58f71e45c4990c69fce629efa36d90dc42535e13c8b841b7b993e7a20b",
+  "scaffold_tree_sha256": "f79ded644d270fbfedd50ffddbe1933a77a4ee2ebdbad5325ca03f633305631f",
+  "repo_commit": "b820545+dirty",
+  "config_sha256": "6822b0bda4671902a996130050ca63e69f349313fbf1b369b378f6ab423db2cb",
+  "oracle_suite_tag": null,
+  "oracle_tree_hash": null,
+  "oracle_content_sha256": "94b727c0f823294aac5fc03c7bd0c9b63bf8a8340419e1486c70362ccad1e2a3",
+  "oracle_dirty": true,
+  "pending_sha256": "f60a6e8a1906722fb38a942bb8af76332e3677f814642da0feff1a1bc78a1382",
+  "mention_patterns_sha256": "fa945d0a404ef14d7a98df754c092e713324805861a89bf4dfaff8cc7e38b4ad",
+  "playwright_version": "1.62.0",
+  "browser_version": "151.0.7922.34",
+  "paths": {
+    "run_dir": "runs/hard_kanban-no_spec__text__google__r0__20261009T230052",
+    "response_raw": "response.raw.txt",
+    "generated_dir": "generated",
+    "dist_dir": "dist",
+    "build_stdout": "build.stdout.txt",
+    "build_stderr": "build.stderr.txt",
+    "screenshot": "screenshot.png",
+    "dom_blocks": "dom_blocks.json",
+    "css_snapshot": "css_snapshot.json",
+    "axe": "axe.json"
+  },
+  "exec": {
+    "format_ok": true,
+    "files_accepted": 1,
+    "files_rejected": [],
+    "contract_ok": true,
+    "build_ok": true,
+    "build_timed_out": false,
+    "build_time_s": 9.47,
+    "build_stdout_path": "build.stdout.txt",
+    "build_stderr_path": "build.stderr.txt",
+    "build_error_messages": [],
+    "render_ok": true,
+    "executable": true
+  },
+  "design2code": {
+    "n_ref_blocks": 13,
+    "n_gen_blocks": 15,
+    "n_matched": 5,
+    "n_merged_ref": 0,
+    "n_merged_gen": 0,
+    "block_match": 0.13790917984702686,
+    "text": 0.9800000000000001,
+    "position": 0.9438048611111112,
+    "color": 1.0,
+    "clip_inpainted": 0.9153102349849348,
+    "reference_source": "figma",
+    "pairs_path": "pairs.json"
+  },
+  "embeddings": {
+    "ves_dinov2": 0.9222924691665674,
+    "mae": 0.21501398086547852,
+    "ssim": 0.7025186419487,
+    "dinov2_model": "facebook/dinov2-base",
+    "clip_model": "openai/clip-vit-base-patch32"
+  },
+  "code_quality": {
+    "rur": 0.9459459459459459,
+    "apr": 0.0,
+    "fu": 0.6129032258064516,
+    "bc": 0.25,
+    "str": 0.3170731707317073,
+    "avu": 0.020560747663551402,
+    "isr": 0.0,
+    "ccr": null,
+    "counts": {
+      "layout_declarations_relative": 35,
+      "layout_declarations_total": 37,
+      "positioned_absolute": 0,
+      "positioned_total": 6,
+      "containers_flex_grid": 38,
+      "containers_total": 62,
+      "bands_covered": 1,
+      "bands_total": 4,
+      "semantic_elements": 26,
+      "elements_total": 82,
+      "arbitrary_classes": 11,
+      "classes_total": 535,
+      "inline_style_elements": 0,
+      "custom_classes_reused": 0,
+      "custom_classes_used": 0,
+      "custom_classes_dead": 0,
+      "classes_undefined": 0
+    }
+  },
+  "functional": {
+    "accuracy_a": 0.9642857142857143,
+    "accuracy_a_restricted": 0.9642857142857143,
+    "accuracy_b": 0.6,
+    "cases": [
+      {
+        "case_id": "H-A-01",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 5,
+        "n_total": 5,
+        "requirements": [
+          "H-01"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 391
+      },
+      {
+        "case_id": "H-A-02",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 10,
+        "n_total": 10,
+        "requirements": [
+          "H-02",
+          "H-03"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 391
+      },
+      {
+        "case_id": "H-A-03",
+        "level": "A",
+        "outcome": "PARTIAL",
+        "blocked": false,
+        "n_pass": 14,
+        "n_total": 15,
+        "requirements": [
+          "H-04"
+        ],
+        "failed": [
+          "'Feito': corpo da mesma família de cor :: (250, 245, 255)"
+        ],
+        "error": null,
+        "duration_ms": 562
+      },
+      {
+        "case_id": "H-A-04",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 7,
+        "n_total": 7,
+        "requirements": [
+          "H-06"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 547
+      },
+      {
+        "case_id": "H-A-05",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 8,
+        "n_total": 8,
+        "requirements": [
+          "H-07"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1062
+      },
+      {
+        "case_id": "H-A-06",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 7,
+        "n_total": 7,
+        "requirements": [
+          "H-08"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 2907
+      },
+      {
+        "case_id": "H-A-07",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 8,
+        "n_total": 8,
+        "requirements": [
+          "H-09"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1734
+      },
+      {
+        "case_id": "H-A-08",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 11,
+        "n_total": 11,
+        "requirements": [
+          "H-05"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1703
+      },
+      {
+        "case_id": "H-A-09",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 7,
+        "n_total": 7,
+        "requirements": [
+          "H-05"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 3156
+      },
+      {
+        "case_id": "H-A-10",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 4,
+        "n_total": 4,
+        "requirements": [
+          "H-10"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 2735
+      },
+      {
+        "case_id": "H-A-11",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 5,
+        "n_total": 5,
+        "requirements": [
+          "H-12"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 3031
+      },
+      {
+        "case_id": "H-A-12",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 10,
+        "n_total": 10,
+        "requirements": [
+          "H-13"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 5594
+      },
+      {
+        "case_id": "H-A-13",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 8,
+        "n_total": 8,
+        "requirements": [
+          "H-14"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 5953
+      },
+      {
+        "case_id": "H-A-14",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 8,
+        "n_total": 8,
+        "requirements": [
+          "H-15"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 5187
+      },
+      {
+        "case_id": "H-A-15",
+        "level": "A",
+        "outcome": "PENDING",
+        "blocked": false,
+        "n_pass": 0,
+        "n_total": 0,
+        "requirements": [
+          "H-11"
+        ],
+        "failed": [],
+        "error": "pendente: PD-H2",
+        "duration_ms": 0
+      },
+      {
+        "case_id": "H-B-01",
+        "level": "B",
+        "outcome": "PARTIAL",
+        "blocked": false,
+        "n_pass": 4,
+        "n_total": 6,
+        "requirements": [
+          "H-S01"
+        ],
+        "failed": [
+          "fundo #105610 (ΔE ≤ 5) :: (0, 122, 85)",
+          "fundo geral #D7CFCF (ΔE ≤ 5) :: [(226, 232, 240), (226, 232, 240), (226, 232, 240), (255, 255, 255)]"
+        ],
+        "error": null,
+        "duration_ms": 579
+      },
+      {
+        "case_id": "H-B-02",
+        "level": "B",
+        "outcome": "NO",
+        "blocked": false,
+        "n_pass": 0,
+        "n_total": 12,
+        "requirements": [
+          "H-S02"
+        ],
+        "failed": [
+          "'Para Fazer': cabeçalho com a cor forte do mapeamento :: (21, 93, 252)",
+          "'Para Fazer': largura ≥ 340 px :: 328",
+          "'Para Fazer': corpo com a cor fraca do mapeamento :: (239, 246, 255)",
+          "'Em Progresso': cabeçalho com a cor forte do mapeamento :: (245, 74, 0)",
+          "'Em Progresso': largura ≥ 340 px :: 328",
+          "'Em Progresso': corpo com a cor fraca do mapeamento :: (255, 248, 237)",
+          "'Feito': cabeçalho com a cor forte do mapeamento :: (152, 16, 250)",
+          "'Feito': largura ≥ 340 px :: 328",
+          "'Feito': corpo com a cor fraca do mapeamento :: (250, 245, 255)",
+          "'Aprovado': cabeçalho com a cor forte do mapeamento :: (0, 153, 102)",
+          "'Aprovado': largura ≥ 340 px :: 328",
+          "'Aprovado': corpo com a cor fraca do mapeamento :: (236, 252, 245)"
+        ],
+        "error": null,
+        "duration_ms": 390
+      },
+      {
+        "case_id": "H-B-03",
+        "level": "B",
+        "outcome": "PARTIAL",
+        "blocked": false,
+        "n_pass": 3,
+        "n_total": 6,
+        "requirements": [
+          "H-S03"
+        ],
+        "failed": [
+          "opacidade de 70 % :: 0.75",
+          "cor da borda #656060 (ΔE ≤ 8) :: ['rgba(212, 212, 212, 1.000)', 'dashed']",
+          "o + é cinza :: (0, 0, 0)"
+        ],
+        "error": null,
+        "duration_ms": 610
+      },
+      {
+        "case_id": "H-B-04",
+        "level": "B",
+        "outcome": "PARTIAL",
+        "blocked": false,
+        "n_pass": 4,
+        "n_total": 8,
+        "requirements": [
+          "H-S04"
+        ],
+        "failed": [
+          "274 × 191 px :: Box(x=41, y=604, w=296, h=296)",
+          "fundo #D7CFCF (ΔE ≤ 5) :: (250, 249, 246)",
+          "descrição a 24 px",
+          "lixeira #B50000 (ΔE ≤ 5) :: (236, 0, 63)"
+        ],
+        "error": null,
+        "duration_ms": 1687
+      },
+      {
+        "case_id": "H-B-05",
+        "level": "B",
+        "outcome": "PARTIAL",
+        "blocked": false,
+        "n_pass": 1,
+        "n_total": 4,
+        "requirements": [
+          "H-S05"
+        ],
+        "failed": [
+          "aria-label do input 'Descrição da nova tarefa' :: None",
+          "check na cor verde do header (ΔE ≤ 5) :: (0, 153, 102)",
+          "X em #B50000 (ΔE ≤ 5) :: (236, 0, 63)"
+        ],
+        "error": null,
+        "duration_ms": 1156
+      },
+      {
+        "case_id": "H-B-06",
+        "level": "B",
+        "outcome": "PARTIAL",
+        "blocked": false,
+        "n_pass": 4,
+        "n_total": 5,
+        "requirements": [
+          "H-S06"
+        ],
+        "failed": [
+          "o card de criação volta a 70 % de opacidade :: 0.758223"
+        ],
+        "error": null,
+        "duration_ms": 2875
+      },
+      {
+        "case_id": "H-B-07",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 14,
+        "n_total": 14,
+        "requirements": [
+          "H-S07"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 3391
+      },
+      {
+        "case_id": "H-B-08",
+        "level": "B",
+        "outcome": "PARTIAL",
+        "blocked": false,
+        "n_pass": 5,
+        "n_total": 6,
+        "requirements": [
+          "H-S08"
+        ],
+        "failed": [
+          "há um <article> por card :: 0"
+        ],
+        "error": null,
+        "duration_ms": 2703
+      },
+      {
+        "case_id": "H-B-09",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 7,
+        "n_total": 7,
+        "requirements": [
+          "H-S09"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 2328
+      },
+      {
+        "case_id": "H-B-10",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 4,
+        "n_total": 4,
+        "requirements": [
+          "H-S10"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1672
+      }
+    ],
+    "suite_sha256": "94b727c0f823294aac5fc03c7bd0c9b63bf8a8340419e1486c70362ccad1e2a3",
+    "suite_git_tag": null
+  },
+  "technical": {
+    "console_errors": [],
+    "console_error_count": 0,
+    "blocked_requests": [],
+    "axe_violations": {
+      "critical": 0,
+      "serious": 1,
+      "moderate": 1,
+      "minor": 0
+    },
+    "axe_report_path": "axe.json"
+  },
+  "input_spec": {
+    "chars": 1792,
+    "words": 334,
+    "constraint_density": {
+      "hex": 0,
+      "px": 0,
+      "defaults": 0,
+      "aria": 0,
+      "html_tags": 0
+    },
+    "requirement_coverage": {
+      "total": 0.6,
+      "by_info_source": {
+        "image": 1.0,
+        "behavior": 1.0,
+        "spec_only": 0.0
+      }
+    },
+    "structure_markers": {
+      "lists": 0,
+      "numbering": 0,
+      "headings": 0,
+      "code_blocks": 0,
+      "type_decls": 0
+    },
+    "image_references": 0,
+    "stack_requests": {
+      "react": false,
+      "vue": false,
+      "svelte": false,
+      "next": false,
+      "html_puro": false,
+      "bootstrap": false,
+      "jquery": false,
+      "outros": []
+    },
+    "envelope_chars": 2173
+  },
+  "cost": {
+    "prompt_tokens": 1106,
+    "input_tokens": 1107,
+    "output_tokens": 5147,
+    "thoughts_tokens": 2611,
+    "latency_ms": 48530
+  },
+  "status": "done",
+  "errors": []
+}

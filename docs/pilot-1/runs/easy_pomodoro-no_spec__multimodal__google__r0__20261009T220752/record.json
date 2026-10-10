@@ -1,0 +1,545 @@
+{
+  "run_id": "easy_pomodoro-no_spec__multimodal__google__r0__20261009T220752",
+  "run_kind": "pilot",
+  "cell_key": "easy_pomodoro/no_spec|multimodal|google:gemini-3.8-flash|r0",
+  "task_id": "easy_pomodoro",
+  "difficulty": "easy",
+  "prompt_kind": "no_spec",
+  "prompt_id": "easy_pomodoro/no_spec",
+  "material_shown": null,
+  "modality": "multimodal",
+  "rep": 0,
+  "created_at": "2026-10-09T22:07:52+00:00",
+  "provider": "google",
+  "model_id_requested": "gemini-3.8-flash",
+  "model_id_returned": "gemini-3.8-flash",
+  "temperature": null,
+  "thinking": {
+    "thinking_budget": 8192
+  },
+  "seed": 20260101,
+  "prompt_sha256": "27667b81378568dd90642b1b17dbb21505cb5487a1407f84a325c91fc60a6afb",
+  "image_sha256": "d31bf1895365b188ea5e26cc0099043e1a11907450b216af136259e512d2fc3a",
+  "envelope_sha256": "39799bf1cb796bc406f839863d96a53bfd49f96651ed119058d01f47fab003b7",
+  "envelope_version": "2",
+  "scaffold_version": "1.0.0",
+  "scaffold_lock_sha256": "784afb58f71e45c4990c69fce629efa36d90dc42535e13c8b841b7b993e7a20b",
+  "scaffold_tree_sha256": "f79ded644d270fbfedd50ffddbe1933a77a4ee2ebdbad5325ca03f633305631f",
+  "repo_commit": "b820545+dirty",
+  "config_sha256": "6822b0bda4671902a996130050ca63e69f349313fbf1b369b378f6ab423db2cb",
+  "oracle_suite_tag": "oracle-v1",
+  "oracle_tree_hash": "2cc00ca38cdb19d29ead965b9ddaf7c9e5a158bd",
+  "oracle_content_sha256": "d7c7b3be3ac2939bb38d0593da1d6cdd995be46c51bdf95e90294dd3062bd2e6",
+  "oracle_dirty": false,
+  "pending_sha256": "84819752d2fcaca7b88451bbc50c0d1d711af7d28f63bc0e294a98b2775b491d",
+  "mention_patterns_sha256": "1a4bb9c66f62133015429b551635ef9ac23e98d52a373dd5f509f8222e935fd2",
+  "playwright_version": "1.62.0",
+  "browser_version": "151.0.7922.34",
+  "paths": {
+    "run_dir": "runs/easy_pomodoro-no_spec__multimodal__google__r0__20261009T220752",
+    "response_raw": "response.raw.txt",
+    "generated_dir": "generated",
+    "dist_dir": "dist",
+    "build_stdout": "build.stdout.txt",
+    "build_stderr": "build.stderr.txt",
+    "screenshot": "screenshot.png",
+    "dom_blocks": "dom_blocks.json",
+    "css_snapshot": "css_snapshot.json",
+    "axe": "axe.json"
+  },
+  "exec": {
+    "format_ok": true,
+    "files_accepted": 4,
+    "files_rejected": [],
+    "contract_ok": true,
+    "build_ok": true,
+    "build_timed_out": false,
+    "build_time_s": 6.88,
+    "build_stdout_path": "build.stdout.txt",
+    "build_stderr_path": "build.stderr.txt",
+    "build_error_messages": [],
+    "render_ok": true,
+    "executable": true
+  },
+  "design2code": {
+    "n_ref_blocks": 9,
+    "n_gen_blocks": 9,
+    "n_matched": 9,
+    "n_merged_ref": 0,
+    "n_merged_gen": 0,
+    "block_match": 1.0,
+    "text": 1.0,
+    "position": 0.9525362654320989,
+    "color": 0.959279503253227,
+    "clip_inpainted": 0.9003088176639988,
+    "reference_source": "figma",
+    "pairs_path": "pairs.json"
+  },
+  "embeddings": {
+    "ves_dinov2": 0.9590993255975409,
+    "mae": 0.03693539649248123,
+    "ssim": 0.8934455513954163,
+    "dinov2_model": "facebook/dinov2-base",
+    "clip_model": "openai/clip-vit-base-patch32"
+  },
+  "code_quality": {
+    "rur": 0.9,
+    "apr": 0.0,
+    "fu": 0.7142857142857143,
+    "bc": 0.25,
+    "str": 0.3333333333333333,
+    "avu": 0.1111111111111111,
+    "isr": 0.041666666666666664,
+    "ccr": 0.0,
+    "counts": {
+      "layout_declarations_relative": 27,
+      "layout_declarations_total": 30,
+      "positioned_absolute": 0,
+      "positioned_total": 4,
+      "containers_flex_grid": 10,
+      "containers_total": 14,
+      "bands_covered": 1,
+      "bands_total": 4,
+      "semantic_elements": 8,
+      "elements_total": 24,
+      "arbitrary_classes": 17,
+      "classes_total": 153,
+      "inline_style_elements": 1,
+      "custom_classes_reused": 0,
+      "custom_classes_used": 2,
+      "custom_classes_dead": 0,
+      "classes_undefined": 0
+    }
+  },
+  "functional": {
+    "accuracy_a": 1.0,
+    "accuracy_a_restricted": 1.0,
+    "accuracy_b": 0.5,
+    "cases": [
+      {
+        "case_id": "E-A-01",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 4,
+        "n_total": 4,
+        "n_steps": 1,
+        "requirements": [
+          "E-04",
+          "E-05",
+          "E-06"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1890
+      },
+      {
+        "case_id": "E-A-02",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 3,
+        "n_total": 3,
+        "n_steps": 1,
+        "requirements": [
+          "E-02"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1281
+      },
+      {
+        "case_id": "E-A-03",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 2,
+        "n_total": 2,
+        "n_steps": 0,
+        "requirements": [
+          "E-01"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1094
+      },
+      {
+        "case_id": "E-A-04",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 3,
+        "n_total": 3,
+        "n_steps": 1,
+        "requirements": [
+          "E-03",
+          "E-04"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1266
+      },
+      {
+        "case_id": "E-A-05",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 1,
+        "n_total": 1,
+        "n_steps": 3,
+        "requirements": [
+          "E-05",
+          "E-06"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 2328
+      },
+      {
+        "case_id": "E-A-06",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 2,
+        "n_total": 2,
+        "n_steps": 5,
+        "requirements": [
+          "E-06"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1453
+      },
+      {
+        "case_id": "E-A-07",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 6,
+        "n_total": 6,
+        "n_steps": 1,
+        "requirements": [
+          "E-07",
+          "E-08"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1375
+      },
+      {
+        "case_id": "E-A-08",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 1,
+        "n_total": 1,
+        "n_steps": 4,
+        "requirements": [
+          "E-09"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1516
+      },
+      {
+        "case_id": "E-A-09",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 2,
+        "n_total": 2,
+        "n_steps": 5,
+        "requirements": [
+          "E-12"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1656
+      },
+      {
+        "case_id": "E-A-10",
+        "level": "A",
+        "outcome": "PENDING",
+        "blocked": false,
+        "n_pass": 0,
+        "n_total": 0,
+        "n_steps": 0,
+        "requirements": [
+          "E-10"
+        ],
+        "failed": [],
+        "error": "pendente: PD-E2",
+        "duration_ms": 0
+      },
+      {
+        "case_id": "E-A-11",
+        "level": "A",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 1,
+        "n_total": 1,
+        "n_steps": 2,
+        "requirements": [
+          "E-03"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1375
+      },
+      {
+        "case_id": "E-B-01",
+        "level": "B",
+        "outcome": "PARTIAL",
+        "blocked": false,
+        "n_pass": 3,
+        "n_total": 4,
+        "n_steps": 1,
+        "requirements": [
+          "E-S01"
+        ],
+        "failed": [
+          "altura de 70 px :: altura=61"
+        ],
+        "error": null,
+        "duration_ms": 1781
+      },
+      {
+        "case_id": "E-B-02",
+        "level": "B",
+        "outcome": "PARTIAL",
+        "blocked": false,
+        "n_pass": 1,
+        "n_total": 4,
+        "n_steps": 1,
+        "requirements": [
+          "E-S02"
+        ],
+        "failed": [
+          "círculo de 503 × 503 px :: caixa=Box(x=530, y=256, w=380, h=380)",
+          "tempo com fonte 128 px",
+          "nome do período com fonte 36 px"
+        ],
+        "error": null,
+        "duration_ms": 1516
+      },
+      {
+        "case_id": "E-B-03",
+        "level": "B",
+        "outcome": "PARTIAL",
+        "blocked": false,
+        "n_pass": 1,
+        "n_total": 2,
+        "n_steps": 1,
+        "requirements": [
+          "E-S03"
+        ],
+        "failed": [
+          "linha divisória #716C6C (ΔE ≤ 5) :: linhas=[(209, 213, 220)]"
+        ],
+        "error": null,
+        "duration_ms": 1297
+      },
+      {
+        "case_id": "E-B-04",
+        "level": "B",
+        "outcome": "PARTIAL",
+        "blocked": false,
+        "n_pass": 2,
+        "n_total": 3,
+        "n_steps": 4,
+        "requirements": [
+          "E-S04"
+        ],
+        "failed": [
+          "rodando: todos desabilitados"
+        ],
+        "error": null,
+        "duration_ms": 1375
+      },
+      {
+        "case_id": "E-B-05",
+        "level": "B",
+        "outcome": "PARTIAL",
+        "blocked": false,
+        "n_pass": 4,
+        "n_total": 5,
+        "n_steps": 0,
+        "requirements": [
+          "E-S05",
+          "E-S10"
+        ],
+        "failed": [
+          "todos são type=number"
+        ],
+        "error": null,
+        "duration_ms": 1234
+      },
+      {
+        "case_id": "E-B-06",
+        "level": "B",
+        "outcome": "NO",
+        "blocked": false,
+        "n_pass": 0,
+        "n_total": 2,
+        "n_steps": 2,
+        "requirements": [
+          "E-S06"
+        ],
+        "failed": [
+          "parado: aria-label 'Iniciar temporizador' :: Iniciar Pomodoro",
+          "rodando: aria-label 'Pausar temporizador' :: Pausar Pomodoro"
+        ],
+        "error": null,
+        "duration_ms": 1250
+      },
+      {
+        "case_id": "E-B-07",
+        "level": "B",
+        "outcome": "NO",
+        "blocked": false,
+        "n_pass": 0,
+        "n_total": 3,
+        "n_steps": 1,
+        "requirements": [
+          "E-S07"
+        ],
+        "failed": [
+          "input 1 tem <label> associado :: labels=0",
+          "input 2 tem <label> associado :: labels=0",
+          "input 3 tem <label> associado :: labels=0"
+        ],
+        "error": null,
+        "duration_ms": 1297
+      },
+      {
+        "case_id": "E-B-08",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 1,
+        "n_total": 1,
+        "n_steps": 2,
+        "requirements": [
+          "E-S08"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1203
+      },
+      {
+        "case_id": "E-B-09",
+        "level": "B",
+        "outcome": "PARTIAL",
+        "blocked": false,
+        "n_pass": 7,
+        "n_total": 12,
+        "n_steps": 2,
+        "requirements": [
+          "E-S09"
+        ],
+        "failed": [
+          "Foco Total: retângulo de 89 × 40 px :: retângulo=(236.984375, 852, 72, 28)",
+          "Pausa Curta: retângulo de 89 × 40 px :: retângulo=(727.90625, 852, 72, 28)",
+          "Pausa Curta: fundo na cor do modo :: fundo=(77, 128, 85)",
+          "Pausa Longa: retângulo de 89 × 40 px :: retângulo=(1224, 852, 72, 28)",
+          "Foco Total alinhado à logo (±24 px) :: x=144 logo=24"
+        ],
+        "error": null,
+        "duration_ms": 1469
+      },
+      {
+        "case_id": "E-B-10",
+        "level": "B",
+        "outcome": "YES",
+        "blocked": false,
+        "n_pass": 4,
+        "n_total": 4,
+        "n_steps": 1,
+        "requirements": [
+          "E-S03"
+        ],
+        "failed": [],
+        "error": null,
+        "duration_ms": 1234
+      },
+      {
+        "case_id": "E-B-11",
+        "level": "B",
+        "outcome": "PARTIAL",
+        "blocked": false,
+        "n_pass": 2,
+        "n_total": 3,
+        "n_steps": 4,
+        "requirements": [
+          "E-S11"
+        ],
+        "failed": [
+          "o som foi tocado ao zerar :: plays=0"
+        ],
+        "error": null,
+        "duration_ms": 2094
+      }
+    ],
+    "suite_sha256": "d7c7b3be3ac2939bb38d0593da1d6cdd995be46c51bdf95e90294dd3062bd2e6",
+    "suite_git_tag": "oracle-v1"
+  },
+  "technical": {
+    "console_errors": [],
+    "console_error_count": 0,
+    "blocked_requests": [],
+    "axe_violations": {
+      "critical": 0,
+      "serious": 2,
+      "moderate": 1,
+      "minor": 0
+    },
+    "axe_report_path": "axe.json"
+  },
+  "input_spec": {
+    "chars": 986,
+    "words": 186,
+    "constraint_density": {
+      "hex": 0,
+      "px": 0,
+      "defaults": 1,
+      "aria": 0,
+      "html_tags": 0
+    },
+    "requirement_coverage": {
+      "total": 0.5217391304347826,
+      "by_info_source": {
+        "image": 1.0,
+        "behavior": 1.0,
+        "spec_only": 0.0
+      }
+    },
+    "structure_markers": {
+      "lists": 0,
+      "numbering": 0,
+      "headings": 0,
+      "code_blocks": 0,
+      "type_decls": 0
+    },
+    "image_references": 0,
+    "stack_requests": {
+      "react": false,
+      "vue": false,
+      "svelte": false,
+      "next": false,
+      "html_puro": false,
+      "bootstrap": false,
+      "jquery": false,
+      "outros": []
+    },
+    "envelope_chars": 2173
+  },
+  "cost": {
+    "prompt_tokens": 908,
+    "input_tokens": 2001,
+    "output_tokens": 4618,
+    "thoughts_tokens": 720,
+    "latency_ms": 39092
+  },
+  "status": "done",
+  "errors": []
+}

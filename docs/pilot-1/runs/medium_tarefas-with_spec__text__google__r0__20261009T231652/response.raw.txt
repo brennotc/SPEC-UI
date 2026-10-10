@@ -1,0 +1,764 @@
+```ts file=src/app/types.ts
+export type PriorityLevel = 'URGENTE' | 'MÉDIO' | 'RELAXA';
+
+export interface Task {
+  id: string;
+  description: string;
+  dueDate: string; // Formato YYYY-MM-DD
+  priority: PriorityLevel;
+  completed: boolean;
+}
+
+export interface TaskGroup {
+  groupTitle: string; // "Hoje", "Amanhã" ou a data formatada
+  dateKey: string;
+  tasks: Task[];
+}
+
+export interface TaskFilter {
+  date?: string;
+  priority?: PriorityLevel | 'TODAS';
+}
+
+export const PRIORITY_WEIGHT: Record<PriorityLevel, number> = {
+  URGENTE: 3,
+  'MÉDIO': 2,
+  RELAXA: 1
+};
+```
+
+```css file=src/styles.css
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/inter/700.css';
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+  background-color: #000000;
+  color: #FFFFFF;
+  overflow: hidden;
+}
+
+/* Custom scrollbar for task container */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #111111;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #60C2E5;
+}
+
+/* Color definitions */
+:root {
+  --color-urgente: #FF0000;
+  --color-medio: #8D8A31;
+  --color-relaxa: #0F633F;
+  --color-gray: #D5D0D0;
+  --color-blue-header: #60C2E5;
+}
+```
+
+```html file=src/app/app.html
+<div class="h-screen w-screen flex flex-col bg-black text-white overflow-hidden font-sans select-none">
+  <!-- 1. HEADER FIXO -->
+  <header
+    class="w-full flex-none flex items-center px-6 md:px-12 z-20"
+    style="height: 70px; background-color: #60C2E5;"
+  >
+    <div class="flex items-center gap-3">
+      <ng-icon
+        name="heroListBullet"
+        class="text-black text-3xl font-bold flex-shrink-0"
+        aria-hidden="true"
+      ></ng-icon>
+      <h1 class="text-black text-2xl md:text-3xl font-bold tracking-tight">
+        Tarefas Para Fazer
+      </h1>
+    </div>
+  </header>
+
+  <!-- 2. LINHA DE FILTROS FIXA -->
+  <section
+    aria-label="Filtros de tarefas"
+    class="w-full flex-none bg-black px-6 md:px-12 py-4 border-b border-neutral-900 z-10"
+  >
+    <div class="flex flex-wrap items-center gap-6 md:gap-10">
+      <!-- Filtro de Data -->
+      <div class="flex items-center gap-4">
+        <label for="filter-date-input" class="text-[32px] font-bold" style="color: #D5D0D0;">
+          Data:
+        </label>
+        <input
+          id="filter-date-input"
+          type="text"
+          placeholder="DD/MM/AAAA"
+          maxlength="10"
+          [value]="filterDateDisplay()"
+          (input)="onFilterDateInput($event)"
+          aria-label="Filtrar por data"
+          class="text-black text-center font-medium focus:outline-none focus:ring-2 focus:ring-[#60C2E5] rounded-none"
+          style="width: 170px; height: 55px; background-color: #D5D0D0;"
+        />
+      </div>
+
+      <!-- Filtro de Prioridade -->
+      <div class="flex items-center gap-4">
+        <label for="filter-priority-select" class="text-[32px] font-bold" style="color: #D5D0D0;">
+          Prioridade:
+        </label>
+        <div class="relative">
+          <select
+            id="filter-priority-select"
+            [value]="filterPriority()"
+            (change)="onFilterPriorityChange($event)"
+            aria-label="Filtrar por prioridade"
+            class="text-black font-medium px-3 focus:outline-none focus:ring-2 focus:ring-[#60C2E5] rounded-none cursor-pointer appearance-none text-center"
+            style="width: 170px; height: 55px; background-color: #D5D0D0;"
+          >
+            <option value="TODAS">Selecione</option>
+            <option value="URGENTE">URGENTE</option>
+            <option value="MÉDIO">MÉDIO</option>
+            <option value="RELAXA">RELAXA</option>
+          </select>
+          <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-black">
+            <ng-icon name="lucideChevronDown" class="text-xl"></ng-icon>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botão para limpar filtros caso estejam ativos -->
+      @if (filterDateDisplay() || filterPriority() !== 'TODAS') {
+        <button
+          type="button"
+          (click)="clearFilters()"
+          class="text-sm font-semibold underline text-[#60C2E5] hover:opacity-80 transition cursor-pointer"
+        >
+          Limpar Filtros
+        </button>
+      }
+    </div>
+  </section>
+
+  <!-- 3. ÁREA CENTRAL (LISTA COM ROLAGEM VERTICAL EXCLUSIVA) -->
+  <main
+    class="flex-1 overflow-y-auto px-6 md:px-12 py-6 custom-scrollbar"
+    tabindex="0"
+    aria-label="Lista de Tarefas"
+  >
+    <div class="w-full max-w-[1327px]">
+      @if (groupedTasks().length === 0) {
+        <div class="py-16 text-center text-neutral-400">
+          <p class="text-2xl font-medium">Nenhuma tarefa encontrada para os filtros selecionados.</p>
+        </div>
+      }
+
+      @for (group of groupedTasks(); track group.dateKey) {
+        <div class="mb-10">
+          <!-- Cabeçalho do Grupo -->
+          <div class="mb-2">
+            <h2
+              class="text-[32px] font-bold tracking-tight inline-block"
+              style="color: #60C2E5;"
+            >
+              {{ group.groupTitle }}
+            </h2>
+            <!-- Linha branca de 1327px que inicia alinhada horizontalmente com o título -->
+            <div
+              class="w-full max-w-[1327px] h-[2px] bg-white mt-1 mb-4"
+              role="separator"
+            ></div>
+          </div>
+
+          <!-- Linhas de Tarefa do Grupo -->
+          <div class="flex flex-col">
+            @for (task of group.tasks; track task.id) {
+              <div class="w-full max-w-[1247px] mb-3">
+                @if (editingTaskId() === task.id) {
+                  <!-- MODO DE EDIÇÃO IN-LINE -->
+                  <div
+                    class="flex flex-wrap items-center gap-3 py-2 px-3 bg-neutral-900 border border-[#60C2E5]"
+                  >
+                    <!-- Campo de Data para Edição -->
+                    <input
+                      type="text"
+                      placeholder="DD/MM/AAAA"
+                      maxlength="10"
+                      [value]="editDateInput()"
+                      (input)="onEditDateChange($event)"
+                      aria-label="Editar data da tarefa"
+                      class="text-black text-center font-medium focus:outline-none focus:ring-1 focus:ring-[#60C2E5] rounded-none"
+                      style="width: 140px; height: 38px; background-color: #D5D0D0;"
+                    />
+
+                    <!-- Campo de Prioridade para Edição -->
+                    <select
+                      [value]="editPriorityInput()"
+                      (change)="onEditPriorityChange($event)"
+                      aria-label="Editar prioridade da tarefa"
+                      class="text-black font-medium px-2 focus:outline-none focus:ring-1 focus:ring-[#60C2E5] rounded-none cursor-pointer"
+                      style="width: 140px; height: 38px; background-color: #D5D0D0;"
+                    >
+                      <option value="URGENTE">URGENTE</option>
+                      <option value="MÉDIO">MÉDIO</option>
+                      <option value="RELAXA">RELAXA</option>
+                    </select>
+
+                    <!-- Campo de Descrição para Edição -->
+                    <input
+                      type="text"
+                      [value]="editDescriptionInput()"
+                      (input)="onEditDescChange($event)"
+                      aria-label="Editar descrição da tarefa"
+                      class="flex-1 min-w-[200px] text-black px-3 font-medium focus:outline-none focus:ring-1 focus:ring-[#60C2E5] rounded-none"
+                      style="height: 38px; background-color: #D5D0D0;"
+                    />
+
+                    <!-- Botão Confirmar Edição (Ícone Check) -->
+                    <button
+                      type="button"
+                      (click)="saveEditingTask()"
+                      aria-label="Confirmar alteração da tarefa"
+                      class="flex items-center justify-center p-2 rounded hover:opacity-80 transition cursor-pointer focus:ring-2 focus:ring-[#60C2E5]"
+                      style="color: #60C2E5;"
+                    >
+                      <ng-icon name="lucideCheck" class="text-3xl font-bold"></ng-icon>
+                    </button>
+
+                    <!-- Botão Cancelar Edição -->
+                    <button
+                      type="button"
+                      (click)="cancelEditing()"
+                      aria-label="Cancelar edição"
+                      class="flex items-center justify-center p-2 rounded hover:opacity-80 transition cursor-pointer text-gray-400 focus:ring-2 focus:ring-gray-400"
+                    >
+                      <ng-icon name="lucideX" class="text-2xl font-bold"></ng-icon>
+                    </button>
+                  </div>
+                } @else {
+                  <!-- MODO DE EXIBIÇÃO DA TAREFA -->
+                  <div
+                    class="flex items-center justify-between py-2 transition-opacity"
+                    [class.opacity-50]="task.completed"
+                  >
+                    <!-- Bloco Esquerdo: [Badge de Prioridade] [Checkbox] [Descrição] -->
+                    <div class="flex items-center gap-4 flex-1 min-w-0 pr-4">
+                      <!-- Badge de Prioridade (146px x 36px) -->
+                      <div
+                        class="flex-shrink-0 flex items-center justify-center font-bold text-white text-base tracking-wider uppercase"
+                        style="width: 146px; height: 36px;"
+                        [style.background-color]="getPriorityColor(task.priority)"
+                      >
+                        {{ task.priority }}
+                      </div>
+
+                      <!-- Checkbox em branco quando desselecionado -->
+                      <label class="relative flex items-center cursor-pointer flex-shrink-0">
+                        <input
+                          type="checkbox"
+                          [checked]="task.completed"
+                          (change)="toggleTaskCompletion(task.id)"
+                          [attr.aria-label]="'Marcar tarefa ' + task.description + ' como concluída'"
+                          class="peer h-6 w-6 appearance-none border-2 border-white rounded-none bg-transparent checked:bg-white checked:border-white focus:outline-none focus:ring-2 focus:ring-[#60C2E5] cursor-pointer"
+                        />
+                        <ng-icon
+                          name="lucideCheck"
+                          class="absolute inset-0 m-auto text-black text-base font-black opacity-0 peer-checked:opacity-100 pointer-events-none"
+                        ></ng-icon>
+                      </label>
+
+                      <!-- Nome / Descrição da Tarefa -->
+                      <span
+                        class="text-white text-xl font-normal truncate"
+                        [class.line-through]="task.completed"
+                        [title]="task.description"
+                      >
+                        {{ task.description }}
+                      </span>
+                    </div>
+
+                    <!-- Bloco Direito: [Lápis em azul header] [Lixeira em vermelho Prioridade URGENTE] -->
+                    <div class="flex items-center gap-4 flex-shrink-0">
+                      <button
+                        type="button"
+                        (click)="startEditingTask(task)"
+                        aria-label="Editar tarefa"
+                        class="p-1 hover:opacity-80 transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#60C2E5]"
+                        style="color: #60C2E5;"
+                      >
+                        <ng-icon name="lucidePencil" class="text-2xl"></ng-icon>
+                      </button>
+
+                      <button
+                        type="button"
+                        (click)="deleteTask(task.id)"
+                        aria-label="Excluir tarefa"
+                        class="p-1 hover:opacity-80 transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FF0000]"
+                        style="color: #FF0000;"
+                      >
+                        <ng-icon name="lucideTrash2" class="text-2xl"></ng-icon>
+                      </button>
+                    </div>
+                  </div>
+                }
+
+                <!-- Linha branca de 1247px separando tarefas -->
+                <div
+                  class="w-full max-w-[1247px] h-[1px] bg-white my-1"
+                  role="separator"
+                ></div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </main>
+
+  <!-- 4. DIVISÓRIA E RODAPÉ DE CRIAÇÃO (FIXO) -->
+  <footer class="w-full flex-none bg-black z-20">
+    <!-- Linha cinza horizontal separando a lista do rodapé -->
+    <div
+      class="w-full h-[2px]"
+      style="background-color: #D5D0D0;"
+      role="separator"
+    ></div>
+
+    <form
+      (submit)="onSubmitNewTask($event)"
+      class="w-full px-6 md:px-12 py-5 flex flex-wrap items-center gap-4 md:gap-6"
+      aria-label="Adicionar nova tarefa"
+    >
+      <span class="text-2xl md:text-[28px] font-bold text-white flex-shrink-0">
+        Nova tarefa:
+      </span>
+
+      <!-- Input de Data -->
+      <div class="flex-shrink-0">
+        <label for="new-task-date" class="sr-only">Data da nova tarefa</label>
+        <input
+          id="new-task-date"
+          type="text"
+          placeholder="DD/MM/AAAA"
+          maxlength="10"
+          [value]="newTaskDate()"
+          (input)="onNewTaskDateInput($event)"
+          aria-label="Data da nova tarefa"
+          class="text-black text-center font-medium focus:outline-none focus:ring-2 focus:ring-[#60C2E5] rounded-none"
+          style="width: 150px; height: 50px; background-color: #D5D0D0;"
+          required
+        />
+      </div>
+
+      <!-- Select de Prioridade -->
+      <div class="relative flex-shrink-0">
+        <label for="new-task-priority" class="sr-only">Prioridade da tarefa</label>
+        <select
+          id="new-task-priority"
+          [value]="newTaskPriority()"
+          (change)="onNewTaskPriorityChange($event)"
+          aria-label="Prioridade da tarefa"
+          class="text-black font-medium px-4 focus:outline-none focus:ring-2 focus:ring-[#60C2E5] rounded-none cursor-pointer appearance-none text-center"
+          style="width: 160px; height: 50px; background-color: #D5D0D0;"
+        >
+          <option value="URGENTE">URGENTE</option>
+          <option value="MÉDIO">MÉDIO</option>
+          <option value="RELAXA">RELAXA</option>
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-black">
+          <ng-icon name="lucideChevronDown" class="text-xl"></ng-icon>
+        </div>
+      </div>
+
+      <!-- Input de Descrição longo -->
+      <div class="flex-1 min-w-[240px]">
+        <label for="new-task-desc" class="sr-only">Descrição da tarefa</label>
+        <input
+          id="new-task-desc"
+          type="text"
+          placeholder="Descrição da tarefa"
+          [value]="newTaskDescription()"
+          (input)="newTaskDescription.set($any($event.target).value)"
+          aria-label="Descrição da tarefa"
+          class="w-full text-black px-4 font-medium focus:outline-none focus:ring-2 focus:ring-[#60C2E5] rounded-none placeholder:text-neutral-600"
+          style="height: 50px; background-color: #D5D0D0;"
+          required
+        />
+      </div>
+
+      <!-- Botão com ícone de + Azul Header -->
+      <button
+        type="submit"
+        aria-label="Adicionar tarefa"
+        class="flex-shrink-0 flex items-center justify-center p-2 rounded-none hover:opacity-80 transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-white"
+        style="width: 50px; height: 50px; background-color: #60C2E5;"
+      >
+        <ng-icon name="lucidePlus" class="text-black text-3xl font-extrabold"></ng-icon>
+      </button>
+    </form>
+  </footer>
+</div>
+```
+
+```ts file=src/app/app.ts
+import { Component, computed, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { heroListBullet } from '@ng-icons/heroicons/outline';
+import {
+  lucidePencil,
+  lucideTrash2,
+  lucideCheck,
+  lucidePlus,
+  lucideChevronDown,
+  lucideX
+} from '@ng-icons/lucide';
+import { PriorityLevel, Task, TaskGroup, PRIORITY_WEIGHT } from './types';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, NgIcon],
+  viewProviders: [
+    provideIcons({
+      heroListBullet,
+      lucidePencil,
+      lucideTrash2,
+      lucideCheck,
+      lucidePlus,
+      lucideChevronDown,
+      lucideX
+    })
+  ],
+  templateUrl: './app.html',
+  styleUrls: ['./app.css']
+})
+export class App {
+  // Helpers para cálculo de datas padrão
+  private todayStr = this.getTodayIso();
+  private tomorrowStr = this.getOffsetIso(1);
+  private dayAfterStr = this.getOffsetIso(2);
+
+  // Estado das Tarefas
+  readonly tasks = signal<Task[]>([
+    {
+      id: 'task-1',
+      description: 'Reunião de alinhamento com equipe de produto',
+      dueDate: this.todayStr,
+      priority: 'URGENTE',
+      completed: false
+    },
+    {
+      id: 'task-2',
+      description: 'Revisar PR de autenticação e permissões',
+      dueDate: this.todayStr,
+      priority: 'MÉDIO',
+      completed: false
+    },
+    {
+      id: 'task-3',
+      description: 'Organizar pastas de downloads e backup',
+      dueDate: this.todayStr,
+      priority: 'RELAXA',
+      completed: true
+    },
+    {
+      id: 'task-4',
+      description: 'Preparar apresentação de arquitetura Angular 20',
+      dueDate: this.tomorrowStr,
+      priority: 'URGENTE',
+      completed: false
+    },
+    {
+      id: 'task-5',
+      description: 'Atualizar documentação das APIs no Confluence',
+      dueDate: this.tomorrowStr,
+      priority: 'MÉDIO',
+      completed: false
+    },
+    {
+      id: 'task-6',
+      description: 'Pesquisar novas extensões do Tailwind CSS',
+      dueDate: this.dayAfterStr,
+      priority: 'RELAXA',
+      completed: false
+    }
+  ]);
+
+  // Filtros
+  readonly filterDateDisplay = signal<string>(''); // formato DD/MM/AAAA
+  readonly filterPriority = signal<PriorityLevel | 'TODAS'>('TODAS');
+
+  // Formulário de Adição
+  readonly newTaskDate = signal<string>(this.isoToDisplay(this.todayStr));
+  readonly newTaskPriority = signal<PriorityLevel>('URGENTE');
+  readonly newTaskDescription = signal<string>('');
+
+  // Modo de Edição
+  readonly editingTaskId = signal<string | null>(null);
+  readonly editDateInput = signal<string>('');
+  readonly editPriorityInput = signal<PriorityLevel>('URGENTE');
+  readonly editDescriptionInput = signal<string>('');
+
+  // Tarefas agrupadas e ordenadas por prioridade
+  readonly groupedTasks = computed<TaskGroup[]>(() => {
+    const all = this.tasks();
+    const filterD = this.filterDateDisplay().trim();
+    const filterP = this.filterPriority();
+
+    let filtered = all;
+
+    // Filtro por data
+    if (filterD.length === 10) {
+      const isoFilter = this.displayToIso(filterD);
+      filtered = filtered.filter((t) => t.dueDate === isoFilter);
+    }
+
+    // Filtro por prioridade
+    if (filterP !== 'TODAS') {
+      filtered = filtered.filter((t) => t.priority === filterP);
+    }
+
+    // Agrupar por data (dueDate)
+    const groupsMap = new Map<string, Task[]>();
+    for (const task of filtered) {
+      if (!groupsMap.has(task.dueDate)) {
+        groupsMap.set(task.dueDate, []);
+      }
+      groupsMap.get(task.dueDate)!.push(task);
+    }
+
+    // Ordenar as datas cronologicamente
+    const sortedDateKeys = Array.from(groupsMap.keys()).sort();
+
+    // Ordenar as tarefas dentro de cada grupo da mais prioritária para a menos prioritária
+    return sortedDateKeys.map((dateKey) => {
+      const tasksInGroup = groupsMap.get(dateKey) || [];
+      const sortedTasks = [...tasksInGroup].sort((a, b) => {
+        const weightDiff = PRIORITY_WEIGHT[b.priority] - PRIORITY_WEIGHT[a.priority];
+        if (weightDiff !== 0) return weightDiff;
+        return a.description.localeCompare(b.description);
+      });
+
+      return {
+        groupTitle: this.resolveGroupTitle(dateKey),
+        dateKey,
+        tasks: sortedTasks
+      };
+    });
+  });
+
+  // Utilitários de data
+  private getTodayIso(): string {
+    const d = new Date();
+    return this.formatIsoDate(d);
+  }
+
+  private getOffsetIso(offsetDays: number): string {
+    const d = new Date();
+    d.setDate(d.getDate() + offsetDays);
+    return this.formatIsoDate(d);
+  }
+
+  private formatIsoDate(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  private isoToDisplay(iso: string): string {
+    if (!iso || !iso.includes('-')) return '';
+    const [y, m, d] = iso.split('-');
+    if (!y || !m || !d) return '';
+    return `${d.padStart(2, '0')}/${m.padStart(2, '0')}/${y}`;
+  }
+
+  private displayToIso(display: string): string {
+    const parts = display.split('/');
+    if (parts.length !== 3) return '';
+    const [d, m, y] = parts;
+    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+  }
+
+  private applyDateMask(value: string): string {
+    const digits = value.replace(/\D/g, '').slice(0, 8);
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+  }
+
+  resolveGroupTitle(dateKey: string): string {
+    const today = this.getTodayIso();
+    const tomorrow = this.getOffsetIso(1);
+
+    if (dateKey === today) {
+      return 'Hoje';
+    }
+    if (dateKey === tomorrow) {
+      return 'Amanhã';
+    }
+    return this.isoToDisplay(dateKey);
+  }
+
+  getPriorityColor(priority: PriorityLevel): string {
+    switch (priority) {
+      case 'URGENTE':
+        return '#FF0000';
+      case 'MÉDIO':
+        return '#8D8A31';
+      case 'RELAXA':
+        return '#0F633F';
+      default:
+        return '#D5D0D0';
+    }
+  }
+
+  // Ações de Filtro
+  onFilterDateInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const masked = this.applyDateMask(input.value);
+    input.value = masked;
+    this.filterDateDisplay.set(masked);
+  }
+
+  onFilterPriorityChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.filterPriority.set(select.value as PriorityLevel | 'TODAS');
+  }
+
+  clearFilters(): void {
+    this.filterDateDisplay.set('');
+    this.filterPriority.set('TODAS');
+  }
+
+  // Ações de Tarefa
+  toggleTaskCompletion(id: string): void {
+    this.tasks.update((list) =>
+      list.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+  }
+
+  deleteTask(id: string): void {
+    this.tasks.update((list) => list.filter((task) => task.id !== id));
+    if (this.editingTaskId() === id) {
+      this.cancelEditing();
+    }
+  }
+
+  startEditingTask(task: Task): void {
+    this.editingTaskId.set(task.id);
+    this.editDateInput.set(this.isoToDisplay(task.dueDate));
+    this.editPriorityInput.set(task.priority);
+    this.editDescriptionInput.set(task.description);
+  }
+
+  onEditDateChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const masked = this.applyDateMask(input.value);
+    input.value = masked;
+    this.editDateInput.set(masked);
+  }
+
+  onEditPriorityChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.editPriorityInput.set(select.value as PriorityLevel);
+  }
+
+  onEditDescChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.editDescriptionInput.set(input.value);
+  }
+
+  saveEditingTask(): void {
+    const id = this.editingTaskId();
+    if (!id) return;
+
+    let isoDate = this.displayToIso(this.editDateInput());
+    if (!isoDate || isoDate.length !== 10) {
+      isoDate = this.getTodayIso();
+    }
+
+    const desc = this.editDescriptionInput().trim();
+    if (!desc) return;
+
+    const priority = this.editPriorityInput();
+
+    this.tasks.update((list) =>
+      list.map((task) =>
+        task.id === id
+          ? {
+              ...task,
+              dueDate: isoDate,
+              priority,
+              description: desc
+            }
+          : task
+      )
+    );
+
+    this.cancelEditing();
+  }
+
+  cancelEditing(): void {
+    this.editingTaskId.set(null);
+    this.editDateInput.set('');
+    this.editDescriptionInput.set('');
+  }
+
+  // Ações de Adição
+  onNewTaskDateInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const masked = this.applyDateMask(input.value);
+    input.value = masked;
+    this.newTaskDate.set(masked);
+  }
+
+  onNewTaskPriorityChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.newTaskPriority.set(select.value as PriorityLevel);
+  }
+
+  onSubmitNewTask(event: Event): void {
+    event.preventDefault();
+    const desc = this.newTaskDescription().trim();
+    if (!desc) return;
+
+    let iso = this.displayToIso(this.newTaskDate());
+    if (!iso || iso.length !== 10) {
+      iso = this.getTodayIso();
+    }
+
+    const newTask: Task = {
+      id: 'task-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+      description: desc,
+      dueDate: iso,
+      priority: this.newTaskPriority(),
+      completed: false
+    };
+
+    this.tasks.update((list) => [...list, newTask]);
+
+    // Limpar os inputs do formulário
+    this.newTaskDescription.set('');
+    this.newTaskPriority.set('URGENTE');
+    this.newTaskDate.set(this.isoToDisplay(this.getTodayIso()));
+  }
+}
+```
+
+```css file=src/app/app.css
+/* Component-specific overrides if needed */
+```
