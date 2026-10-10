@@ -245,7 +245,7 @@ class Pipeline:
 
         # 5. build + render + métricas. Uma falha de INFRAESTRUTURA aqui (disco, porta, Chromium que caiu) não pode perder a
         # chamada paga: vira `metric_error` com a exceção em `errors`, o record é gravado e a retomada não refaz a API
-        # (`evaluate --rebuild` refaz só o build/render a partir de response.raw.txt). Falha DO APP (build quebrado, timeout
+        # (refazer só o build/render a partir de response.raw.txt seria `evaluate --rebuild`, F3.3 do plano, ainda NÃO aplicado). Falha DO APP (build quebrado, timeout
         # de carregamento) já é `nonexecutable`; erro de configuração e cota continuam subindo.
         try:
             self._build_render_measure(cell, task, pkg, bundle, rec, out_dir)

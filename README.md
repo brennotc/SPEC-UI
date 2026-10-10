@@ -154,6 +154,9 @@ recusa e valem `refusal`; `MAX_TOKENS` vale `truncated`. Exceção de **infraest
 (disco, navegador fechado, `OSError`) vira `metric_error` **gravado** (a resposta paga já está em `response.raw.txt`) e a execução segue
 para a próxima célula. Já o app que não carrega em 30 s é falha do app: `render_ok = false` e status `nonexecutable`. Se a extração do DOM falhar
 com o render ok, Design2Code e CLIP ficam `null` com a nota no record (zero só vale para página realmente vazia).
+**Ainda não existe comando para recuperar um `metric_error` de infraestrutura gravado antes do render** (sem `screenshot`):
+`specui evaluate --rebuild` (refazer build e render a partir de `response.raw.txt`, sem API) está planejado e adiado para depois do `analyze`;
+até lá, `analyze` recusa enquanto houver um desses records e `evaluate` o informa como erro.
 
 ## 9. Execução
 
