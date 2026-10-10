@@ -107,7 +107,9 @@ specui check-model                                       # confirma os ids dos d
 ```
 
 `requirements.lock` é o `pip freeze` do ambiente do piloto 1 (Playwright 1.62.0 → Chromium 151.0.7922.34, torch 2.14.1, transformers 5.19.0);
-`playwright` é a única dependência pinada em `requirements.txt`, porque a versão define o navegador. Windows: `git config core.longpaths true`. O `workspace_dir` (`C:/specui-work`) é curto de propósito (limite de caminho).
+`playwright` é a única dependência pinada em `requirements.txt`, porque a versão define o navegador. Windows: `git config core.longpaths true`. O `workspace_dir` tem padrão por plataforma (`C:/specui-work` no Windows, curto de propósito por causa do limite de caminho; `~/.cache/specui-work` nas demais) e pode ser trocado na configuração.
+
+A instalação é **editável** (`pip install -e .`): `oracles/`, `configs/`, `benchmarks/` e `scaffold/` não são empacotados, são lidos do repositório. Python 3.12 é exigido (`requires-python` em `pyproject.toml`; o harness usa `os.path.isjunction`).
 
 ## 6. Tarefas, requisitos e rastreabilidade
 
@@ -140,6 +142,12 @@ e as falhas de infraestrutura `api_error` (a célula é refeita), `metric_error`
 `model_mismatch` (modelo devolvido ≠ solicitado: a célula é refeita; **se repetir, o run é interrompido** com
 `ModelMismatchError`, checkpoint intacto). Não existe fallback de modelo nem de provedor.
 
+Todo record grava `finish_reason` (o motivo de parada devolvido pelo provedor). `RECITATION`, `SAFETY`, `PROHIBITED_CONTENT`, `BLOCKLIST`, `SPII` e `IMAGE_SAFETY` (e o bloqueio do prompt) são motivos de
+recusa e valem `refusal`; `MAX_TOKENS` vale `truncated`. Exceção de **infraestrutura** no build ou no render
+(disco, navegador fechado, `OSError`) vira `metric_error` **gravado** (a resposta paga já está em `response.raw.txt`) e a execução segue
+para a próxima célula. Já o app que não carrega em 30 s é falha do app: `render_ok = false` e status `nonexecutable`. Se a extração do DOM falhar
+com o render ok, Design2Code e CLIP ficam `null` com a nota no record (zero só vale para página realmente vazia).
+
 ## 9. Execução
 
 ```bash
@@ -157,6 +165,10 @@ Ordem das células: **rep-major** (camadas completas por repetição). Chaves do
 alterna entre `GEMINI_API_KEY`, `GEMINI_API_KEY_1..9`; quando a cota **diária** de uma chave acaba, ela sai da rotação e a execução
 segue com a próxima. Só quando todas esgotam a execução para; o progresso fica salvo e é retomado no mesmo comando. Atenção: chaves
 do **mesmo projeto** do Google Cloud dividem a mesma cota, então só chaves de projetos diferentes somam cota. A execução principal **só inicia** com o oráculo congelado (seção 11).
+
+`specui smoke`, `run --mock` e `pilot --mock` gravam em `results/smoke/`, nunca em `results/pilot/` nem na execução principal; o gerador simulado
+nunca entra em `evaluate` (salvo `--include-mock`) nem em `analyze` (que o recusa). `specui evaluate` em `run_kind: main` com o grupo
+`functional` **recusa** (exit 2) se o oráculo não estiver congelado (árvore suja, sem tag ou `oracles/VERSION` diferente da tag).
 
 ## 10. Métricas (por artigo)
 
@@ -187,8 +199,13 @@ Cada caso é um par (Task, Expected Result) com script Playwright determinístic
 com `run_for`, `reduced_motion`, rede bloqueada fora da origem local, espiões de áudio. Seletores semânticos (papel, rótulo, texto,
 geometria que o prompt dá); `oracle-lint` rejeita `#id`, `.classe`, `data-testid` e caso sem asserção.
 
-- **Resultado:** YES (todas as asserções passam), PARTIAL (≥ 1 passa e ≥ 1 falha), NO (nenhuma passa, exceção ou pré-condição que
-  falhou: `blocked=true`, vale 0 e fica no denominador). Asserções `PENDING` ficam fora do numerador e do denominador.
+- **O que pontua:** só o *Expected Result* (`ok` e `eventually`). A *Task* (`act`) e as pré-condições (`require`) que **passam** são
+  **passos** (status `step`): ficam fora do numerador e do denominador e são contadas em `n_steps`. `act` ou `require` que **falha** é
+  falha pontuada; `require` que falha ainda bloqueia o caso. Quando o efeito principal da funcionalidade é pré-condição (`require`) das
+  asserções de invariante, uma funcionalidade quebrada dá NO, não PARTIAL (regra PD-C3 em `oracles/<tarefa>/pending.yaml`). Caso sem
+  nenhuma asserção pontuada dá NO, e o `oracle-lint` exige ≥ 1 `ok`/`eventually` por caso não pendente.
+- **Resultado:** YES (todas as asserções pontuadas passam), PARTIAL (≥ 1 passa e ≥ 1 falha), NO (nenhuma passa, exceção ou pré-condição
+  que falhou: `blocked=true`, vale 0 e fica no denominador). Asserções `PENDING` ficam fora do numerador e do denominador.
 - **Níveis:** A (só do `## Prompt`; nota **principal**) e B (exigências específicas da spec: hex ΔE ≤ 5, medidas, ARIA, semântica,
   foco, áudio; diagnóstica).
 - **Regra de decisão das pendências** (o `## Prompt` não muda, logo uma decisão não pode criar requisito que ele não contém):
@@ -205,9 +222,18 @@ geometria que o prompt dá); `oracle-lint` rejeita `#id`, `.classe`, `data-testi
 - **Mutação** (`specui mutate`): sobre saídas do piloto que deram YES, estraga o app em tempo de execução (remover elementos, engolir
   cliques, congelar timers, somente leitura, remover rolagem, quebrar DnD, trocar texto) e confirma que o caso deixa de dar YES.
   `sensitivity.csv`: `KILLED` | `WEAK` | `SURVIVED` | `NOT_APPLIED`. Caso que sobrevive é revisto antes do congelamento.
+  `sensitivity_baseline.csv` guarda o resultado de cada caso-alvo no app intacto (diagnóstico de todo `NOT_APPLIED`). `MUT-M8`
+  (`neutralize_filters`) desliga só os controles de filtro, sem derrubar a criação de tarefas (M-A-10, M-A-11).
+- **Piloto 1 (`oracle-v1`, `google:gemini-3.8-flash`, 12 células):** 148 pares oráculo × mutação: **136 KILLED, 11 WEAK, 1 NOT_APPLIED,
+  0 SURVIVED**. Os 11 WEAK são casos multi-requisito em que PARTIAL é intencional (E-A-01, M-A-05, H-A-03); o NOT_APPLIED é
+  MUT-H4 × H-A-03 num run cujo baseline já era PARTIAL. `accuracy_a` mudou em 1 das 12 células (medium, `no_spec`, multimodal:
+  0,958 → 0,917); `accuracy_b` caiu nas 6 células `no_spec` e ficou igual nas `with_spec`; `n_total` do nível A por run caiu
+  (48/99/113 → 25/50/71) porque passos deixaram de pontuar. A evidência (records, capturas, relatórios, baseline anterior) está em
+  [docs/pilot-1/](docs/pilot-1/README.md); o registro por classe de mudança, em `oracles/CHANGELOG.md`.
 - **Congelamento:** `git tag oracle-v1` na árvore atual de `oracles/` (e `oracles/VERSION` igual à tag). A execução principal recusa
   `dirty`/sem tag; cada record grava tag, hash da árvore, hash do conteúdo, hash de `pending.yaml` e de `mention_patterns`, e as
   versões do Playwright e do Chromium. Qualquer mudança exige nova tag e reexecução; `analyze` recusa misturar tags.
+  `oracles/registry.yaml` é informativo (nenhum código o lê) e permanece porque `oracles/` está congelado.
 
 ## 12. Análise
 
@@ -225,7 +251,8 @@ geometria que o prompt dá); `oracle-lint` rejeita `#id`, `.classe`, `data-testi
 - **Livres:** regressão da nota sobre cobertura e densidade com erros agrupados por participante, ITT por padrão, `accuracy_a_restricted`.
 - **`contract_failure`** por fonte do prompt, nos livres cruzada com `stack_requests`.
 - `analyze` **recusa**: runs `metric_error` em `main` (lista quais), versões diferentes do oráculo, hashes de `mention_patterns`
-  diferentes nas análises de livres, margem de equivalência alterada, runs do piloto.
+  diferentes nas análises de livres, margem de equivalência alterada, runs do piloto, runs do gerador simulado e **navegadores
+  diferentes** (`playwright_version` ou `browser_version`): reavaliar numa máquina ou Chromium diferente exige reavaliar todas as células.
 
 ## 13. Painel
 
@@ -251,7 +278,10 @@ pedidos de outra tecnologia, e `stack_requests` mede quantos prompts pedem outra
 
 Versões exatas no `package.json` e `package-lock.json` commitado (Angular 20.3, Tailwind 4.3, ng-icons 32.5, fontsource); ids de modelo
 fixos e verificados a cada geração; seeds `base_seed + rep`; temperatura do padrão do provedor (gravada `null`);
-`config_sha256`, `repo_commit` e o hash da árvore do scaffold em cada record; relógio fixo em 10/03/2026 10:00.
+`config_sha256` (sem os caminhos da máquina), `repo_commit` (com `+dirty` se há qualquer mudança fora de `results/`) e o hash da árvore
+do scaffold em cada record; relógio fixo em 10/03/2026 10:00 (`specui/clock.py`, fonte única; a configuração recusa outro valor).
+A proveniência do oráculo (tag, hash da árvore e do conteúdo, `pending.yaml`, `mention_patterns`) e as versões do Playwright/Chromium são
+**recalculadas em toda avaliação funcional**: o record sempre diz com qual oráculo e navegador a nota foi calculada, também após `specui evaluate`.
 
 ## 16. Ameaças à validade
 
@@ -260,6 +290,13 @@ fixos e verificados a cada geração; seeds `base_seed + rep`; temperatura do pa
   (regra 1) e pela mutação/piloto, mas não eliminado.
 - **Recusas e truncamento** valem 0 na ITT; as taxas são reportadas.
 - **Oráculo não validado contra implementação real** antes do piloto; defeitos de teste são corrigidos só depois, com registro.
+- **Teto da nota do nível A** (1,00 / 0,96 nas 12 células do piloto 1). O que no código do oráculo contribui para isso, declarado como
+  ameaça e não corrigido: (a) PARTIAL vale 0,5, então asserções de invariante que passam com a funcionalidade quebrada davam piso de
+  0,5 (tratado: passos não pontuam e o efeito principal é pré-condição, seção 11); (b) `find_play_button` aceita, sem nome acessível,
+  qualquer botão abaixo do visor; (c) E-A-03 ("fundo branco") passa de graça com o `preflight` do Tailwind; (d) as faixas de matiz
+  são largas (verde 76°–166°, azul 190°–251°) e somam ±5° (PD-C2) e o limite de croma do cinza; (e) a isenção de matiz do corpo
+  de "Aprovado" em H-A-03 (PD-H6). No piloto, as únicas asserções A que caíram foram três leituras de cor (M-A-06, M-A-12, H-A-03),
+  classificadas como `model_defect`.
 - **Piso da nota funcional:** uma página branca sem relação com a tarefa já passa no caso "fundo branco" (≈ 0,1 de `accuracy_a` no smoke com o gerador simulado); a ITT atribui 0 só a falhas de geração/execução, não a apps vazios.
 - **Pouca potência:** 3 tarefas × 2 modalidades × 5 repetições por modelo; os ICs refletem isso.
 - **Confusão tarefa × dificuldade**, um único gerador, spec mais longa que o prompt (seção 2).
