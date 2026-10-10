@@ -30,7 +30,7 @@ def prepare_frame(df: pd.DataFrame, run_kind: str = "main", allow_mixed_oracle: 
     """Valida o quadro de runs e acrescenta `model`, `spec`, `accuracy_itt` e `accuracy_cond`.
 
     Recusa: runs `pilot` misturados, `metric_error` em `main` (resolver com `specui evaluate`), mais de uma versão
-    do oráculo, `done` sem nota funcional.
+    do oráculo ou do navegador (Playwright/Chromium), `done` sem nota funcional.
     """
     _need(df, ["run_id", "status", "prompt_kind", "task_id", "modality", "provider", "model_id_requested"])
     df = df.copy()
@@ -53,6 +53,14 @@ def prepare_frame(df: pd.DataFrame, run_kind: str = "main", allow_mixed_oracle: 
                     f"runs de versões diferentes do oráculo ({column}): {sorted(df[column].dropna().unique())}. "
                     "Mudar o oráculo exige reexecutar as células."
                 )
+    # O navegador também é instrumento: todas as métricas visuais e o oráculo dependem do render. Reavaliar (`specui evaluate`)
+    # numa máquina/Chromium diferente misturaria navegadores em silêncio.
+    for column in ("playwright_version", "browser_version"):
+        if column in df and df[column].dropna().nunique() > 1:
+            raise AnalysisRefused(
+                f"runs com navegadores diferentes ({column}): {sorted(df[column].dropna().unique())}. "
+                "Reavalie todas as células na mesma máquina e versão do Playwright/Chromium (requirements.lock)."
+            )
 
     df = df[~df["status"].isin(EXCLUDED_STATUSES)].copy()  # infraestrutura / modelo trocado: fora de tudo
     df["model"] = df["provider"] + ":" + df["model_id_requested"]

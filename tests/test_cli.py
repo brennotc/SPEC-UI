@@ -119,3 +119,24 @@ def test_pilot_report_lists_failures_and_rates(repo_root, tmp_path):
     assert "contract_failure" in md and "specui serve --run-id r0" in md
     rows = paths["csv"].read_text(encoding="utf-8-sig").splitlines()
     assert rows[0].split(";")[-2:] == ["classification", "note"] and len(rows) == 3
+
+
+def _dirty_oracle(monkeypatch):
+    from specui.oracle.provenance import OracleProvenance
+
+    monkeypatch.setattr("specui.cli.read_provenance", lambda *a, **k: OracleProvenance(
+        tag=None, tree_hash="t", dirty=True, content_sha256="c", pending_sha256="p", mention_patterns_sha256="m", version_file="oracle-v1"))
+
+
+def test_evaluate_functional_on_a_main_run_requires_a_frozen_oracle(mock_config, monkeypatch):
+    _dirty_oracle(monkeypatch)
+    refused = runner.invoke(app, ["evaluate", "--all", "--run-kind", "main", "--groups", "functional", "--config", str(mock_config)])
+    assert refused.exit_code == 2 and "não está congelado" in refused.output and "não commitadas" in refused.output
+    everything = runner.invoke(app, ["evaluate", "--all", "--run-kind", "main", "--config", str(mock_config)])  # sem --groups = todos
+    assert everything.exit_code == 2 and "não está congelado" in everything.output
+    # outros grupos, e o piloto, não exigem o oráculo congelado: passam pela checagem (o repositório fictício não tem tarefas,
+    # então falham adiante por outro motivo, nunca com o exit 2 da recusa)
+    visual = runner.invoke(app, ["evaluate", "--all", "--run-kind", "main", "--groups", "visual", "--config", str(mock_config)])
+    pilot = runner.invoke(app, ["evaluate", "--all", "--run-kind", "pilot", "--groups", "functional", "--config", str(mock_config)])
+    for result in (visual, pilot):
+        assert result.exit_code != 2 and "não está congelado" not in result.output

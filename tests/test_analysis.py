@@ -277,3 +277,17 @@ def test_freeze_meta_warns_when_the_config_hash_changes_but_only_refuses_a_new_m
     assert "configuração mudou" in caplog.text
     with pytest.raises(ValueError, match="mudou depois do congelamento"):
         store.freeze_meta(0.1, "hash-a" * 8)
+
+
+def test_runs_from_different_browsers_are_refused():
+    df = synthetic({"google:g": 0.2})
+    df["playwright_version"], df["browser_version"] = "1.62.0", "151.0.7922.34"
+    prepare_frame(df)  # um só navegador: passa
+    df.loc[0, "browser_version"] = "152.0.0.0"
+    with pytest.raises(AnalysisRefused, match="navegadores diferentes") as err:
+        prepare_frame(df)
+    assert "browser_version" in str(err.value) and "requirements.lock" in str(err.value)
+    df["browser_version"] = "151.0.7922.34"
+    df.loc[1, "playwright_version"] = "1.63.0"
+    with pytest.raises(AnalysisRefused, match="playwright_version"):
+        prepare_frame(df)

@@ -16,6 +16,7 @@ from specui.config import find_repo_root, load_config
 from specui.harness import BrowserSession, ScaffoldHarness
 from specui.llm import ConfigurationError, ModelMismatchError, make_client, model_matches
 from specui.models import Cell, Generator, RunConfig, RunRecord
+from specui.oracle.provenance import freeze_problems, read_provenance
 from specui.pipeline import RunSummary, run_experiment
 from specui.storage import RunStore
 from specui.tasks import png_size
@@ -228,6 +229,15 @@ def evaluate(
         console.print("[red]Informe --run-id <id> ou --all.[/red]")
         raise typer.Exit(2)
     cfg = _load(config, {"run_kind": run_kind} if run_kind else None)
+    wanted = _csv(groups)
+    if cfg.run_kind == "main" and (wanted is None or "functional" in wanted):
+        # reavaliar a nota funcional de uma execução PRINCIPAL é medir com o oráculo: ele precisa estar congelado
+        problems = freeze_problems(read_provenance(cfg.repo_root, cfg.path("oracles_dir")))
+        if problems:
+            console.print("[red bold]evaluate recusado:[/red bold] o oráculo não está congelado:")
+            for message in problems:
+                console.print(f"  {message}")
+            raise typer.Exit(2)
     store = RunStore(cfg.path("results_dir"), cfg.run_kind)
     tasks = {t.id: t for t in load_tasks(cfg.path("benchmarks_dir"))}
     records = [r for r in store.load_records() if all_runs or r.run_id == run_id]
@@ -235,7 +245,6 @@ def evaluate(
         console.print("[yellow]Nenhuma execução encontrada.[/yellow]")
         raise typer.Exit(1)
     failed = 0
-    wanted = _csv(groups)
     with ExitStack() as stack:
         needs_browser = wanted is None or "functional" in wanted  # o oráculo precisa do navegador
         session = (
