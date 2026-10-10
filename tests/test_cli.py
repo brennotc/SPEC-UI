@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import pytest
@@ -140,3 +141,46 @@ def test_evaluate_functional_on_a_main_run_requires_a_frozen_oracle(mock_config,
     pilot = runner.invoke(app, ["evaluate", "--all", "--run-kind", "pilot", "--groups", "functional", "--config", str(mock_config)])
     for result in (visual, pilot):
         assert result.exit_code != 2 and "não está congelado" not in result.output
+
+
+def test_mock_generator_never_writes_to_main_or_pilot(mock_config, tmp_path, monkeypatch):
+    """`run --mock` e `pilot --mock` (config de main/pilot) gravam em results/smoke/, não no resultado real."""
+    seen = []
+
+    def fake_execute(cfg, resume):
+        seen.append((cfg.run_kind, [g.provider for g in cfg.generators]))
+        from specui.pipeline import RunSummary
+
+        return RunSummary()
+
+    monkeypatch.setattr("specui.cli._execute", fake_execute)
+    runner.invoke(app, ["run", "--mock", "--config", str(mock_config)])
+    runner.invoke(app, ["pilot", "--mock", "--config", str(mock_config)])
+    assert seen == [("smoke", ["mock"]), ("smoke", ["mock"])]
+
+
+def test_evaluate_skips_mock_runs_unless_asked(repo_root, mock_config):
+    from specui.models import RunRecord
+    from specui.storage import RunStore
+
+    root = mock_config.parent
+    config = root / "eval.yaml"
+    lines = [
+        f"extends: {(repo_root / 'configs' / 'default.yaml').as_posix()}",
+        f"benchmarks_dir: {(repo_root / 'benchmarks').as_posix()}",
+        f"results_dir: {(root / 'results').as_posix()}",
+        "generators:",
+        "  - {provider: mock, model_id: mock-1, request_delay_s: 0}",
+    ]
+    config.write_text(os.linesep.join(lines) + os.linesep, encoding="utf-8")
+    store = RunStore(root / "results", "pilot")
+    for i, provider in enumerate(("mock", "google")):
+        store.save(RunRecord(run_id=f"r{i}", run_kind="pilot", cell_key=f"k{i}", task_id="easy_pomodoro", difficulty="easy",
+                             prompt_kind="no_spec", prompt_id="easy_pomodoro/no_spec", modality="text", rep=0,
+                             created_at="2026-10-09T00:00:00+00:00", provider=provider, model_id_requested="m",
+                             prompt_sha256="p", envelope_sha256="e", envelope_version="2", status="format_failure",
+                             paths={"run_dir": f"runs/r{i}"}))
+    ignored = runner.invoke(app, ["evaluate", "--run-id", "r0", "--run-kind", "pilot", "--groups", "visual", "--config", str(config)])
+    assert ignored.exit_code == 1 and "Nenhuma execução" in ignored.output  # o record do mock é ignorado
+    included = runner.invoke(app, ["evaluate", "--run-id", "r0", "--run-kind", "pilot", "--groups", "visual", "--include-mock", "--config", str(config)])
+    assert "Nenhuma execução" not in included.output and "sem render" in included.output  # com --include-mock ele entra

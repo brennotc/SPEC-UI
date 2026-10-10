@@ -126,3 +126,8 @@ def test_aggregate_roundtrip(tmp_path, tasks):
     # valores ausentes não viram 0: não aparecem no formato longo
     assert long.loc[long.metric == "d2c_block_match"].empty
     assert json.loads(json.dumps(to_long(df).shape[0])) > 0
+
+
+def test_smoke_runs_have_their_own_folder(tmp_path):
+    smoke, pilot, main = RunStore(tmp_path, "smoke"), RunStore(tmp_path, "pilot"), RunStore(tmp_path, "main")
+    assert smoke.root == tmp_path / "smoke" and pilot.root == tmp_path / "pilot" and main.root == tmp_path

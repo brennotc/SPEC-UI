@@ -15,7 +15,7 @@ from specui.clock import FIXED_NOW
 
 Modality = Literal["text", "multimodal"]
 Difficulty = Literal["easy", "medium", "hard"]
-RunKind = Literal["pilot", "main"]
+RunKind = Literal["pilot", "main", "smoke"]  # smoke: gerador simulado, results/smoke/ (nunca entra em evaluate/analyze)
 Provider = Literal["google", "mock"]
 PromptKind = Literal["no_spec", "with_spec", "free"]
 MaterialShown = Literal["image", "image+brief", "image+prototype"]

@@ -36,6 +36,8 @@ def prepare_frame(df: pd.DataFrame, run_kind: str = "main", allow_mixed_oracle: 
     df = df.copy()
     if "run_kind" in df and (df["run_kind"] != run_kind).any():
         raise AnalysisRefused(f"o quadro mistura run_kind diferente de '{run_kind}' (o piloto fica fora da análise)")
+    if (df["provider"] == "mock").any():
+        raise AnalysisRefused("o quadro contém runs do gerador simulado (mock): dado de teste nunca entra na análise")
     broken = df.loc[df["status"] == "metric_error", "run_id"].tolist()
     if broken:
         raise AnalysisRefused(

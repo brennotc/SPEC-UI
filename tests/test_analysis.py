@@ -130,7 +130,7 @@ def test_contrast_needs_the_model_factor():
 
 
 def test_consistency_signs_differences_and_tost():
-    results = main_contrast(itt(synthetic({"google:g": 0.30, "google:h": 0.28, "mock:m": 0.0})), **FAST)
+    results = main_contrast(itt(synthetic({"google:g": 0.30, "google:h": 0.28, "google:z": 0.0})), **FAST)
     cons = consistency(results, equivalence_margin=None)
     assert len(cons["differences"]) == 3  # k = 3: todos os pares
     assert cons["tost"]["ran"] is False and "equivalence_margin" in cons["tost"]["reason"]
@@ -139,7 +139,7 @@ def test_consistency_signs_differences_and_tost():
     by_pair = {(d["a"], d["b"]): d for d in with_margin["differences"]}
     assert with_margin["tost"]["ran"] is True
     assert by_pair[("google:g", "google:h")]["equivalent"] is True  # 0,30 vs 0,28 dentro de ±0,10
-    assert by_pair[("google:h", "mock:m")]["equivalent"] is False
+    assert by_pair[("google:h", "google:z")]["equivalent"] is False
     same = consistency(main_contrast(itt(synthetic({"google:g": 0.3, "google:h": 0.3}, noise=0.01)), **FAST))
     assert same["n_strata_same_sign"] == 6
 
@@ -290,4 +290,11 @@ def test_runs_from_different_browsers_are_refused():
     df["browser_version"] = "151.0.7922.34"
     df.loc[1, "playwright_version"] = "1.63.0"
     with pytest.raises(AnalysisRefused, match="playwright_version"):
+        prepare_frame(df)
+
+
+def test_mock_runs_never_reach_the_analysis():
+    df = synthetic({"google:g": 0.2})
+    df.loc[0, "provider"] = "mock"
+    with pytest.raises(AnalysisRefused, match="gerador simulado"):
         prepare_frame(df)

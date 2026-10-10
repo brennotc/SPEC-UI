@@ -73,7 +73,7 @@ def repo_commit(repo_root: str | Path) -> str | None:
 class RunStore:
     def __init__(self, results_dir: str | Path, run_kind: RunKind = "main") -> None:
         base = Path(results_dir)
-        self.root = base / "pilot" if run_kind == "pilot" else base
+        self.root = base / run_kind if run_kind in ("pilot", "smoke") else base
         self.runs_dir = self.root / "runs"
         self.manifest_path = self.root / "manifest.jsonl"
         self.run_kind = run_kind

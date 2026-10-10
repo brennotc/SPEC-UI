@@ -55,6 +55,13 @@ def _mock_generator(variant: str) -> Generator:
     return Generator(provider="mock", model_id="mock-1", mock_variant=variant, request_delay_s=0)  # type: ignore[arg-type]
 
 
+def _as_smoke(cfg: RunConfig) -> RunConfig:
+    """O gerador simulado nunca grava em results/ (principal) nem em results/pilot/: vai para results/smoke/."""
+    if cfg.run_kind != "smoke":
+        console.print(f"[yellow]gerador simulado: gravando em results/smoke/ (e não em {cfg.run_kind})[/yellow]")
+    return cfg.model_copy(update={"run_kind": "smoke"})
+
+
 def _print_summary(summary: RunSummary) -> None:
     table = Table(title="Resumo da execução")
     table.add_column("status")
@@ -125,7 +132,7 @@ def run(
             raise typer.Exit(2)
         cfg = cfg.model_copy(update={"generators": kept})
     if mock:
-        cfg = cfg.model_copy(update={"generators": [_mock_generator(mock_variant)]})
+        cfg = _as_smoke(cfg).model_copy(update={"generators": [_mock_generator(mock_variant)]})
     _execute(cfg, resume)
 
 
@@ -137,19 +144,19 @@ def pilot(
     """Piloto: 1 repetição, todos os geradores, grava em results/pilot/ (fora da análise)."""
     cfg = _load(config)
     if mock:
-        cfg = cfg.model_copy(update={"generators": [_mock_generator("ok")]})
+        cfg = _as_smoke(cfg).model_copy(update={"generators": [_mock_generator("ok")]})
     _execute(cfg, resume=True)
 
 
 @app.command()
 def smoke(config: ConfigOpt = DEFAULT_CONFIG) -> None:
-    """Fumaça ponta a ponta com o gerador simulado: 1 tarefa, 1 célula, em results/pilot/."""
-    overrides = {"run_kind": "pilot", "repetitions": 1, "tasks": ["easy"], "modalities": ["text"],
+    """Fumaça ponta a ponta com o gerador simulado: 1 tarefa, 1 célula, em results/smoke/ (fora do piloto e da análise)."""
+    overrides = {"run_kind": "smoke", "repetitions": 1, "tasks": ["easy"], "modalities": ["text"],
                  "prompt_sources": ["no_spec"]}
     cfg = _load(config, overrides).model_copy(update={"generators": [_mock_generator("ok")]})
     summary = _execute(cfg, resume=False)
 
-    store = RunStore(cfg.path("results_dir"), "pilot")
+    store = RunStore(cfg.path("results_dir"), "smoke")
     rec = store.load_records()[-1] if store.load_records() else None
     checks: list[tuple[str, bool]] = []
     if rec:
@@ -220,6 +227,7 @@ def evaluate(
     all_runs: Annotated[bool, typer.Option("--all", help="Reavalia todas as execuções renderizadas.")] = False,
     groups: Annotated[str | None, typer.Option(help="Grupos: technical,visual,code,functional (padrão: todos).")] = None,
     run_kind: Annotated[str | None, typer.Option(help="main | pilot (padrão: o da config).")] = None,
+    include_mock: Annotated[bool, typer.Option("--include-mock", help="Inclui runs do gerador simulado (por padrão ficam de fora).")] = False,
 ) -> None:
     """Recalcula métricas a partir dos artefatos gravados, SEM chamar o LLM nem refazer o build."""
     from specui.stages import reevaluate_record
@@ -240,7 +248,7 @@ def evaluate(
             raise typer.Exit(2)
     store = RunStore(cfg.path("results_dir"), cfg.run_kind)
     tasks = {t.id: t for t in load_tasks(cfg.path("benchmarks_dir"))}
-    records = [r for r in store.load_records() if all_runs or r.run_id == run_id]
+    records = [r for r in store.load_records() if (all_runs or r.run_id == run_id) and (include_mock or r.provider != "mock")]
     if not records:
         console.print("[yellow]Nenhuma execução encontrada.[/yellow]")
         raise typer.Exit(1)
