@@ -119,3 +119,19 @@ def test_config_hash_ignores_machine_paths_but_not_experiment_parameters(repo_ro
     assert config_sha256(base) == config_sha256(elsewhere)
     assert config_sha256(base) != config_sha256(load_config(repo_root / "configs" / "default.yaml", overrides={"repetitions": 2}))
     assert config_sha256(base) != config_sha256(load_config(repo_root / "configs" / "default.yaml", overrides={"base_seed": 7}))
+
+
+def test_the_fixed_clock_has_one_source_and_the_config_cannot_change_it(repo_root):
+    from datetime import date
+
+    from oracles.common.dates import TODAY
+    from oracles.easy_pomodoro.helpers import PAUSE_AT
+    from specui.clock import FIXED_NOW, fixed_date, fixed_plus
+    from specui.harness.browser import BrowserSession
+    from specui.oracle.runner import FIXED_NOW as RUNNER_NOW
+
+    assert RUNNER_NOW == FIXED_NOW == RunConfig.model_fields["clock_epoch_iso"].default == BrowserSession().clock_epoch_iso
+    assert TODAY == fixed_date() == date(2026, 3, 10) and PAUSE_AT == fixed_plus(1) == "2026-03-10T10:01:00"
+    assert load_config(repo_root / "configs" / "default.yaml").clock_epoch_iso == FIXED_NOW
+    with pytest.raises(ValueError, match="parte do instrumento"):
+        load_config(repo_root / "configs" / "default.yaml", overrides={"clock_epoch_iso": "2026-03-11T10:00:00"})

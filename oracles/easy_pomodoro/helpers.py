@@ -13,9 +13,10 @@ from oracles.common.locators import (
     timer_display,
     wait_display,
 )
+from specui.clock import fixed_plus
 from specui.oracle import Checks
 
-PAUSE_AT = "2026-03-10T10:01:00"  # depois do relógio ter arrancado em 10:00; nenhum timer do app deve existir ainda
+PAUSE_AT = fixed_plus(1)  # 1 min depois do relógio fixo, que arranca no 10:00; nenhum timer do app deve existir ainda
 MODES = ("Foco Total", "Pausa Curta", "Pausa Longa")
 
 

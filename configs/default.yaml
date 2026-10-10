@@ -42,7 +42,7 @@ build_timeout_s: 180
 build_configuration: development   # development | production
 viewport: null                     # null = tamanho do PNG da tarefa (1440x900)
 render_settle_ms: 800
-clock_epoch_iso: "2026-03-10T10:00:00"
+clock_epoch_iso: "2026-03-10T10:00:00"   # FIXO (specui/clock.py): os oraculos foram escritos para esta data; outro valor e recusado
 block_network: true
 
 # Metricas

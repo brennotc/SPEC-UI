@@ -1,6 +1,6 @@
 """Datas: o 'hoje' do experimento e como preencher campos de data (AD-M1).
 
-O relógio é instalado em 10/03/2026 10:00 (uma terça-feira), então "Hoje" é 10/03, "Amanhã" é 11/03.
+O relógio vem de `specui.clock` (10/03/2026 10:00, uma terça-feira), então "Hoje" é 10/03 e "Amanhã" é 11/03.
 """
 
 import re
@@ -8,7 +8,9 @@ from datetime import date, timedelta
 
 from playwright.sync_api import Locator
 
-TODAY = date(2026, 3, 10)
+from specui.clock import fixed_date
+
+TODAY = fixed_date()  # a MESMA data que o runner instala no relógio da página
 TOMORROW = TODAY + timedelta(days=1)
 LATER = TODAY + timedelta(days=3)  # 13/03: um dia "escrito" (nem Hoje nem Amanhã)
 

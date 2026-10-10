@@ -11,6 +11,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from specui.clock import FIXED_NOW
+
 Modality = Literal["text", "multimodal"]
 Difficulty = Literal["easy", "medium", "hard"]
 RunKind = Literal["pilot", "main"]
@@ -158,13 +160,23 @@ class RunConfig(BaseModel):
     build_configuration: Literal["development", "production"] = "development"
     viewport: tuple[int, int] | None = None  # None = tamanho do PNG da tarefa
     render_settle_ms: int = 800
-    clock_epoch_iso: str = "2026-03-10T10:00:00"
+    clock_epoch_iso: str = FIXED_NOW  # fixo: é parte do instrumento (ver specui/clock.py)
     block_network: bool = True
 
     # Métricas
     enable_embeddings: bool = True
     enable_ocr_fallback: bool = False
     oracle_levels: list[Literal["A", "B"]] = Field(default_factory=lambda: ["A", "B"])
+
+    @field_validator("clock_epoch_iso")
+    @classmethod
+    def _clock_is_the_instrument_clock(cls, value: str) -> str:
+        if value != FIXED_NOW:
+            raise ValueError(
+                f"clock_epoch_iso deve ser {FIXED_NOW}: o relógio é parte do instrumento (os oráculos criam tarefas para "
+                "hoje/amanhã a partir desta data); mudá-lo exige nova versão do oráculo, não só da configuração"
+            )
+        return value
 
     @field_validator("repetitions", "free_repetitions", "build_timeout_s")
     @classmethod

@@ -11,6 +11,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from specui.clock import fixed_date_br
 from specui.config import find_repo_root, load_config
 from specui.harness import BrowserSession, ScaffoldHarness
 from specui.llm import ConfigurationError, ModelMismatchError, make_client, model_matches
@@ -340,7 +341,7 @@ def serve(
         raise typer.Exit(1)
     with StaticServer(dist, port=port) as server:
         console.print(f"App de {run_id} em [bold]{server.url}[/bold]  (Ctrl+C para encerrar)")
-        console.print("Obs.: o oráculo roda com o relógio fixo em 10/03/2026; aqui o relógio é o real.")
+        console.print(f"Obs.: o oráculo roda com o relógio fixo em {fixed_date_br()}; aqui o relógio é o real.")
         webbrowser.open(server.url)
         try:
             while True:

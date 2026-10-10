@@ -18,6 +18,8 @@ from urllib.parse import urlparse
 from playwright.sync_api import Browser, BrowserContext, Page, Playwright, sync_playwright
 from pydantic import BaseModel, Field
 
+from specui.clock import FIXED_NOW
+
 logger = logging.getLogger(__name__)
 
 _JS_DIR = Path(__file__).parent / "js"
@@ -53,7 +55,7 @@ class BrowserSession:
 
     def __init__(
         self,
-        clock_epoch_iso: str = "2026-03-10T10:00:00",
+        clock_epoch_iso: str = FIXED_NOW,
         render_settle_ms: int = 800,
         block_network: bool = True,
         headless: bool = True,

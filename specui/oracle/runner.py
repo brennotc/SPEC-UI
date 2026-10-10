@@ -11,12 +11,12 @@ from urllib.parse import urlparse
 
 from playwright.sync_api import expect
 
+from specui.clock import FIXED_NOW
 from specui.harness.browser import BrowserSession
 from specui.models import CaseOutcome
 from specui.oracle.protocol import REGISTRY, BlockedError, CaseSpec, Checks, classify, now_ms
 from specui.oracle.requirements import Requirement, load_pending, load_requirements
 
-FIXED_NOW = "2026-03-10T10:00:00"  # terça-feira, 10h local: "Hoje/Amanhã" estáveis, sem virada de dia
 EXPECT_TIMEOUT_MS = 1500
 ACTION_TIMEOUT_MS = 3000
 ROOT_TIMEOUT_MS = 10_000

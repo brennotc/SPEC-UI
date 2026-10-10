@@ -71,3 +71,9 @@ Sob o protocolo de passos (acima), cada caso abaixo passa a ter o efeito princip
 - **Mutação nova MUT-M8 `neutralize_filters`** (`specui/oracle/mutations.py`, alvos M-A-10 e M-A-11): os controles de filtro
   (faixa abaixo do header) deixam de reagir e o formulário do rodapé segue funcionando. MUT-M2/M3 derrubavam `need_tasks` e o
   KILLED vinha da criação de tarefas falhando; o MUT-M8 exercita a filtragem em si.
+
+### Relógio fixo com fonte única (revisão I1)
+- **adapter_gap**: `oracles/common/dates.py::TODAY` e `oracles/easy_pomodoro/helpers.py::PAUSE_AT` eram cópias literais de
+  10/03/2026 e 10:01; agora derivam de `specui/clock.py` (a mesma fonte do runner, do render e da configuração). Valores
+  idênticos; nenhuma mudança de comportamento nas suítes. `RunConfig` recusa qualquer `clock_epoch_iso` diferente do relógio
+  fixo, porque a suíte medium cria tarefas para "hoje" a partir dele.
