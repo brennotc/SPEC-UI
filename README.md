@@ -33,7 +33,8 @@ front-end gerado? E isso muda com a complexidade do sistema (easy, medium, hard)
 2. **H2 (interação spec × modalidade):** o benefício da spec é menor quando o modelo também recebe a imagem (a imagem já carrega
    parte do que a spec descreve).
 3. **H3 (fidelidade × manutenibilidade):** a spec muda a fidelidade visual (Design2Code, VES) e a qualidade de código
-   (Figma2Code) em sentidos possivelmente distintos.
+   (Figma2Code) em sentidos possivelmente distintos. **Limitação atual:** o código não tem análise para H3 (seção 12); as métricas
+   visuais e de código são calculadas e gravadas, mas o relatório só usa `accuracy_a`.
 4. **H4 (consistência, exige k ≥ 2 modelos):** o efeito da spec segue a mesma tendência **nos modelos testados**. Redação
    padrão: "nos modelos testados"; nunca "independentemente do modelo". Interação não significativa **não** é evidência de
    igualdade. Com um único gerador, H4 não é testada.
@@ -103,7 +104,7 @@ pip install -r requirements-ocr.txt                      # opcional: referência
 playwright install chromium
 cp .env.example .env                                     # GEMINI_API_KEY[_1..9], FIGMA_TOKEN, FIGMA_FILE_KEY
 specui scaffold-check                                    # npm ci uma vez e build do projeto vazio
-specui check-model                                       # confirma os ids dos dois modelos (recusa alias -latest/-preview)
+specui check-model                                       # confirma o id do gerador configurado (um só: k = 1; recusa alias -latest/-preview)
 ```
 
 `requirements.lock` é o `pip freeze` do ambiente do piloto 1 (Playwright 1.62.0 → Chromium 151.0.7922.34, torch 2.14.1, transformers 5.19.0);
@@ -114,7 +115,8 @@ run**, em `model_cache_dir` (padrão `~/.cache/specui-models`). O experimento **
 (`local_files_only=True`, `HF_HUB_OFFLINE=1`), e a ausência de um modelo é um erro de configuração que o `preflight` aponta antes de qualquer chamada
 paga. Para baixar uma vez, com rede:
 `python -c "import os; os.environ['HF_HUB_OFFLINE']='0'; from huggingface_hub import snapshot_download; [snapshot_download(m, cache_dir=r'C:/Users/<você>/.cache/specui-models') for m in ('facebook/dinov2-base', 'openai/clip-vit-base-patch32')]"`.
-Cada record grava `<modelo>@<sha do snapshot>` em `embeddings.dinov2_model` e `embeddings.clip_model`.
+Cada record grava `<modelo>@<sha do snapshot>` em `embeddings.dinov2_model` e `embeddings.clip_model` **a partir do commit `ab3c969`**;
+os records do piloto 1 (`docs/pilot-1/`) foram gravados antes, em `b820545+dirty`, e têm só o nome do modelo.
 
 A instalação é **editável** (`pip install -e .`): `oracles/`, `configs/`, `benchmarks/` e `scaffold/` não são empacotados, são lidos do repositório. Python 3.12 é exigido (`requires-python` em `pyproject.toml`; o harness usa `os.path.isjunction`).
 
@@ -141,7 +143,9 @@ escala (frame 1440×900 == PNG). Preencha os `node_id` em [benchmarks/tasks/figm
 
 O envelope (`ENVELOPE_VERSION = "2"`) descreve só a stack e o contrato (arquivos permitidos, proibições, "testes não serão
 executados", formato de saída, **sem rede em runtime**, e a cláusula de que as restrições técnicas **prevalecem** sobre qualquer
-pedido de tecnologia do usuário). Nada sobre a interface. Formato de saída: blocos ```` ```ts file=src/app/app.ts ````. O contrato exige
+pedido de tecnologia do usuário). Nada sobre a interface. **Inconsistência conhecida e não corrigida:** o envelope diz "Sem roteamento"
+(`specui/prompting.py`) e, ao mesmo tempo, lista `@angular/router` entre os pacotes disponíveis (a lista vem do `package.json` do
+scaffold). Não foi alterada para preservar `envelope_version = 2` e a comparabilidade com o piloto 1. Formato de saída: blocos ```` ```ts file=src/app/app.ts ````. O contrato exige
 `export class App` em `src/app/app.ts`. O `styles.css` do scaffold é fixo; o do modelo vira `src/app.styles.css`.
 
 Statuses: `done`, `format_failure`, `contract_failure`, `truncated` (antes do parser), `refusal`, `nonexecutable` (build/render),
@@ -149,11 +153,12 @@ e as falhas de infraestrutura `api_error` (a célula é refeita), `metric_error`
 `model_mismatch` (modelo devolvido ≠ solicitado: a célula é refeita; **se repetir, o run é interrompido** com
 `ModelMismatchError`, checkpoint intacto). Não existe fallback de modelo nem de provedor.
 
-Todo record grava `finish_reason` (o motivo de parada devolvido pelo provedor). `RECITATION`, `SAFETY`, `PROHIBITED_CONTENT`, `BLOCKLIST`, `SPII` e `IMAGE_SAFETY` (e o bloqueio do prompt) são motivos de
+Todo record grava `finish_reason` (o motivo de parada devolvido pelo provedor) **a partir do commit `67e69d5`**; nos records do piloto 1 ele é `null`. `RECITATION`, `SAFETY`, `PROHIBITED_CONTENT`, `BLOCKLIST`, `SPII` e `IMAGE_SAFETY` (e o bloqueio do prompt) são motivos de
 recusa e valem `refusal`; `MAX_TOKENS` vale `truncated`. Exceção de **infraestrutura** no build ou no render
 (disco, navegador fechado, `OSError`) vira `metric_error` **gravado** (a resposta paga já está em `response.raw.txt`) e a execução segue
 para a próxima célula. Já o app que não carrega em 30 s é falha do app: `render_ok = false` e status `nonexecutable`. Se a extração do DOM falhar
-com o render ok, Design2Code e CLIP ficam `null` com a nota no record (zero só vale para página realmente vazia).
+com o render ok, Design2Code e CLIP ficam `null` com a nota no record. Já página renderizada sem nenhum bloco de texto, ou sem nenhum par
+casado com a referência, vale 0,0 (seção 10).
 **Ainda não existe comando para recuperar um `metric_error` de infraestrutura gravado antes do render** (sem `screenshot`):
 `specui evaluate --rebuild` (refazer build e render a partir de `response.raw.txt`, sem API) está planejado e adiado para depois do `analyze`;
 até lá, `analyze` recusa enquanto houver um desses records e `evaluate` o informa como erro.
@@ -201,7 +206,12 @@ requisitos eram inferíveis do material mostrado ao participante; igual a `accur
 cobertura de requisitos por `info_source`, marcadores de estrutura, referências à imagem e **`stack_requests`** (React, Vue, HTML
 puro, Bootstrap...). Custo: tokens de entrada/saída/raciocínio e latência.
 
-**Métrica não calculada fica `null` com o motivo em `errors`: nunca 0.**
+**Métrica não calculada fica `null` com o motivo em `errors`: nunca 0.** Isso vale para a extração do DOM que falhou, para a falta de
+blocos de referência e para a falta de `torch`/`transformers`. **Exceção por decisão (`specui/metrics/design2code.py:251-252`):** com blocos
+de referência presentes e nenhum par casado (o app renderizou sem nenhum bloco correspondente, ou sem nenhum bloco de texto), `text`,
+`position` e `color` valem 0,0 e `block_match` vale `área pareada / área total` (0,0 sem pares); o docstring da função diz "valem 0 por
+definição (nenhum bloco casou)". A média de um conjunto vazio não existe e 0,0 é o pior valor da escala. Essa decisão não foi validada
+contra o artigo e segue aberta para revisão (alternativa: `None`, que tira a célula dessas métricas em vez de pontuá-la com 0).
 
 ## 11. Oráculos
 
@@ -227,7 +237,10 @@ geometria que o prompt dá); `oracle-lint` rejeita `#id`, `.classe`, `data-testi
 - **Dados criados pela UI:** os testes criam as próprias tarefas/cards; dados iniciais do app não afetam nenhuma asserção.
 - **Piloto:** todos os geradores, N = 1, em `results/pilot/`. As falhas são classificadas **por você** em `test_defect` |
   `model_defect` | `ambiguity` | `adapter_gap`; só `test_defect` e `adapter_gap` editam o oráculo (registrado em
-  `oracles/CHANGELOG.md`). O oráculo **nunca foi exercitado contra uma implementação real** antes do piloto: não há implementação
+  `oracles/CHANGELOG.md`). A classificação do piloto 1 está em `oracles/CHANGELOG.md` (seção "Classificação do pesquisador"), que
+  classifica os 3 casos de nível A que não deram YES (`M-A-06`, `M-A-12`, `H-A-03`: `model_defect`). Esses 3 foram copiados por
+  script para a coluna `classification` de `docs/pilot-1/failure_report.csv`; as outras 59 linhas (nível B) ficam sem classificação por
+  caso: o CHANGELOG registra as correções do oráculo que saíram delas, não uma classe por linha. O oráculo **nunca foi exercitado contra uma implementação real** antes do piloto: não há implementação
   de referência das tarefas, de propósito.
 - **Mutação** (`specui mutate`): sobre saídas do piloto que deram YES, estraga o app em tempo de execução (remover elementos, engolir
   cliques, congelar timers, somente leitura, remover rolagem, quebrar DnD, trocar texto) e confirma que o caso deixa de dar YES.
@@ -260,6 +273,9 @@ geometria que o prompt dá); `oracle-lint` rejeita `#id`, `.classe`, `data-testi
 - **Itens:** `flag_floor` / `flag_ceiling`, `blocked_rate`, discriminação por spec/modalidade/modelo, nota com e sem os casos marcados.
 - **Livres:** regressão da nota sobre cobertura e densidade com erros agrupados por participante, ITT por padrão, `accuracy_a_restricted`.
 - **`contract_failure`** por fonte do prompt, nos livres cruzada com `stack_requests`.
+- **Limitação atual:** o relatório (`results/aggregate/report.md`) usa só `accuracy_a`. `accuracy_b`, as métricas visuais (Design2Code,
+  VES, CLIP, MAE, SSIM) e as de qualidade de código não entram em nenhum contraste; ficam em `runs.parquet` e `metrics_long.csv`, e o
+  painel mostra qualidade de código × VES sem teste estatístico. **H3 não tem análise implementada.**
 - `analyze` **recusa**: runs `metric_error` em `main` (lista quais), versões diferentes do oráculo, hashes de `mention_patterns`
   diferentes nas análises de livres, margem de equivalência alterada, runs do piloto, runs do gerador simulado e **navegadores
   diferentes** (`playwright_version` ou `browser_version`): reavaliar numa máquina ou Chromium diferente exige reavaliar todas as células.
@@ -272,8 +288,12 @@ console, axe, prompt + sha); prompts livres.
 
 ## 14. `results/` e `record.json`
 
-`results/` é **inteiramente ignorado pelo git** (sem negações). Cada `record.json` é autossuficiente (caminhos relativos, hashes de
-prompt/imagem/envelope/scaffold/oráculo, id solicitado e devolvido, parâmetros enviados). `specui export` é um utilitário opcional,
+`results/` é **inteiramente ignorado pelo git** (sem negações). Cada `record.json` reúne caminhos relativos, hashes de
+prompt/imagem/envelope/scaffold/oráculo, id solicitado e devolvido e parâmetros enviados, mas **não é autossuficiente**: grava só o
+`config_sha256` (não a configuração), e o código gerado, a resposta bruta e a captura ficam em arquivos ao lado dele. Os records do
+piloto 1 (`docs/pilot-1/`) ainda têm três limites: `config_sha256` calculado pela função antiga (que incluía os caminhos da máquina; não
+bate com o hash atual da mesma configuração), `repo_commit` = `b820545+dirty` (o commit da geração, não o da reavaliação) e nenhum
+`finish_reason` nem `@sha` dos modelos de embedding. Detalhes em [docs/pilot-1/README.md](docs/pilot-1/README.md). `specui export` é um utilitário opcional,
 fora do fluxo principal, para depositar os dados com DOI (`MANIFEST.json` com sha256).
 
 ### Prompts livres: coleta anônima
