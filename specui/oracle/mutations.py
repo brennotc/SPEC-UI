@@ -94,6 +94,27 @@ def make_readonly(mutation_id: str, targets: Sequence[str]) -> Mutation:
     )
 
 
+def neutralize_filters(mutation_id: str, targets: Sequence[str]) -> Mutation:
+    """Faz os controles de FILTRO (input/select na faixa logo abaixo do header) pararem de reagir, sem tocar no resto.
+
+    Diferente de `make_readonly`/`block_input_events`, que também derrubam o formulário de criação (e o caso morre na
+    pré-condição, antes de exercitar o filtro): aqui as tarefas são criadas normalmente e só a filtragem fica inerte.
+    A faixa é a do filtro no layout do prompt: abaixo do header (top > 50 px) e acima de 30 % da altura da janela."""
+    js = (
+        "() => { const inBand = (el) => { const r = el.getBoundingClientRect();"
+        " return r.height > 0 && r.top > 50 && r.top < 0.3 * window.innerHeight; };"
+        " const found = Array.from(document.querySelectorAll('input, select')).filter(inBand).length > 0;"
+        " ['change', 'input', 'keyup', 'keydown', 'blur', 'focusout'].forEach((type) =>"
+        " window.addEventListener(type, (e) => { if (e.target && e.target.getBoundingClientRect && inBand(e.target))"
+        " e.stopImmediatePropagation(); }, true));"
+        " return found; }"
+    )
+    return Mutation(
+        mutation_id, "neutralize_filters", "os controles de filtro (faixa abaixo do header) deixam de reagir; o formulário do rodapé segue funcionando",
+        tuple(targets), after_js=js,
+    )
+
+
 def unclamp_overflow(mutation_id: str, targets: Sequence[str]) -> Mutation:
     return Mutation(
         mutation_id, "unclamp_overflow", "remove a rolagem interna: overflow visível e altura automática em tudo", tuple(targets),
@@ -126,6 +147,7 @@ CATALOG: dict[str, list[Mutation]] = {
         unclamp_overflow("MUT-M5", ["M-A-09"]),
         change_text("MUT-M6", "Hoje", "Today", ["M-A-05"]),
         change_text("MUT-M7", "Tarefas Para Fazer", "To do", ["M-A-01"]),
+        neutralize_filters("MUT-M8", ["M-A-10", "M-A-11"]),  # exercita a filtragem em si, não a criação de tarefas
     ],
     "hard_kanban": [
         block_events("MUT-H1", "block_click", ["click"], ["H-A-05", "H-A-06", "H-A-07", "H-A-09"]),

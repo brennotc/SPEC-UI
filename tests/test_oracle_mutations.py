@@ -10,6 +10,7 @@ from specui.oracle.mutations import (
     change_text,
     freeze_timers,
     make_readonly,
+    neutralize_filters,
     remove_all,
     run_mutations,
     summarize,
@@ -129,3 +130,57 @@ def test_mutation_dataclass_is_frozen():
     m = Mutation("m", "op", "d", ("c",))
     with pytest.raises(AttributeError):
         m.id = "x"  # type: ignore[misc]
+
+
+FILTER_PAGE = """<!doctype html><meta charset="utf-8"><body><app-root>
+<select aria-label="filtro" style="position:absolute;top:90px;left:20px"><option value="">todos</option><option value="a">só alfa</option></select>
+<ul style="position:absolute;top:150px"><li>alfa</li><li>beta</li></ul>
+<input aria-label="descrição" style="position:absolute;top:800px;left:20px">
+<button style="position:absolute;top:800px;left:300px" onclick="document.getElementById('out').textContent=document.querySelector('input').value">ok</button>
+<p id="out" style="position:absolute;top:840px"></p></app-root>
+<script>document.querySelector('select').addEventListener('change', (e) => {
+  document.querySelectorAll('li').forEach((li) => { li.style.display = e.target.value === 'a' && li.textContent !== 'alfa' ? 'none' : ''; }); });</script></body>"""
+
+FILTER_CASES = '''
+from specui.oracle import case
+
+@case("F-A-01", requirements=["F-01"], level="A", task="filtrar", expected="beta some")
+def filters(page, t):
+    t.act("escolher alfa", lambda: page.get_by_role("combobox").select_option("a"))
+    t.require("a beta fica oculta", not page.get_by_text("beta", exact=True).is_visible())
+    t.ok("a alfa continua visível", page.get_by_text("alfa", exact=True).is_visible())
+
+@case("F-A-02", requirements=["F-01"], level="A", task="formulário", expected="o texto vai para a saída")
+def form(page, t):
+    t.act("digitar", lambda: page.get_by_label("descrição").fill("oi"))
+    t.act("clicar", lambda: page.get_by_role("button", name="ok").click())
+    t.ok("a saída mostra o texto", page.locator("#out").inner_text() == "oi")
+'''
+
+
+@pytest.mark.slow
+def test_neutralize_filters_kills_only_the_filter_case(tmp_path):
+    root = tmp_path / "oracles"
+    (root / "demo4").mkdir(parents=True)
+    for pkg in (root, root / "demo4"):
+        (pkg / "__init__.py").write_text("", encoding="utf-8")
+    (root / "demo4" / "level_a.py").write_text(FILTER_CASES, encoding="utf-8")
+    (root / "demo4" / "requirements.yaml").write_text(
+        "requirements:\n  - {id: F-01, text: x, category: a, info_source: behavior}\n", encoding="utf-8")
+    dist = tmp_path / "dist"
+    dist.mkdir()
+    (dist / "index.html").write_text(FILTER_PAGE, encoding="utf-8")
+    suite = load_suite(root, "demo4")
+    with BrowserSession() as session:
+        rows = run_mutations(suite, session, dist, (1440, 900), "run-f", [neutralize_filters("X-F", ["F-A-01", "F-A-02"])])
+        none_found = run_mutations(suite, session, dist, (1440, 900), "run-f", [neutralize_filters("X-N", ["F-A-01"])])
+    by = {r.case_id: r for r in rows}
+    assert by["F-A-01"].verdict == "KILLED"  # a filtragem ficou inerte
+    assert by["F-A-02"].verdict == "SURVIVED"  # o formulário do rodapé segue funcionando: a mutação é específica do filtro
+    assert none_found[0].verdict == "KILLED"
+    blank = tmp_path / "blank"
+    blank.mkdir()
+    (blank / "index.html").write_text("<!doctype html><body><app-root><p>sem filtro</p></app-root></body>", encoding="utf-8")
+    with BrowserSession() as session:
+        rows = run_mutations(load_suite(root, "demo4"), session, blank, (1440, 900), "run-b", [neutralize_filters("X-B", ["F-A-02"])])
+    assert rows[0].verdict == "NOT_APPLIED"  # baseline não era YES (a página não tem o formulário)

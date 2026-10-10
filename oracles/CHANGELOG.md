@@ -68,3 +68,6 @@ Sob o protocolo de passos (acima), cada caso abaixo passa a ter o efeito princip
   dois cards (`need_cards`, em vez de `act` + `_must`) é o efeito principal; `H-A-11` "o card muda para Em Progresso" vira
   `require` ("o card só existe uma vez" passa com o app inerte); `H-A-14` "arrastar B para cima do A reordena" vira `require`
   ("mesma coluna" e "nenhum card se perdeu" passam com o app inerte). MUT-H1/H2/H3 sobre H-A-06/11/14: WEAK → KILLED.
+- **Mutação nova MUT-M8 `neutralize_filters`** (`specui/oracle/mutations.py`, alvos M-A-10 e M-A-11): os controles de filtro
+  (faixa abaixo do header) deixam de reagir e o formulário do rodapé segue funcionando. MUT-M2/M3 derrubavam `need_tasks` e o
+  KILLED vinha da criação de tarefas falhando; o MUT-M8 exercita a filtragem em si.
