@@ -3,7 +3,7 @@
 Toda mudança em `oracles/` depois do congelamento exige nova versão (tag `oracle-vN`, `VERSION` igual à tag)
 e reexecução das células afetadas. Só `test_defect` e `adapter_gap` do piloto justificam edição (ver README).
 
-## oracle-v1 (rascunho, ainda sem tag)
+## oracle-v1 (2026-10-10; tag `oracle-v1`)
 - Suítes de `easy_pomodoro`, `medium_tarefas` e `hard_kanban`, níveis A (derivado só do `## Prompt`) e B (exigências da spec).
 - Decisões pendentes PD-E1..E5, PD-M1..M5, PD-H1..H5 decididas segundo as regras 1/2/3 (`pending.yaml` de cada tarefa).
 - Ainda não executadas contra implementações reais: o piloto com os geradores classifica as falhas
